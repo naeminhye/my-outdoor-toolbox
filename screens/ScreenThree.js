@@ -6,18 +6,20 @@ import {
   View,
   Image
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 
 export default class ScreenThree extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Profile',
-    tabBarIcon: ({ tintColor }) => (
-      <Image
-        source={require('../assets/images/search-icon.png')}
-        style={[myStyles.icon, { tintColor: tintColor }]}
+    tabBarIcon: ({ tintColor, focused }) => (
+      <Ionicons
+        name={focused ? 'ios-people' : 'ios-people-outline'}
+        size={26}
+        style={{ color: tintColor }}
       />
-    )
+    ),
   }
   render() {
     return (

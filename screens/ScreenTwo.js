@@ -10,17 +10,19 @@ import {
 } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import myStyles from '../assets/styles/myStyles';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default class ScreenTwo extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Search',
-    tabBarIcon: ({ tintColor }) => (
-      <Image
-        source={require('../assets/images/chat-icon.png')}
-        style={[myStyles.icon, { tintColor: tintColor }]}
+    tabBarIcon: ({ tintColor, focused }) => (
+      <Ionicons
+        name={focused ? 'ios-search' : 'ios-search-outline'}
+        size={26}
+        style={{ color: tintColor }}
       />
-    )
+    ),
   }
   render() {
     return (
