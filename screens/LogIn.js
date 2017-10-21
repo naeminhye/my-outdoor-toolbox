@@ -2,13 +2,19 @@ import React, { Component } from 'react';
 import { Text, View, StyleSheet, Image } from 'react-native';
 import { Button, FormInput } from 'react-native-elements'; // 0.17.0
 import '@expo/vector-icons'; // 5.2.0
+//import { StackNavigator } from 'react-navigation';
 //import { Constants } from 'expo';
+//import { firebaseApp } from './FirebaseConfig';
 
 export default class LogIn extends Component {
   
     static navigationOptions = {
       header: null,
     };
+    
+    _onLogIn() {
+      
+    }
 
     render() {
         return (

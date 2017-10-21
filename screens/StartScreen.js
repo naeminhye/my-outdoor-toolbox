@@ -1,12 +1,53 @@
 import React, { Component } from 'react';
 import { Text, View, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-elements'; // 0.17.0
-import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.13
+import { Facebook } from 'expo';
+//import { CustomButton } from './CustomButton';
+//import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.13
 
 export default class StartScreen extends Component {
-    
   static navigationOptions = {
     header: null,
+  };
+
+  _handleFacebookLogin = async () => {
+    try {
+      const { type, token } = await Facebook.logInWithReadPermissionsAsync(
+        '1201211719949057', // Replace with your own app id in standalone app
+        { permissions: ['public_profile'] }
+      );
+
+      switch (type) {
+        case 'success': {
+          // Get the user's name using Facebook's Graph API
+          const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
+          const profile = await response.json();
+          Alert.alert(
+            'Logged in!',
+            `Hi ${profile.name}!`,
+          );
+          break;
+        }
+        case 'cancel': {
+          Alert.alert(
+            'Cancelled!',
+            'Login was cancelled!',
+          );
+          break;
+        }
+        default: {
+          Alert.alert(
+            'Oops!',
+            'Login failed!',
+          );
+        }
+      }
+    } catch (e) {
+      Alert.alert(
+        'Oops!',
+        'Login failed!',
+      );
+    }
   };
 
   render() {
@@ -21,10 +62,10 @@ export default class StartScreen extends Component {
 
           <View style={styles.titleView}>
             <Text style={styles.title}>
-              Message App
+              My Outdoor Toolbox
             </Text>
             <Text style={styles.description}>
-              Welcome to my Message App!
+              Welcome to My Outdoor Toolbox!
             </Text>
           </View>
           <View style={styles.loginBtnView}>
@@ -36,13 +77,19 @@ export default class StartScreen extends Component {
                 color: '#87cefa',
               }}
               title="Log in with your Account"
-              //backgroundColor='#fff' 
-              color='#87cefa'
-              buttonStyle={[styles.loginBtn, { backgroundColor:'#fff' }]}
+              //backgroundColor='#fff'
+              color="#87cefa"
+              buttonStyle={[styles.loginBtn, { backgroundColor: '#fff' }]}
               onPress={() => {
-                 navigate('LogIn');
-               }}
+                navigate('LogIn');
+              }}
             />
+            {/*<CustomButton
+              text="Log in with your Account"
+              color="#87cefa"
+              bgColor="#FFF"
+              borderColor="#87cefa"
+            />*/}
             <Button
               large
               iconRight={{
@@ -52,8 +99,8 @@ export default class StartScreen extends Component {
               }}
               title="Log in with Facebook"
               //backgroundColor='#87cefa'
-              color='#fff'
-              buttonStyle={[styles.loginBtn, { backgroundColor:'#87cefa' }]}
+              color="#fff"
+              buttonStyle={[styles.loginBtn, { backgroundColor: '#87cefa' }]}
             />
           </View>
           <View style={styles.signupBtnView}>
@@ -69,10 +116,13 @@ export default class StartScreen extends Component {
               }}
               title="Sign up"
               //backgroundColor='transparent'
-              color='#fff'
-              buttonStyle={[styles.singupBtn, { backgroundColor:'transparent' }]}
-               onPress={() => {
-                 navigate('SignUp');
+              color="#fff"
+              buttonStyle={[
+                styles.singupBtn,
+                { backgroundColor: 'transparent' },
+              ]}
+              onPress={() => {
+                navigate('SignUp');
               }}
             />
           </View>

@@ -1,14 +1,73 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Image } from 'react-native';
+import { Text, View, StyleSheet, Image, Alert } from 'react-native';
 import { Button, FormInput } from 'react-native-elements'; // 0.17.0
 import '@expo/vector-icons'; // 5.2.0
 //import { Constants } from 'expo';
+//import TextField from './TextField';
+
+import { firebaseApp } from '../FirebaseConfig';
 
 export default class SignUp extends Component {
-  
-    static navigationOptions = {
-      header: null,
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      _email: '',
+      _password: '',
     };
+    //this._onSignUp = this._onSignUp.bind(this);
+  }
+
+  static navigationOptions = {
+    header: null,
+  };
+
+  _onSignUp() {
+    const { navigate } = this.props.navigation;
+    firebaseApp
+      .auth()
+      .createUserWithEmailAndPassword(this.state._email, this.state._password)
+      .then(() => {
+        Alert.alert(
+          'Alert Title',
+          'Đăng kí thành công với email ' + this.state._email,
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                navigate('LogIn')
+                //console.log('Failed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+        this.setState({
+          _email: '',
+          _password: '',
+        });
+      })
+      .catch(() => {
+        Alert.alert(
+          'Alert Title',
+          'Đăng kí thất bại: ' + this.state._email,
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            { text: 'OK', onPress: () => console.log('Email: ' + this.state._email) },
+          ],
+          { cancelable: false }
+        );
+      });
+  }
 
   render() {
     return (
@@ -22,21 +81,26 @@ export default class SignUp extends Component {
           <View style={styles.upperView}>
             <FormInput
               containerStyle={styles.textInput}
-              placeholder='Username'
-              placeholderTextColor='#fff'
+              placeholder="Username"
+              placeholderTextColor="#fff"
               inputStyle={styles.text}
             />
             <FormInput
               containerStyle={styles.textInput}
-              placeholder='Password'
-              placeholderTextColor='#fff'
+              placeholder="Password"
+              placeholderTextColor="#fff"
+              secureTextEntry={true}
               inputStyle={styles.text}
+              onChangeText={(_password) => this.setState({ _password })}
+              value={this.state._password}
             />
             <FormInput
               containerStyle={styles.textInput}
-              placeholder='Email'
-              placeholderTextColor='#fff'
+              placeholder="Email"
+              placeholderTextColor="#fff"
               inputStyle={styles.text}
+              onChangeText={(_email) => this.setState({ _email })}
+              value={this.state._email}
             />
             <Button
               large
@@ -45,9 +109,12 @@ export default class SignUp extends Component {
                 type: 'font-awesome',
                 color: '#87cefa',
               }}
-              title='Sign Up'
-              color='#87cefa'
+              title="Sign Up"
+              color="#87cefa"
               buttonStyle={styles.singupBtn}
+              onPress={() => {
+                this._onSignUp();
+              }}
               // buttonStyle={[styles.singupBtn, { backgroundColor: '#fff' }]}
             />
           </View>
@@ -62,8 +129,8 @@ export default class SignUp extends Component {
                 type: 'font-awesome',
                 color: '#fff',
               }}
-              title='Log in'
-              color='#fff'
+              title="Log in"
+              color="#fff"
               buttonStyle={styles.loginBtn}
               // buttonStyle={[styles.loginBtn, { backgroundColor: 'transparent' }]}
             />
@@ -98,8 +165,8 @@ const styles = StyleSheet.create({
   singupBtn: {
     marginLeft: 50,
     marginRight: 50,
-    marginTop: 100, 
-    borderRadius: 50, 
+    marginTop: 100,
+    borderRadius: 50,
     backgroundColor: '#fff',
     width: 350,
   },
@@ -107,7 +174,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 20
+    paddingTop: 20,
   },
   loginBtn: {
     paddingLeft: 50,
@@ -124,7 +191,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     borderBottomWidth: 2,
     marginTop: 15,
-    width:300,
+    width: 300,
   },
   text: {
     color: '#fff',
