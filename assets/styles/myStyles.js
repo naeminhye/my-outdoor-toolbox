@@ -39,6 +39,14 @@ const myStyles = StyleSheet.create({
   },
   searchInput: {
       backgroundColor: '#ccc',
+  },
+  screenHeader: {
+    paddingTop: 60, 
+    paddingLeft: 20, 
+    paddingRight: 20,
+    justifyContent: 'space-between',
+    alignSelf: 'stretch',
+    flexDirection: 'row'
   }
 });
 
