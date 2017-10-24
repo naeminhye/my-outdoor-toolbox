@@ -8,17 +8,16 @@ import {
     ListView,
     Image,
 } from 'react-native';
-import { SearchBar } from 'react-native-elements';
 import myStyles from '../assets/styles/myStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default class ScreenTwo extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Search',
+    tabBarLabel: 'Notifications',
     tabBarIcon: ({ tintColor, focused }) => (
       <Ionicons
-        name={focused ? 'ios-search' : 'ios-search-outline'}
+        name={focused ? 'ios-notifications' : 'ios-notifications-outline'}
         size={26}
         style={{ color: tintColor }}
       />
@@ -29,16 +28,9 @@ export default class ScreenTwo extends Component {
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <ScrollView style={{marginTop: 20}}>
           <View style={myStyles.screenHeader}>
-              <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>Search</Text>
+              <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>Notification</Text>
           </View>
           <View style={{flex: 1, alignItems: 'center'}}>
-            <SearchBar
-                    lightTheme
-                    ref={search => (this.search = search)}
-                    placeholder="Places..."
-                    returnKeyType="search"
-                    containerStyle={myStyles.searchContainer}
-                    inputStyle={myStyles.searchInput} />
             <Text style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>No Result</Text>
           </View>
         </ScrollView>

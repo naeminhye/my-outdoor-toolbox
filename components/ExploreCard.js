@@ -293,12 +293,13 @@ export default class ExploreCard extends Component {
                 fontWeight: '500',
                 color: 'gray',
                 paddingBottom: 10,
-              }}>
+              }}
+              numberOfLines={1}>
               {this.props.description}
             </Text>
-            <Text style={{ fontSize: 12, fontWeight: '500', color: 'gray' }}>
-              Ends in {this.props.due} days
-            </Text>
+            { this.props.due >= 0 ? (<Text style={{ fontSize: 12, fontWeight: '500', color: 'gray' }}>
+              Happens in {this.props.due} days
+            </Text>) : (<Text style={{ fontSize: 12, fontWeight: '500', color: 'gray' }}>This event has expired.</Text>)}
           </View>
           {plusButton}
         </View>

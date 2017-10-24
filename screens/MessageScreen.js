@@ -7,10 +7,11 @@ import {
   Image, 
   ScrollView
 } from 'react-native';
+import { SearchBar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 
-export default class ScreenFour extends Component {
+export default class MessageScreen extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Messages',
@@ -29,8 +30,17 @@ export default class ScreenFour extends Component {
           <View style={myStyles.screenHeader}>
               <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>Messages</Text>
           </View>
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>No Message</Text>
+          <View style={{ height: 40, alignItems:'stretch', paddingLeft: 20, paddingRight: 20 }}>
+            <SearchBar
+                      lightTheme
+                      ref={search => (this.search = search)}
+                      placeholder="Search message..."
+                      returnKeyType="search"
+                      containerStyle={myStyles.searchContainer}
+                      inputStyle={myStyles.searchInput} />
+          </View>
+          <View style={{flex: 1, alignItems: 'center'}}>
+            <Text style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>No Messages</Text>
           </View>
         </ScrollView>
         <TouchableHighlight

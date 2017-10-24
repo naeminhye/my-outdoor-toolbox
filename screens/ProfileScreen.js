@@ -10,7 +10,7 @@ import { Avatar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 
-export default class ScreenThree extends Component {
+export default class ProfileScreen extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Profile',
