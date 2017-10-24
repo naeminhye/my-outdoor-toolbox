@@ -161,10 +161,10 @@ export default class ExploreCard extends Component {
       this.container.measure((fx, fy, width, height, px, py) => {
         this.setState({ offset: py }, () => {
           if (this.state.pressed) {
-            console.log('growing with offset', this.state.offset);
+            //console.log('growing with offset', this.state.offset);
             this.grow();
           } else {
-            console.log('shrinking with offset', this.state.offset);
+            //console.log('shrinking with offset', this.state.offset);
             this.shrink();
           }
         });
@@ -321,6 +321,7 @@ export default class ExploreCard extends Component {
           zIndex: -1,
           backgroundColor: '#fff',
           transform: this.state.content_pan.getTranslateTransform(),
+          paddingBottom: 65,
         }}>
 
         <View
@@ -336,9 +337,24 @@ export default class ExploreCard extends Component {
           <Text style={{ fontSize: 24, fontWeight: '700', color: this.props.color, }}>
             Description
           </Text>
-          <Text style={{ color: 'gray', paddingTop: 10 }}>
+          <Text style={{ color: 'gray', paddingTop: 10 }} numberOfLines={8}>
             {this.props.content}
           </Text>
+          <TouchableOpacity>
+            <Animated.View
+              style={{
+                opacity: this.state.button_opac,
+                backgroundColor: this.props.color,
+                marginTop: 10,
+                borderRadius: 10,
+                width: width - 64,
+                height: 50,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <Text style={{ color: 'white', fontWeight: '800', fontSize: 18 }}>See Event Detail</Text>
+            </Animated.View>
+          </TouchableOpacity>
         </View>
 
       </Animated.View>
@@ -379,8 +395,6 @@ const styles = StyleSheet.create({
   bottom: {
     marginTop: 0,
     padding: 16,
-    // borderBottomLeftRadius: 5,
-    // borderBottomRightRadius: 5,
     backgroundColor: '#fff',
     borderWidth: 1,
   },

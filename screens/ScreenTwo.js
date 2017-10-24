@@ -30,16 +30,16 @@ export default class ScreenTwo extends Component {
         <ScrollView style={{marginTop: 20}}>
           <View style={myStyles.screenHeader}>
               <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>Search</Text>
-              <SearchBar
-                  lightTheme
-                  ref={search => (this.search = search)}
-                  placeholder="Places..."
-                  returnKeyType="search"
-                  containerStyle={myStyles.searchContainer}
-                  inputStyle={myStyles.searchInput} />
           </View>
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>No Result</Text>
+          <View style={{flex: 1, alignItems: 'center'}}>
+            <SearchBar
+                    lightTheme
+                    ref={search => (this.search = search)}
+                    placeholder="Places..."
+                    returnKeyType="search"
+                    containerStyle={myStyles.searchContainer}
+                    inputStyle={myStyles.searchInput} />
+            <Text style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>No Result</Text>
           </View>
         </ScrollView>
       </View>

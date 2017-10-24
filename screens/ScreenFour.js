@@ -33,6 +33,14 @@ export default class ScreenFour extends Component {
                   <Text style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>No Message</Text>
           </View>
         </ScrollView>
+        <TouchableHighlight
+            style={myStyles.addButton}
+            underlayColor="#ff7043"
+            onPress={() => {
+              console.log('Add new message');
+            }}>
+            <Ionicons name="ios-create-outline" size={30} color="#fff" />
+          </TouchableHighlight>
       </View>
     );
   }
