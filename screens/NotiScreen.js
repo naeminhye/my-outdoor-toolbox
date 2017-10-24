@@ -11,7 +11,7 @@ import {
 import myStyles from '../assets/styles/myStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default class ScreenTwo extends Component {
+export default class NotiScreen extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Notifications',
