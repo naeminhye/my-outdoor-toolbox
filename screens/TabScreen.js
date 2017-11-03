@@ -4,11 +4,11 @@ import HomeScreen from './HomeScreen';
 import ExploreScreen from './ExploreScreen';
 import NotiScreen from './NotiScreen';
 import ProfileScreen from './ProfileScreen';
-import MessageScreen from './MessageScreen';
+import SearchScreen from './SearchScreen';
 
 const TabScreen = TabNavigator({
     Home: { screen: HomeScreen },
-    MessageScreen: { screen: MessageScreen },
+    Search: { screen: SearchScreen },
     Explore: { screen: ExploreScreen },
     NotiScreen: { screen: NotiScreen }, 
     ProfileScreen: { screen: ProfileScreen },

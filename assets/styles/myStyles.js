@@ -88,6 +88,14 @@ const myStyles = StyleSheet.create({
     fontSize: 12,
     color: '#fff',
   },
+  inputIcon: {
+    fontSize: 15,
+    color: '#0000003a',
+    marginLeft: 4,
+  },
+  searchIcon: {
+    marginLeft: 16,
+  }
 });
 
 export default myStyles;
