@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
 
    itemDetails: {
      fontSize: 16,
-     color: '	#8e8e93',
+     color: '#8e8e93',
    },
 
    moreContainer: {

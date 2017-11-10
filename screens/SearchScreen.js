@@ -7,6 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
+  Modal,
+  TouchableHighlight,
+  Picker,
 } from 'react-native';
 import { Constants, Location, Permissions } from 'expo';
 import GoogleMapAPI from '../GoogleMapAPI';
@@ -14,16 +17,123 @@ import ListItem from '../components/ListItem';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 
+const placeType = [
+  { name: 'All', value: '' },
+  { name: 'Accounting', value: 'accounting' },
+  { name: 'Airport', value: 'airport' },
+  { name: 'Amusement Park', value: 'amusement_park' },
+  { name: 'Aquarium', value: 'aquarium' },
+  { name: 'Art Gallery', value: 'art_gallery' },
+  { name: 'ATM', value: 'atm' },
+  { name: 'Bakery', value: 'bakery' },
+  { name: 'Bank', value: 'bank' },
+  { name: 'Bar', value: 'bar' },
+  { name: 'Beauty Salon', value: 'beauty_salon' },
+  { name: 'Bicycle Store', value: 'bicycle_store' },
+  { name: 'Book Store', value: 'book_store' },
+  { name: 'Bowling Alley', value: 'bowling_alley' },
+  { name: 'Bus Station', value: 'bus_station' },
+  { name: 'Café', value: 'cafe' },
+  { name: 'Campground', value: 'campground' },
+  { name: 'Car Dealer', value: 'car_dealer' },
+  { name: 'Car Rental', value: 'car_rental' },
+  { name: 'Car Repair', value: 'car_repair' },
+  { name: 'Car Wash', value: 'car_wash' },
+  { name: 'Casino', value: 'casino' },
+  { name: 'Cemetery', value: 'cemetery' },
+  { name: 'Church', value: 'church' },
+  { name: 'City Hall', value: 'city_hall' },
+  { name: 'Clothing Store', value: 'clothing_store' },
+  { name: 'Convenience Store', value: 'convenience_store' },
+  { name: 'Courthouse', value: 'courthouse' },
+  { name: 'Dentist', value: 'dentist' },
+  { name: 'Department Store', value: 'department_store' },
+  { name: 'Doctor', value: 'doctor' },
+  { name: 'Electrician', value: 'electrician' },
+  { name: 'Electronics Store', value: 'electronics_store' },
+  { name: 'Embassy', value: 'embassy' },
+  { name: 'Fire Station', value: 'fire_station' },
+  { name: 'Florist', value: 'florist' },
+  { name: 'Funeral Home', value: 'funeral_home' },
+  { name: 'Furniture Store', value: 'furniture_store' },
+  { name: 'Gas Station', value: 'gas_station' },
+  { name: 'Gym', value: 'gym' },
+  { name: 'Hair Care', value: 'hair_care' },
+  { name: 'Hardware Store', value: 'hardware_store' },
+  { name: 'Hindu Temple', value: 'hindu_temple' },
+  { name: 'Home Goods Store', value: 'home_goods_store' },
+  { name: 'Hospital', value: 'hospital' },
+  { name: 'Insurance Agency', value: 'insurance_agency' },
+  { name: 'Jewelry Store', value: 'jewelry_store' },
+  { name: 'Laundry', value: 'laundry' },
+  { name: 'Lawyer', value: 'lawyer' },
+  { name: 'Library', value: 'library' },
+  { name: 'Liquor Store', value: 'liquor_store' },
+  { name: 'Local Government Office', value: 'local_government_office' },
+  { name: 'Locksmith', value: 'locksmith' },
+  { name: 'Lodging', value: 'lodging' },
+  { name: 'Meal Delivery', value: 'meal_delivery' },
+  { name: 'Meal Takeaway', value: 'meal_takeaway' },
+  { name: 'Mosque', value: 'mosque' },
+  { name: 'Movie Rental', value: 'movie_rental' },
+  { name: 'Movie Theater', value: 'movie_theater' },
+  { name: 'Moving Company', value: 'moving_company' },
+  { name: 'Museum', value: 'museum' },
+  { name: 'Night Club', value: 'night_club' },
+  { name: 'Painter', value: 'painter' },
+  { name: 'Park', value: 'park' },
+  { name: 'Parking', value: 'parking' },
+  { name: 'Pet Store', value: 'pet_store' },
+  { name: 'Pharmacy', value: 'pharmacy' },
+  { name: 'Physiotherapist', value: 'physiotherapist' },
+  { name: 'Plumber', value: 'plumber' },
+  { name: 'Police', value: 'police' },
+  { name: 'Post Office', value: 'post_office' },
+  { name: 'Real Estate Agency', value: 'real_estate_agency' },
+  { name: 'Restaurant', value: 'restaurant' },
+  { name: 'Roofing Contractor', value: 'roofing_contractor' },
+  { name: 'RV Park', value: 'rv_park' },
+  { name: 'School', value: 'school' },
+  { name: 'Shoe Store', value: 'shoe_store' },
+  { name: 'Shopping Mall', value: 'shopping_mall' },
+  { name: 'Spa', value: 'spa' },
+  { name: 'Stadium', value: 'stadium' },
+  { name: 'Storage', value: 'storage' },
+  { name: 'Store', value: 'store' },
+  { name: 'Subway Station', value: 'subway_station' },
+  { name: 'Synagogue', value: 'synagogue' },
+  { name: 'Taxi Stand', value: 'taxi_stand' },
+  { name: 'Train Station', value: 'train_station' },
+  { name: 'Transit Station', value: 'transit_station' },
+  { name: 'Travel Agency', value: 'travel_agency' },
+  { name: 'University', value: 'university' },
+  { name: 'Veterinary Care', value: 'veterinary_care' },
+  { name: 'Zoo', value: 'zoo' },
+];
+
+const placeRadius = [
+  { name: '500m', value: 500 },
+  { name: '1km', value: 1000 },
+  { name: '5km', value: 5000 },
+  { name: '10km', value: 10000 },
+  { name: '50km', value: 50000 },
+  { name: '100km', value: 100000 },
+];
+
 export default class SearchScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       _focus: false,
+      typeModalVisible: false,
+      radiusModalVisible: false,
       locationResult: null,
       lat: 0,
       lon: 0,
-      radius: 10000,
+      radius: 500, // meters
+      tmpRadius: 500,
       type: '',
+      tmpType: '',
       inputValue: '',
       status: '',
       results: [],
@@ -32,6 +142,18 @@ export default class SearchScreen extends Component {
     this._getLocationAsync = this._getLocationAsync.bind(this);
     this._handleTextChange = this._handleTextChange.bind(this);
     this._handleSubmitText = this._handleSubmitText.bind(this);
+  }
+
+  getTypeName(_type) {
+    return placeType.find(
+      (place) => {return place.value === _type;}
+    ).name;
+  }
+  
+  getRadiusName(_type) {
+    return placeRadius.find(
+      (place) => {return place.value === _type;}
+    ).name;
   }
 
   static navigationOptions = {
@@ -45,6 +167,14 @@ export default class SearchScreen extends Component {
       />
     ),
   };
+  
+  setTypeModalVisible(visible) {
+    this.setState({ typeModalVisible: visible });
+  }
+  
+  setRadiusModalVisible(visible) {
+    this.setState({ radiusModalVisible: visible });
+  }
 
   componentDidMount() {
     this._getLocationAsync();
@@ -64,7 +194,7 @@ export default class SearchScreen extends Component {
       lat: location.coords.latitude,
       lon: location.coords.longitude,
     });
-    this._getUVIndex(this.state.lat, this.state.lon);
+    //this._getUVIndex(this.state.lat, this.state.lon);
   };
 
   _handleTextChange = inputValue => {
@@ -88,9 +218,139 @@ export default class SearchScreen extends Component {
     });
   };
 
+  //renderModal()
+
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <Modal
+      animationType="slide"
+      transparent={true}
+      visible={this.state.typeModalVisible}
+      onRequestClose={() => {
+        alert('Modal has been closed.');
+      }}>
+      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <View style={{ padding: 20, backgroundColor: 'white', height: 300 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingBottom: 20,
+              height: 40,
+            }}>
+            <TouchableHighlight
+              onPress={() => {
+                this.setTypeModalVisible(!this.state.typeModalVisible);
+                this.setState({
+                  tmpType: this.state.type,
+                });
+              }}>
+              <Text style={{ fontSize: 18, textAlign: 'center' }}>
+                Cancel
+              </Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress={() => {
+                this.setTypeModalVisible(!this.state.typeModalVisible);
+                let _type = this.state.tmpType;
+                this.setState({
+                  type: _type,
+                  tmpType: this.state.type,
+                });
+                console.log(this.state.type + this.state.radius);
+              }}>
+              <Text style={{ fontSize: 18, textAlign: 'center' }}>
+                Done
+              </Text>
+            </TouchableHighlight>
+          </View>
+            <View style={{ flexDirection: 'column', flex: 1 }}>
+              <Text style={{ textAlign: 'center', fontSize: 20 }}>
+                Type of Place
+              </Text>
+              <Picker
+                selectedValue={this.state.tmpType}
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({ tmpType: itemValue })}>
+                {placeType.map((type, i) => {
+                  return (
+                    <Picker.Item
+                      key={i}
+                      label={type.name}
+                      value={type.value}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
+        </View>
+      </View>
+    </Modal>
+    <Modal
+    animationType="slide"
+    transparent={true}
+    visible={this.state.radiusModalVisible}
+    onRequestClose={() => {
+      alert('Modal has been closed.');
+    }}>
+    <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+      <View style={{ padding: 20, backgroundColor: 'white', height: 300 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingBottom: 20,
+            height: 40,
+          }}>
+          <TouchableHighlight
+            onPress={() => {
+              this.setRadiusModalVisible(!this.state.radiusModalVisible);
+              this.setState({
+                tmpRadius: this.state.radius,
+              });
+            }}>
+            <Text style={{ fontSize: 18, textAlign: 'center' }}>
+              Cancel
+            </Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            onPress={() => {
+              this.setRadiusModalVisible(!this.state.radiusModalVisible);
+              let _radius = this.state.tmpRadius;
+              this.setState({
+                radius: _radius,
+                tmpRadius: this.state.radius,
+              });
+              console.log(this.state.type + this.state.radius);
+            }}>
+            <Text style={{ fontSize: 18, textAlign: 'center' }}>
+              Done
+            </Text>
+          </TouchableHighlight>
+        </View>
+          <View style={{ flexDirection: 'column', flex: 1 }}>
+            <Text style={{ textAlign: 'center', fontSize: 20 }}>
+              Type of Place
+            </Text>
+            <Picker
+              selectedValue={this.state.tmpRadius}
+              onValueChange={(itemValue, itemIndex) =>
+                this.setState({ tmpRadius: itemValue })}>
+              {placeRadius.map((type, i) => {
+                return (
+                  <Picker.Item
+                    key={i}
+                    label={type.name}
+                    value={type.value}
+                  />
+                );
+              })}
+            </Picker>
+          </View>
+      </View>
+    </View>
+  </Modal>
         <ScrollView style={{ marginTop: 20 }}>
           <View style={myStyles.screenHeader}>
             <Text
@@ -126,22 +386,22 @@ export default class SearchScreen extends Component {
                   });
                 }}
               />
-              {this.state.inputValue !== ''
-                ? <TouchableOpacity onPress={() => {
-                  this.textInput.clear();
-                  this.setState({
-                    _focus: true,
-                    inputValue: '',
-                  });
-                }}>
-                    <Ionicons
-                      name="ios-close-circle"
-                      size={16}
-                      style={{ paddingLeft: 5 }}
-                      color="#8e8e93"
-                    />
-                  </TouchableOpacity>
-                : null}
+              {(this.state.inputValue !== '' && this.state._focus)
+              ? <TouchableHighlight onPress={() => {
+                this.textInput.clear();
+                this.textInput.focus();
+                this.setState({
+                  inputValue: '',
+                });
+              }}>
+                  <Ionicons
+                    name="ios-close-circle"
+                    size={20}
+                    style={{ paddingLeft: 5 }}
+                    color="#8e8e93"
+                  />
+                </TouchableHighlight>
+              : null}
             </View>
             {this.state._focus
               ? <TouchableOpacity
@@ -156,6 +416,30 @@ export default class SearchScreen extends Component {
                   </Text>
                 </TouchableOpacity>
               : null}
+          </View>
+          <View
+          style={{
+            flexDirection: 'row',
+            padding: 10,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: 50,
+            backgroundColor: 'white',
+          }}>
+          <TouchableHighlight
+          style={{flex: 1}}
+          onPress={()=> {
+            this.setTypeModalVisible(!this.state.typeModalVisible);
+          }}>
+            <Text style={{ fontSize: 18 }}>Type: {this.getTypeName(this.state.type)}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+          style={{flex: 1}}
+          onPress={()=> {
+            this.setRadiusModalVisible(!this.state.radiusModalVisible);
+          }}>
+            <Text style={{ fontSize: 18 }}>Radius: {this.getRadiusName(this.state.radius)}</Text>
+          </TouchableHighlight>
           </View>
           <View style={{ flex: 1 }}>
             {this.state.status === 'OK'
@@ -184,6 +468,7 @@ export default class SearchScreen extends Component {
                       fontSize: 30,
                       fontWeight: 'bold',
                       color: '#aaaaaa',
+                      marginTop: 200,
                     }}>
                     No results
                   </Text>
