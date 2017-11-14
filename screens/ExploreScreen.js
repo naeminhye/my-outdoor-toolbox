@@ -8,11 +8,15 @@ import {
   ScrollView,
   ListView,
 } from 'react-native';
-import { Constants } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 import ExploreCard from '../components/ExploreCard';
 import { firebaseApp } from '../FirebaseConfig';
+import { Constants } from 'expo';
+import ParallaxScrollView from 'react-native-parallax-scroll-view';
+
+const SCREEN_LABEL = 'Explore';
+const STICKY_HEADER_HEIGHT = 40;
 
 export default class ExploreScreen extends Component {
   constructor(props) {
@@ -28,8 +32,7 @@ export default class ExploreScreen extends Component {
   
   static navigationOptions = {
     header: null,
-    //title: 'Explore',
-    tabBarLabel: 'Explore',
+    tabBarLabel: SCREEN_LABEL,
     tabBarIcon: ({ tintColor, focused }) => (
       <Ionicons
         name={focused ? 'ios-compass' : 'ios-compass-outline'}
@@ -96,7 +99,7 @@ export default class ExploreScreen extends Component {
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <ScrollView scrollEnabled={this.state.scroll} style={{ marginTop: Constants.statusBarHeight, }}>
           <View style={myStyles.screenHeader}>
-            <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>Explore</Text>
+            <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
           </View>
           {this._renderItem()}
       </ScrollView>

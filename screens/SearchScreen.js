@@ -11,12 +11,16 @@ import {
   TouchableHighlight,
   Picker,
 } from 'react-native';
+import {RkText, RkTextInput, RkTheme} from 'react-native-ui-kitten';
 import { Constants, Location, Permissions } from 'expo';
 import GoogleMapAPI from '../GoogleMapAPI';
 import ListItem from '../components/ListItem';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
+import ParallaxScrollView from 'react-native-parallax-scroll-view';
 
+const STICKY_HEADER_HEIGHT = 40;
+const SCREEN_LABEL = 'Search';
 const placeType = [
   { name: 'All', value: '' },
   { name: 'Accounting', value: 'accounting' },
@@ -158,7 +162,7 @@ export default class SearchScreen extends Component {
 
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Search',
+    tabBarLabel: SCREEN_LABEL,
     tabBarIcon: ({ tintColor, focused }) => (
       <Ionicons
         name={focused ? 'ios-search' : 'ios-search-outline'}
@@ -222,7 +226,7 @@ export default class SearchScreen extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight }}>
       <Modal
       animationType="slide"
       transparent={true}
@@ -256,7 +260,7 @@ export default class SearchScreen extends Component {
                 let _type = this.state.tmpType;
                 this.setState({
                   type: _type,
-                  tmpType: this.state.type,
+                  tmpType: _type,
                 });
                 console.log(this.state.type + this.state.radius);
               }}>
@@ -351,14 +355,49 @@ export default class SearchScreen extends Component {
       </View>
     </View>
   </Modal>
-        <ScrollView style={{ marginTop: 20 }}>
-          <View style={myStyles.screenHeader}>
-            <Text
-              style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10 }}>
-              Search
-            </Text>
-          </View>
-          <View style={{ flexDirection: 'row', padding: 10 }}>
+  <ParallaxScrollView
+  ref={(scroll) => { this.scrollview = scroll; }}
+  backgroundColor="#fff"
+  contentBackgroundColor="#fff"
+  parallaxHeaderHeight={100}
+  stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
+  renderForeground={() => (
+    <View style={myStyles.screenHeader}>
+    <Text
+      style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10 }}>
+      {SCREEN_LABEL}
+    </Text>
+  </View>
+  )}
+  renderStickyHeader={() => (
+    <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center', justifyContent: 'flex-end',paddingTop: Constants.statusBarHeight,}}>
+      <Text style={{fontSize: 18, fontWeight: 'bold', margin: 10}}
+      onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{SCREEN_LABEL}</Text>
+    </View>
+  )}>
+          
+          <View style={{ flexDirection: 'row', padding: 10, alignItems: 'center' }}>
+          <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
+          style={{paddingRight: 10, flex: 1}} clearButtonMode='always'
+          onFocus={() => {
+            this.setState({
+              _focus: true,
+            });
+          }}
+          ref={input => {
+            this.textInput = input;
+          }}
+          returnKeyType="search"
+          onSubmitEditing={this._handleSubmitText}
+          placeholder="Search places"
+          value={this.state.inputValue}
+          onChangeText={this._handleTextChange}
+          onBlur={() => {
+            this.setState({
+              _focus: false,
+            });
+          }}/>
+            {/*
             <View style={styles.searchBox}>
               <Ionicons
                 name="ios-search"
@@ -403,6 +442,7 @@ export default class SearchScreen extends Component {
                 </TouchableHighlight>
               : null}
             </View>
+            */}
             {this.state._focus
               ? <TouchableOpacity
                   onPress={() => {
@@ -426,25 +466,26 @@ export default class SearchScreen extends Component {
             height: 50,
             backgroundColor: 'white',
           }}>
-          <TouchableHighlight
+          <TouchableOpacity
           style={{flex: 1}}
           onPress={()=> {
             this.setTypeModalVisible(!this.state.typeModalVisible);
           }}>
             <Text style={{ fontSize: 18 }}>Type: {this.getTypeName(this.state.type)}</Text>
-          </TouchableHighlight>
-          <TouchableHighlight
+          </TouchableOpacity>
+          <TouchableOpacity
           style={{flex: 1}}
           onPress={()=> {
             this.setRadiusModalVisible(!this.state.radiusModalVisible);
           }}>
             <Text style={{ fontSize: 18 }}>Radius: {this.getRadiusName(this.state.radius)}</Text>
-          </TouchableHighlight>
+          </TouchableOpacity>
           </View>
           <View style={{ flex: 1 }}>
             {this.state.status === 'OK'
               ? <FlatList
                   data={this.state.results}
+                  keyExtractor={(item, index) => index}
                   renderItem={({ item }) => (
                     <View>
                       <ListItem name={item.name} vicinity={item.vicinity} />
@@ -474,7 +515,7 @@ export default class SearchScreen extends Component {
                   </Text>
                 </View>}
           </View>
-        </ScrollView>
+          </ParallaxScrollView>
       </View>
     );
   }
@@ -498,4 +539,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  inputIcon: {
+    fontSize: 15,
+    color: '#0000003a',
+    marginLeft: 4,
+  },
+  searchIcon: {
+    marginLeft: 16,
+  }
 });
+
+RkTheme.setType('RkTextInput','searchbox',{
+  height: 40,
+  borderRadius: 50,
+  borderWidth: 1,
+  borderColor: '#0000001A',
+  underlineWidth: 1,
+  underlineColor:'#0000001A',
+}); 

@@ -7,14 +7,19 @@ import {
   Image,
   ScrollView
 } from 'react-native';
+import { Constants } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 import GridView from 'react-native-super-grid';
+import ParallaxScrollView from 'react-native-parallax-scroll-view';
+
+const STICKY_HEADER_HEIGHT = 40;
+const SCREEN_LABEL = 'Home';
 
 export default class HomeScreen extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Home',
+    tabBarLabel: SCREEN_LABEL,
     tabBarIcon: ({ tintColor, focused }) => (
       <Ionicons
         name={focused ? 'ios-home' : 'ios-home-outline'}
@@ -46,11 +51,25 @@ export default class HomeScreen extends Component {
     ];
 
     return (
-      <View style={{ flex: 1, backgroundColor: '#fff' }}>
-        <ScrollView style={{marginTop: 20}}>
-          <View style={myStyles.screenHeader}>
-            <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>Home</Text>
-          </View>
+      <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
+      <ParallaxScrollView
+      ref={(scroll) => { this.scrollview = scroll; }}
+      backgroundColor="#fff"
+      contentBackgroundColor="#fff"
+      parallaxHeaderHeight={100}
+      stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
+      renderForeground={() => (
+        <View style={myStyles.screenHeader}>
+          <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
+        </View>
+      )}
+      renderStickyHeader={() => (
+        <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center',justifyContent: 'flex-end',paddingTop: Constants.statusBarHeight,}}>
+          <Text style={{fontSize: 18, fontWeight: 'bold',margin: 10}}
+          onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{SCREEN_LABEL}</Text>
+        </View>
+      )}>
+          
           <GridView
             itemWidth={200}
             items={items}
@@ -67,7 +86,7 @@ export default class HomeScreen extends Component {
             </TouchableOpacity>
             )}
           />
-        </ScrollView>
+          </ParallaxScrollView>
       </View>
     );
   }
