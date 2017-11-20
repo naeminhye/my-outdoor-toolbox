@@ -8,11 +8,13 @@ import {
   ListView,
   Dimensions,
   StyleSheet,
+  FlatList,
+  ListItem,
+  TouchableOpacity
 } from 'react-native';
 import {
 RkTheme,
 RkButton,
-RkModalImg,
 RkText,
 RkStyleSheet
 } from 'react-native-ui-kitten';
@@ -21,6 +23,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 import { Constants } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
+import Lightbox from 'react-native-lightbox';
 
 const SCREEN_LABEL = 'Profile';
 const STICKY_HEADER_HEIGHT = 40;
@@ -46,9 +49,12 @@ export default class ProfileScreen extends Component {
       ds: ds.cloneWithRows(this._images),
     };
 
-    let {width} = Dimensions.get('window');
-    this.imgSize = (width - 16) / 3;
+    let WINDOW_WIDTH = Dimensions.get('window').width,
+        WINDOW_HEIGHT = Dimensions.get('window').height;
+    this.imgSize = (WINDOW_WIDTH - 16) / 3;
   }
+  
+  _keyExtractor = (item, index) => item.id;
 
   static navigationOptions = {
     header: null,
@@ -70,16 +76,34 @@ _renderGallery() {
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
             flexDirection: 'row',
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
           }}
-          scrollRenderAheadDistance={500}
+          // scrollRenderAheadDistance={500}
           dataSource={this.state.ds}
           renderRow={(rowData, sectionID, rowID) => {
             return (
-              <RkModalImg
-                style={{width: this.imgSize, height: this.imgSize}}
-                source={this._images}
-                index={rowID}/>
+              <View style={{padding: 2, backgroundColor: 'white'}}>
+              <Lightbox
+              renderHeader={close => (
+                <TouchableOpacity onPress={close}>
+                  <Text style={{color: 'white',
+                  borderWidth: 1,
+                  borderColor: 'white',
+                  padding: 8,
+                  borderRadius: 3,
+                  textAlign: 'center',
+                  margin: 10,
+                  alignSelf: 'flex-end',}}>Close</Text>
+                </TouchableOpacity>
+              )}>
+                <Image 
+                  style={{width: this.imgSize, height: this.imgSize}}
+                  source={rowData}
+                  index={rowID}
+                  />
+                  </Lightbox>
+                  
+              </View>
             )
           }}
         />
@@ -108,11 +132,10 @@ _renderGallery() {
         </View>
       )}
       automaticallyAdjustContentInsets={true}>
-          <View style={{ backgroundColor: 'white' }}>
-            <View>
+          <View>
               <View style={{ flexDirection:'row' }}>
-                  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                    <Image style={{borderRadius: AVATAR_SIZE / 2, padding: 5, borderBottomWidth: 0.5, borderColor: '#0000001A'}} source={{
+                  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 5,}}>
+                    <Image style={{borderRadius: AVATAR_SIZE / 2}} source={{
                       uri: 'https://i.pinimg.com/736x/fd/7f/7c/fd7f7c072ed1af1af5420658f6245a49--calendar--exo-exo.jpg',
                       width: AVATAR_SIZE,
                       height: AVATAR_SIZE }}
@@ -139,9 +162,8 @@ _renderGallery() {
                   Yêu màu tím , thích màu hồng, sống nội tâm, hay khóc thầm, ghét sự giả dối.
                 </Text>
               </View>
-            </View>
           </View>
-          <View style={[UtilStyles.bordered, styles.imagesContainer]}>
+          <View style={[UtilStyles.bordered, styles.imagesContainer, { backgroundColor: 'white' }]}>
           <View style={[UtilStyles.rowContainer, {paddingLeft: 2}]}>
             {this._renderGallery()}
           </View>
