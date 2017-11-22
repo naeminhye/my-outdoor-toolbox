@@ -5,6 +5,11 @@
   "author": "Jacey N.",
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
+  "rnpm": {
+    "assets": [
+      "./assets/fonts"
+    ]
+  },
   "dependencies": {
     "expo": "^21.0.0",
     "firebase": "^4.5.2",

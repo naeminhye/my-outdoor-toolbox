@@ -378,7 +378,7 @@ export default class SearchScreen extends Component {
           
           <View style={{ flexDirection: 'row', padding: 10, alignItems: 'center' }}>
           <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
-          style={{paddingRight: 10, flex: 1}} clearButtonMode='always'
+          style={{paddingRight: 10, flex: 1, }} clearButtonMode='always'
           onFocus={() => {
             this.setState({
               _focus: true,
@@ -552,8 +552,6 @@ const styles = StyleSheet.create({
 RkTheme.setType('RkTextInput','searchbox',{
   height: 40,
   borderRadius: 50,
-  borderWidth: 1,
-  borderColor: '#0000001A',
-  underlineWidth: 1,
   underlineColor:'#0000001A',
+  backgroundColor: '#0000001A'
 }); 

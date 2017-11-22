@@ -2,6 +2,7 @@ import React from 'react';
 import {
     StyleSheet
 } from 'react-native';
+import { Fonts } from '../utils/Font';
 
 const myStyles = StyleSheet.create({
   icon: {
@@ -46,7 +47,7 @@ const myStyles = StyleSheet.create({
     paddingRight: 20,
     justifyContent: 'space-between',
     alignSelf: 'stretch',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   addButton: {
     backgroundColor: '#ff5722',
