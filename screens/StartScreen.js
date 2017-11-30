@@ -4,6 +4,7 @@ import { Button } from 'react-native-elements'; // 0.17.0
 import { Facebook } from 'expo';
 //import { CustomButton } from './CustomButton';
 //import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.13
+import { firebaseApp } from '../FirebaseConfig';
 
 export default class StartScreen extends Component {
   static navigationOptions = {
@@ -52,6 +53,12 @@ export default class StartScreen extends Component {
 
   render() {
     const { navigate } = this.props.navigation;
+    let user = firebaseApp.auth().currentUser;
+    console.log(user);
+    if (user) {
+      return navigate('Tab');
+    } else {
+      
     return (
       <View style={styles.container}>
         <Image
@@ -129,6 +136,7 @@ export default class StartScreen extends Component {
         </Image>
       </View>
     );
+    }
   }
 }
 

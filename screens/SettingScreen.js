@@ -13,12 +13,39 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 import { Constants } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
+import { firebaseApp } from '../FirebaseConfig';
 
 const SCREEN_LABEL = 'Setting';
 const STICKY_HEADER_HEIGHT = 40;
 const AVATAR_SIZE = 80;
 
 export default class SettingScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: 'Đỗ Khánh Tú', 
+      email: 'UNKNOWN', 
+      photoUrl: '', 
+      uid: '', 
+      emailVerified: false
+    };
+  }
+
+  componentDidMount() {
+    let user = firebaseApp.auth().currentUser;
+    
+    if (user != null) {
+      this.setState({
+      //name: user.displayName,
+      email: user.email,
+      photoUrl: user.photoURL, 
+      emailVerified: user.emailVerified,
+      uid: user.uid,  // The user's ID, unique to the Firebase project. Do NOT use
+                       // this value to authenticate with your backend server, if
+                       // you have one. Use User.getToken() instead.
+      });
+    }
+  }
     
   static navigationOptions = {
     header: null,
@@ -56,7 +83,7 @@ export default class SettingScreen extends Component {
             />
           </View>
           <View style={{ flex: 2, justifyContent: 'space-around', padding: 20, alignContent: 'center' }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Đỗ Khánh Tú</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{this.state.name}</Text>
           <Text style={{ fontSize: 16, color: '#ccc' }}>
             Yêu màu tím , thích màu hồng, sống nội tâm, hay khóc thầm, ghét sự giả dối.
           </Text>

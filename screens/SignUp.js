@@ -15,7 +15,7 @@ export default class SignUp extends Component {
       _email: '',
       _password: '',
     };
-    //this._onSignUp = this._onSignUp.bind(this);
+    this._onSignUp = this._onSignUp.bind(this);
   }
 
   static navigationOptions = {
@@ -112,9 +112,7 @@ export default class SignUp extends Component {
               title="Sign Up"
               color="#87cefa"
               buttonStyle={styles.singupBtn}
-              onPress={() => {
-                this._onSignUp();
-              }}
+              onPress={this._onSignUp}
               // buttonStyle={[styles.singupBtn, { backgroundColor: '#fff' }]}
             />
           </View>
