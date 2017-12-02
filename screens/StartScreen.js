@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Image } from 'react-native';
+import { Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Button } from 'react-native-elements'; // 0.17.0
 import { Facebook } from 'expo';
-//import { CustomButton } from './CustomButton';
-//import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.13
 import { firebaseApp } from '../FirebaseConfig';
+import TabScreen from './TabScreen';
+import Loading from '../components/Loading';
 
 export default class StartScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true,
+      isLoggedIn: false,
+    };
+  }
   static navigationOptions = {
     header: null,
   };
@@ -51,92 +58,108 @@ export default class StartScreen extends Component {
     }
   };
 
-  render() {
-    const { navigate } = this.props.navigation;
-    let user = firebaseApp.auth().currentUser;
-    console.log(user);
-    if (user) {
-      return navigate('Tab');
-    } else {
-      
-    return (
-      <View style={styles.container}>
-        <Image
-          source={{
-            uri: 'https://goo.gl/Qiccdn',
-          }}
-          style={styles.imageBg}>
+  componentDidMount() {
+    firebaseApp.auth().onAuthStateChanged((user) => {
+      if (user) {
+        setTimeout(() => {
+          this.setState({
+            isLoggedIn: true,
+            isLoading: false
+          })
+        }, 3000);
+      }
+      else {
+        this.setState({
+          isLoading: false
+        });
+      }
+    });
+  }
 
-          <View style={styles.titleView}>
-            <Text style={styles.title}>
-              My Outdoor Toolbox
-            </Text>
-            <Text style={styles.description}>
-              Welcome to My Outdoor Toolbox!
-            </Text>
-          </View>
-          <View style={styles.loginBtnView}>
-            <Button
-              large
-              iconRight={{
-                name: 'angle-right',
-                type: 'font-awesome',
-                color: '#87cefa',
+  render() {
+    {/*<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator /></View>*/} 
+    const { navigate } = this.props.navigation;
+    return (
+      this.state.isLoading ? 
+          <Loading /> :(
+          this.state.isLoggedIn ?
+          <TabScreen /> :
+          <View style={styles.container}>
+            <Image
+              source={{
+                uri: 'https://goo.gl/Qiccdn',
               }}
-              title="Log in with your Account"
-              //backgroundColor='#fff'
-              color="#87cefa"
-              buttonStyle={[styles.loginBtn, { backgroundColor: '#fff' }]}
-              onPress={() => {
-                navigate('LogIn');
-              }}
-            />
-            {/*<CustomButton
-              text="Log in with your Account"
-              color="#87cefa"
-              bgColor="#FFF"
-              borderColor="#87cefa"
-            />*/}
-            <Button
-              large
-              iconRight={{
-                name: 'angle-right',
-                type: 'font-awesome',
-                color: '#fff',
-              }}
-              title="Log in with Facebook"
-              //backgroundColor='#87cefa'
-              color="#fff"
-              buttonStyle={[styles.loginBtn, { backgroundColor: '#87cefa' }]}
-            />
-          </View>
-          <View style={styles.signupBtnView}>
-            <Text style={{ color: '#fff', fontSize: 16 }}>
-              {' '}Do not have an account?
-            </Text>
-            <Button
-              large
-              iconRight={{
-                name: 'angle-right',
-                type: 'font-awesome',
-                color: '#fff',
-              }}
-              title="Sign up"
-              //backgroundColor='transparent'
-              color="#fff"
-              buttonStyle={[
-                styles.singupBtn,
-                { backgroundColor: 'transparent' },
-              ]}
-              onPress={() => {
-                navigate('SignUp');
-              }}
-            />
-          </View>
-        </Image>
-      </View>
+              style={styles.imageBg}>
+    
+              <View style={styles.titleView}>
+                <Text style={styles.title}>
+                  My Outdoor Toolbox
+                </Text>
+                <Text style={styles.description}>
+                  Welcome to My Outdoor Toolbox!
+                </Text>
+              </View>
+              <View style={styles.loginBtnView}>
+                <Button
+                  large
+                  iconRight={{
+                    name: 'angle-right',
+                    type: 'font-awesome',
+                    color: '#87cefa',
+                  }}
+                  title="Log in with your Account"
+                  //backgroundColor='#fff'
+                  color="#87cefa"
+                  buttonStyle={[styles.loginBtn, { backgroundColor: '#fff' }]}
+                  onPress={() => {
+                    navigate('LogIn');
+                  }}
+                />
+                {/*<CustomButton
+                  text="Log in with your Account"
+                  color="#87cefa"
+                  bgColor="#FFF"
+                  borderColor="#87cefa"
+                />*/}
+                <Button
+                  large
+                  iconRight={{
+                    name: 'angle-right',
+                    type: 'font-awesome',
+                    color: '#fff',
+                  }}
+                  title="Log in with Facebook"
+                  //backgroundColor='#87cefa'
+                  color="#fff"
+                  buttonStyle={[styles.loginBtn, { backgroundColor: '#87cefa' }]}
+                />
+              </View>
+              <View style={styles.signupBtnView}>
+                <Text style={{ color: '#fff', fontSize: 16 }}>
+                  {' '}Do not have an account?
+                </Text>
+                <Button
+                  large
+                  iconRight={{
+                    name: 'angle-right',
+                    type: 'font-awesome',
+                    color: '#fff',
+                  }}
+                  title="Sign up"
+                  //backgroundColor='transparent'
+                  color="#fff"
+                  buttonStyle={[
+                    styles.singupBtn,
+                    { backgroundColor: 'transparent' },
+                  ]}
+                  onPress={() => {
+                    navigate('SignUp');
+                  }}
+                />
+              </View>
+            </Image>
+          </View>)
     );
-    }
   }
 }
 

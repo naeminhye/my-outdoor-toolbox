@@ -12,6 +12,7 @@ export default class SignUp extends Component {
     super(props);
 
     this.state = {
+      _name: '',
       _email: '',
       _password: '',
     };
@@ -22,12 +23,22 @@ export default class SignUp extends Component {
     header: null,
   };
 
+  writeUserData(userId, name, email) {
+    firebaseApp.database().ref('users/' + userId).set({
+      username: name,
+      email: email,
+      profile_picture : 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png'
+    });
+  }
+
   _onSignUp() {
     const { navigate } = this.props.navigation;
     firebaseApp
       .auth()
       .createUserWithEmailAndPassword(this.state._email, this.state._password)
       .then(() => {
+        let user = firebaseApp.auth().currentUser;
+        this.writeUserData(user.uid, this.state._name, this.state._email);
         Alert.alert(
           'Alert Title',
           'Đăng kí thành công với email ' + this.state._email,
@@ -40,7 +51,7 @@ export default class SignUp extends Component {
             {
               text: 'OK',
               onPress: () => {
-                navigate('LogIn')
+                navigate('Tab')
                 //console.log('Failed')
               },
             },
@@ -81,9 +92,11 @@ export default class SignUp extends Component {
           <View style={styles.upperView}>
             <FormInput
               containerStyle={styles.textInput}
-              placeholder="Username"
+              placeholder="Name"
               placeholderTextColor="#fff"
               inputStyle={styles.text}
+              onChangeText={(_name) => this.setState({ _name })}
+              value={this.state._name}
             />
             <FormInput
               containerStyle={styles.textInput}

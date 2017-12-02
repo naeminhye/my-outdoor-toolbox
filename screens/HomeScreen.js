@@ -17,6 +17,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import GridView from 'react-native-super-grid';
+import { firebaseApp } from '../FirebaseConfig';
 
 const ITEM_WIDTH = 280,
 ITEM_HEIGHT = 360;

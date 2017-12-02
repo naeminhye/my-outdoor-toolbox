@@ -26,7 +26,10 @@ export default class PostDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            users: [],
             userId: 'User ID',
+            username: 'User Name',
+            profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
             postId: 'Post ID',
             title: 'Title',
             featuredImage: 'http://drpattydental.com/wp-content/uploads/2017/05/placeholder.png',
@@ -47,7 +50,8 @@ export default class PostDetail extends Component {
 
     componentDidMount() {
         const { params } = this.props.navigation.state;
-        var postRef = firebaseApp.database().ref('posts/' + params.postID);
+
+        let postRef = firebaseApp.database().ref('posts/' + params.postID);
         postRef.on('value', snap => {
             this.setState({
                 userId: snap.val().userId,
@@ -60,7 +64,7 @@ export default class PostDetail extends Component {
                 time: snap.val().time,
                 //tags: snap.val().tags,
             });
-        });   
+        });
     }
 
     timeConverter = (timestamp) => {
@@ -141,14 +145,12 @@ export default class PostDetail extends Component {
                             }} />
                 <View style={{flexDirection:'row', marginTop: 10}}>
                     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', }}>
-                        <Image style={{borderRadius: 40}} source={{
-                            uri: 'https://i.pinimg.com/736x/fd/7f/7c/fd7f7c072ed1af1af5420658f6245a49--calendar--exo-exo.jpg',
-                            width: 80,
-                            height: 80 }}
+                        <Image style={{borderRadius: 40, width: 80, height: 80 }} 
+                        source={{uri: this.state.profile_picture}}
                         />
                     </View>
                     <View style={{ flex: 3, justifyContent: 'space-around', alignContent: 'center' }}>
-                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{this.state.userId}</Text>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{this.state.username}</Text>
                         <Text style={{ fontSize: 14, color: '#ff9797'}}>
                         Yêu màu tím , thích màu hồng, sống nội tâm, hay khóc thầm, ghét sự giả dối.
                         </Text>

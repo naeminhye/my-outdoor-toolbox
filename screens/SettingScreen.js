@@ -32,9 +32,8 @@ export default class SettingScreen extends Component {
   }
 
   componentDidMount() {
-    let user = firebaseApp.auth().currentUser;
-    
-    if (user != null) {
+    firebaseApp.auth().onAuthStateChanged((user) => {
+      if (user != null) {
       this.setState({
       //name: user.displayName,
       email: user.email,
@@ -44,7 +43,7 @@ export default class SettingScreen extends Component {
                        // this value to authenticate with your backend server, if
                        // you have one. Use User.getToken() instead.
       });
-    }
+    }});
   }
     
   static navigationOptions = {
@@ -52,20 +51,30 @@ export default class SettingScreen extends Component {
     }
 
     render() {
+      const { navigate, goBack } = this.props.navigation;
         return (
           <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
           <ParallaxScrollView
           ref={(scroll) => { this.scrollview = scroll; }}
           backgroundColor="#fff"
           contentBackgroundColor="#fff"
-          parallaxHeaderHeight={60}
+          parallaxHeaderHeight={100}
           stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
           renderForeground={() => (
-            <View style={{ paddingTop: 20, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row'}}>
-              <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
-              <TouchableOpacity onPress={()=>{this.props.navigation.goBack()}}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#FF5252', marginBottom: 10, }}>Done</Text>
+            <View  style={{ flexDirection: 'column', paddingTop: 25 }}>
+              <TouchableOpacity 
+                onPress={() => goBack()}>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20 }}>
+                    <Ionicons name={'ios-arrow-back'} size={28}/> 
+                    <Text style={{fontSize: 20, fontWeight: 'bold',}}> Back</Text>
+                </View>
               </TouchableOpacity>
+              <View style={{ paddingTop: 5, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row'}}>
+                <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
+                <TouchableOpacity onPress={()=>{ console.log('Edit'); }}>
+                  <Text style={{ fontSize: 20, color: '#FF5252', marginBottom: 10, }}>Edit</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
           renderStickyHeader={() => (
@@ -77,7 +86,7 @@ export default class SettingScreen extends Component {
           <View style={{ flexDirection:'row' }}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 5,}}>
             <Image style={{borderRadius: AVATAR_SIZE / 2}} source={{
-              uri: 'https://i.pinimg.com/736x/fd/7f/7c/fd7f7c072ed1af1af5420658f6245a49--calendar--exo-exo.jpg',
+              uri: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
               width: AVATAR_SIZE,
               height: AVATAR_SIZE }}
             />
@@ -103,6 +112,15 @@ export default class SettingScreen extends Component {
               <Text style={{ fontSize: 12, textAlign: 'center'}}>following</Text>
             </View>
           </View>
+          <TouchableOpacity onPress={() => {
+            firebaseApp.auth().signOut().then(function() {
+              //TODO: Hành động sau khi signout
+            }).catch(function(error) {
+              // An error happened.
+            });
+          }}>
+          <View style={{ backgroundColor: 'red', width: 100, height: 50}}></View>
+          </TouchableOpacity>
             </ParallaxScrollView>
           </View>
         );

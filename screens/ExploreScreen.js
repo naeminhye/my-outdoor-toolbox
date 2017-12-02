@@ -36,9 +36,10 @@ export default class ExploreScreen extends Component {
       // ],
       dataSource: [],
       categories: [],
+      users: [],
+      profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
     };
 
-    //this.itemRef = firebaseApp.database().ref('posts');
     this.database = firebaseApp.database();
   }
   
@@ -55,6 +56,21 @@ export default class ExploreScreen extends Component {
   }
   
   listenForEvents(database) {
+    database.ref('users').on('value', snap => {
+      let events = [];
+      snap.forEach(child => {
+        events.push({
+          username: child.val().username,
+          userId: child.key,
+          profile_picture: child.val().profile_picture,
+        });
+
+        this.setState({
+          users: events,
+        });
+      });
+    });
+
     database.ref('post_categories').on('value', snap => {
       let events = [];
       snap.forEach(child => {
@@ -82,6 +98,7 @@ export default class ExploreScreen extends Component {
           categoryId: child.val().categoryId,
           category: 'Unknown',
           userId: child.val().userId, // tam thoi dung user name thay cho id
+          username: child.val().userId,
           address: child.val().address,
           //description: child.val().description,
           //content: child.val().content,
@@ -92,23 +109,42 @@ export default class ExploreScreen extends Component {
       
       events.map((item, index) => {
         let categories = this.state.categories;
+        let users = this.state.users;
         categories.map((cat, i) => {
           if(item.categoryId == cat._key)
           {
             item.category = cat.name;
           }
         });
+
+        users.map((user, i) => {
+          if(item.userId == user.userId)
+          {
+            item.username = user.username;
+          }
+        });
       });
         
-
       this.setState({
         dataSource: events,
       });
     });
-    //this.onPressVideo = this.onPressVideo.bind(this);
   }
 
   componentDidMount() {
+    firebaseApp.auth().onAuthStateChanged((user) => {
+      if (user != null) {
+        var userRef = firebaseApp.database().ref('users/' + user.uid);
+        userRef.on('value', snap => {
+          this.setState({
+            profile_picture: snap.val().profile_picture,
+          });
+        });
+      }
+      else {
+        console.log('user bị null');
+      }
+    });
     this.listenForEvents(this.database);
   }
 
@@ -140,7 +176,7 @@ export default class ExploreScreen extends Component {
             <LinearGradient colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.125)', 'rgba(0, 0, 0, 0.25)', ]}
               style={{ width: ITEM_WIDTH, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10 }}> 
               <Text style={{fontSize: 16, color: '#fff', backgroundColor: 'transparent', alignItems: 'center',}}><Ionicons name={'ios-heart-outline'} size={24}/> {item.loves}</Text>
-              <Text style={{fontSize: 16, color: '#fff', backgroundColor: 'transparent',}}>by <Text style={{fontWeight: 'bold', }}>{item.userId}</Text></Text>
+              <Text style={{fontSize: 16, color: '#fff', backgroundColor: 'transparent',}}>by <Text style={{fontWeight: 'bold', }}>{item.username}</Text></Text>
             </LinearGradient>
           </View>
         </Image>
@@ -182,31 +218,6 @@ export default class ExploreScreen extends Component {
     );
   }
 
-  // onPressVideo() {
-  //   this.vid.presentIOSFullscreenPlayer();
-  //   this.vid.seek(5);
-  // }
-
-  // _renderVideos({item}) {
-  //   return(
-  //     <View style={{ padding: 20, borderRadius: 10, width: (window.width - 40), height: (window.width - 40)}}>
-  //     <TouchableOpacity onPress={this.onPressVideo}>
-  //       <Video
-  //         ref={r => {
-  //           this.vid = r;
-  //         }}
-  //         source={item}
-  //         rate={1.0}
-  //         volume={1.0}
-  //         muted={false}
-  //         resizeMode="cover"
-  //         style={{ width: (window.width - 40), height: (window.width - 40) }}
-  //       />
-  //     </TouchableOpacity>
-  //   </View>
-  //   );
-  // }
-
   _renderModalContent = () => (
     <View style={styles.modalContent}>
       <AddNewPost onCancelPress={() => this.setState({ visibleModal: false })} />
@@ -235,7 +246,7 @@ export default class ExploreScreen extends Component {
   );
 
   render() {
-    const { navigate } = this.props.navigation;
+    const { navigate,goBack } = this.props.navigation;
     return (
       <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
       <ParallaxScrollView
@@ -249,10 +260,8 @@ export default class ExploreScreen extends Component {
           <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
           <TouchableOpacity onPress={() => { navigate('Setting'); }}
           style={{ marginBottom: 10, alignItems: 'center', justifyContent: 'center', padding: 5, borderRadius: 50 / 2, borderColor: '#FF5252'}}>
-            <Image style={{borderRadius: 40 / 2}} source={{
-              uri: 'https://i.pinimg.com/736x/fd/7f/7c/fd7f7c072ed1af1af5420658f6245a49--calendar--exo-exo.jpg',
-              width: 40,
-              height: 40 }}
+            <Image style={{borderRadius: 40 / 2, width: 40, height: 40}} 
+              source={{ uri: this.state.profile_picture }}
             />
           </TouchableOpacity>
         </View>
