@@ -18,6 +18,7 @@ import { Constants, Video, LinearGradient } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import Modal from 'react-native-modal';
 import AddNewPost from './AddNewPost';
+import Loading from '../components/Loading';
 
 const SCREEN_LABEL = 'Explore';
 const STICKY_HEADER_HEIGHT = 40;
@@ -30,6 +31,7 @@ export default class ExploreScreen extends Component {
     super(props);
 
     this.state = {
+      isLoading: true,
       visibleModal: false,
       // video: [
       //   { uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', }
@@ -127,6 +129,7 @@ export default class ExploreScreen extends Component {
         
       this.setState({
         dataSource: events,
+        isLoading: false,
       });
     });
   }
@@ -250,106 +253,110 @@ export default class ExploreScreen extends Component {
     return (
       <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
       <ParallaxScrollView
-      ref={(scroll) => { this.scrollview = scroll; }}
-      backgroundColor="#fff"
-      contentBackgroundColor="#fff"
-      parallaxHeaderHeight={100}
-      stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
-      renderForeground={() => (
-        <View style={myStyles.screenHeader}>
-          <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
-          <TouchableOpacity onPress={() => { navigate('Setting'); }}
-          style={{ marginBottom: 10, alignItems: 'center', justifyContent: 'center', padding: 5, borderRadius: 50 / 2, borderColor: '#FF5252'}}>
-            <Image style={{borderRadius: 40 / 2, width: 40, height: 40}} 
-              source={{ uri: this.state.profile_picture }}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
+        ref={(scroll) => { this.scrollview = scroll; }}
+        backgroundColor="#fff"
+        contentBackgroundColor="#fff"
+        parallaxHeaderHeight={100}
+        stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
+        renderForeground={() => (
+          <View style={myStyles.screenHeader}>
+            <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
+            <TouchableOpacity onPress={() => { navigate('Setting'); }}
+            style={{ marginBottom: 10, alignItems: 'center', justifyContent: 'center', padding: 5, borderRadius: 50 / 2, borderColor: '#FF5252'}}>
+              <Image style={{borderRadius: 40 / 2, width: 40, height: 40}} 
+                source={{ uri: this.state.profile_picture }}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       renderStickyHeader={() => (
         <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center',justifyContent: 'flex-end',paddingTop: Constants.statusBarHeight,}}>
           <Text style={{fontSize: 18, fontWeight: 'bold',margin: 10}}
           onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{SCREEN_LABEL}</Text>
         </View>
       )}>
-       {/*Headline*/}
-        <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Latest Stories</Text>
-          <Text style={{ fontSize: 16, color: '#FF5252', }}>See more <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
-        </View>
-        <Carousel
-          data={this.state.dataSource}
-          renderItem={({ item, index })=>{
-            return(
-              <TouchableOpacity onPress={() => {
-                navigate('PostDetail', { postID: item._key });
-              }}> 
-              {this._renderPosts({ item, index })}
-              </TouchableOpacity>
-            )
-          }}
-          sliderWidth={window.width}
-          itemWidth={260}
-          activeSlideAlignment={'start'}
-          inactiveSlideScale={1}
-          inactiveSlideOpacity={1}
-        />
+      { this.state.isLoading ? <Loading /> :
+        <View>
+          {/*Headline*/}
+            <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Latest Stories</Text>
+            <Text style={{ fontSize: 16, color: '#FF5252', }}>See more <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
+          </View>
+          <Carousel
+            data={this.state.dataSource}
+            renderItem={({ item, index })=>{
+              return(
+                <TouchableOpacity onPress={() => {
+                  navigate('PostDetail', { postID: item._key });
+                }}> 
+                {this._renderPosts({ item, index })}
+                </TouchableOpacity>
+              )
+            }}
+            sliderWidth={window.width}
+            itemWidth={260}
+            activeSlideAlignment={'start'}
+            inactiveSlideScale={1}
+            inactiveSlideOpacity={1}
+          />
+
+          {/*Headline*/}
+          <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Take your backpack and go</Text>
+            <Text style={{ fontSize: 16, color: '#FF5252', }}>See all <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
+          </View>
+          {/*
+          <Carousel
+            data={this.state.video}
+            renderItem={this._renderVideos}
+            sliderWidth={window.width}
+            itemWidth={window.width}
+            activeSlideAlignment={'start'}
+            inactiveSlideScale={1}
+            inactiveSlideOpacity={1}
+          />
+          */}
+          {/* Tao function render rieng */}
+          {this._renderSpecialPost()}
+          
+          {/*Headline*/}
+          <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Let's Check-In</Text>
+            <Text style={{ fontSize: 16, color: '#FF5252', }}>See all <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
+          </View>
+          <Carousel
+            data={this.state.dataSource.filter(story => story.categoryId === 3)}
+            renderItem={({ item, index })=>{
+              return(
+                <TouchableOpacity onPress={() => {
+                  navigate('PostDetail', { postID: item._key });
+                }}> 
+                {this._renderPosts({ item, index })}
+                </TouchableOpacity>
+              )
+            }}
+            sliderWidth={window.width}
+            itemWidth={260}
+            activeSlideAlignment={'start'}
+            inactiveSlideScale={1}
+            inactiveSlideOpacity={1}
+          />
 
         {/*Headline*/}
-        <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Take your backpack and go</Text>
-          <Text style={{ fontSize: 16, color: '#FF5252', }}>See all <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
-        </View>
-        {/*
-        <Carousel
-          data={this.state.video}
-          renderItem={this._renderVideos}
-          sliderWidth={window.width}
-          itemWidth={window.width}
-          activeSlideAlignment={'start'}
-          inactiveSlideScale={1}
-          inactiveSlideOpacity={1}
-        />
-        */}
-        {/* Tao function render rieng */}
-        {this._renderSpecialPost()}
-        
-        {/*Headline*/}
-        <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Let's Check-In</Text>
-          <Text style={{ fontSize: 16, color: '#FF5252', }}>See all <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
-        </View>
-        <Carousel
-          data={this.state.dataSource.filter(story => story.categoryId === 3)}
-          renderItem={({ item, index })=>{
-            return(
-              <TouchableOpacity onPress={() => {
-                navigate('PostDetail', { postID: item._key });
-              }}> 
-              {this._renderPosts({ item, index })}
-              </TouchableOpacity>
-            )
-          }}
-          sliderWidth={window.width}
-          itemWidth={260}
-          activeSlideAlignment={'start'}
-          inactiveSlideScale={1}
-          inactiveSlideOpacity={1}
-        />
-
-       {/*Headline*/}
-        <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Categories</Text>
-          <Text style={{ fontSize: 16, color: '#FF5252', }}>See all <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
-        </View>
-        <Carousel
-          data={this.state.categories}
-          renderItem={this._renderCategories}
-          sliderWidth={window.width}
-          itemWidth={260}
-          activeSlideAlignment={'start'}
-          inactiveSlideScale={1}
-          inactiveSlideOpacity={1} />
+          <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Categories</Text>
+            <Text style={{ fontSize: 16, color: '#FF5252', }}>See all <Ionicons name={'ios-arrow-forward'} size={16}/></Text>
+          </View>
+          <Carousel
+            data={this.state.categories}
+            renderItem={this._renderCategories}
+            sliderWidth={window.width}
+            itemWidth={260}
+            activeSlideAlignment={'start'}
+            inactiveSlideScale={1}
+            inactiveSlideOpacity={1} />
+        </View> 
+      }
       </ParallaxScrollView>
 
       <TouchableOpacity onPress={() => { this.setState({ visibleModal: true }) }}>
@@ -368,13 +375,12 @@ export default class ExploreScreen extends Component {
 const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 10,
     borderColor: 'rgba(0, 0, 0, 0.1)',
-    height: window.height - 60,
+    height: window.height,
     width: window.width,
+    paddingTop: Constants.statusBarHeight,
   },
   bottomModal: {
-    marginTop: 40,
     margin: 0,
   },
 });

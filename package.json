@@ -19,6 +19,7 @@
     "react": "16.0.0-alpha.12",
     "react-native": "https://github.com/expo/react-native/archive/sdk-21.0.2.tar.gz",
     "react-native-elements": "^0.17.0",
+    "react-native-keyboard-aware-scroll-view": "^0.4.1",
     "react-native-lightbox": "^0.7.0",
     "react-native-modal": "^4.1.1",
     "react-native-parallax-scroll-view": "^0.20.1",

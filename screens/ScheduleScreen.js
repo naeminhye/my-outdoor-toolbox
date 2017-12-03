@@ -38,19 +38,32 @@ export default class ScheduleScreen extends Component {
     }
 
   render() {
+    const { navigate, goBack } = this.props.navigation;
     return (
-        <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
-        <ParallaxScrollView
-        ref={(scroll) => { this.scrollview = scroll; }}
-        backgroundColor="#fff"
-        contentBackgroundColor="#fff"
-        parallaxHeaderHeight={100}
-        stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
-        renderForeground={() => (
-          <View style={myStyles.screenHeader}>
-          <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
+      <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
+      <ParallaxScrollView
+      ref={(scroll) => { this.scrollview = scroll; }}
+      backgroundColor="#fff"
+      contentBackgroundColor="#fff"
+      parallaxHeaderHeight={100}
+      stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
+      renderForeground={() => (
+        <View  style={{ flexDirection: 'column', paddingTop: 25 }}>
+          <TouchableOpacity 
+            onPress={() => goBack()}>
+            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20 }}>
+                <Ionicons name={'ios-arrow-back'} size={28}/> 
+                <Text style={{fontSize: 20, fontWeight: 'bold',}}> Back</Text>
+            </View>
+          </TouchableOpacity>
+          <View style={{ paddingTop: 5, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row'}}>
+            <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
+            <TouchableOpacity onPress={()=>{ console.log('Edit'); }}>
+              <Text style={{ fontSize: 20, color: '#FF5252', marginBottom: 10, }}>Edit</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        )}
+      )}
         renderStickyHeader={() => (
           <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center',justifyContent: 'flex-end',paddingTop: Constants.statusBarHeight,}}>
             <Text style={{fontSize: 18, fontWeight: 'bold',margin: 10}}

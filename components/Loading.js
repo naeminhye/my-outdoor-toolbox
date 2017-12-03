@@ -23,26 +23,22 @@ export default class Loading extends Component {
     }
     
     render() {
-        console.log('Spinning');
         return(
-            <View style={{ flex: 1, backgroundColor: '#FF5252', justifyContent:'center', alignItems: 'center' }}>
+            <View style={{ flex: 1, backgroundColor: '#FFF', justifyContent:'center', alignItems: 'center' }}>
                 <View>
                     <Animation 
                     style={{
-                        width: 200,
-                        height: 200,
+                        width: 400,
+                        height: 300,
                     }} 
                     ref={animation => {
                         this.animation = animation;
                     }}
-                    source={require('../assets/lottie/loading.json')} 
+                    source={require('../assets/lottie/loader.json')} 
                     // progress={this.state.progress} 
                     loop={true} />    
                 </View>
                 {/* <ActivityIndicator size={'large'} color={'#FF5252'}/> */}
-                <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#FFF' }}>
-                    Loading...
-                </Text>
             </View>
         );
     }

@@ -53,7 +53,6 @@ export default class WeatherCard extends React.Component {
                   flex: 1,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  opacity: 0.7,
                 }}
                 resizeMode="cover"
               >
@@ -62,30 +61,6 @@ export default class WeatherCard extends React.Component {
                 <Text style={styles._temperature}>{this.state.temp}°C</Text>
                 <Ionicons name={'ios-partly-sunny-outline'} size={ITEM_WIDTH/4} color='white' style={{backgroundColor: 'transparent',}}/>
               </Image>
-              <View
-                style={{
-                  backgroundColor: '#fff',
-                  position: 'absolute',
-                  bottom: -15,
-                  alignSelf: 'center',
-                  borderRadius: 50,
-                  padding: 10,
-                  width: 100,
-                  height: 50,
-                  justifyContent: 'space-around',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  shadowColor: '#000',
-                  shadowOffset: { width: -2, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 2,
-                  elevation: 1,
-                }}>
-                <TouchableOpacity onPress={() => {}}>
-                    <Ionicons name={'ios-share-outline'} size={25}/>
-                </TouchableOpacity>
-                <Text style={{ fontSize: 16 }}>Share</Text>
-              </View>
             </View>
           );
     }

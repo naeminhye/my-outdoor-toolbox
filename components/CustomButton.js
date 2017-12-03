@@ -1,22 +1,28 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+
+import PropTypes from 'prop-types';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
 export default function CustomButton({ 
 	text, 
-	bgColor = '#FFF', 
+	backgroundColor = '#FFF', 
 	color = '#000', 
 	borderWidth = 1, 
-	borderColor = '#000', 
+  borderColor = '#000', 
+  width = WIDTH * 0.8,
+  height = HEIGHT * 0.08,
+  fontSize = 22,
 	onPress}) {
 		
 	return (
     <TouchableOpacity 
-		activeOpacity={0.9} 
-		style={[styles.button, { backgroundColor: bgColor, borderColor: borderColor, borderWidth: borderWidth }]} 
-		onPress={onPress}>
-		<Text style={[styles.buttonText, { color: color }]}>{text}</Text>
+      {...this.props}
+      activeOpacity={0.9} 
+      style={[styles.button, { backgroundColor: backgroundColor, borderColor: borderColor, borderWidth: borderWidth, width: width, height: height, }]} 
+      onPress={onPress}>
+      <Text style={[styles.buttonText, { color: color, fontSize: fontSize }]}>{text}</Text>
     </TouchableOpacity>
 	);
 }
@@ -26,14 +32,15 @@ CustomButton.propTypes = {
   bgColor: PropTypes.string,
   color: PropTypes.string,
   borderColor: PropTypes.string,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  fontSize: PropTypes.number,
   //borderWidth: PropTypes.number,
   onPress: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
   button: {
-    width: WIDTH * 0.8,
-    height: HEIGHT * 0.08,
     borderRadius: 50,
     //borderWidth: 2,
     //backgroundColor: '#FFF',
@@ -43,8 +50,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     alignSelf: 'center',
-    fontSize: 22,
-    fontWeight: '150',
+    fontWeight: '200',
     //color: '#B9A8FF',
   },
 });
