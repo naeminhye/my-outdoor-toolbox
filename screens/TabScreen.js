@@ -13,6 +13,7 @@ import AddNewPost from './AddNewPost';
 import WeatherScreen from './WeatherScreen';
 import ScheduleScreen from './ScheduleScreen';
 import AgendaScreen from './AgendaScreen';
+import MessageDetail from './MessageDetail';
 
 const TabInStack = TabNavigator({
     Home: { 
@@ -50,6 +51,7 @@ const TabScreen = StackNavigator({
   TabInStack: { screen: TabInStack },
   PostDetail: { screen: PostDetail },
   Setting: { screen: SettingScreen },
+  MessageDetail: { screen: MessageDetail },
   //AddPost: { screen: AddNewPost },
   // Weather: { screen: WeatherScreen },
   // Schedule: { screen: ScheduleScreen },

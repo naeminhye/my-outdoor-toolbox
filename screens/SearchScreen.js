@@ -397,52 +397,6 @@ export default class SearchScreen extends Component {
               _focus: false,
             });
           }}/>
-            {/*
-            <View style={styles.searchBox}>
-              <Ionicons
-                name="ios-search"
-                size={20}
-                style={{ paddingRight: 5 }}
-              />
-              <TextInput
-                style={{ flex: 1 }}
-                onFocus={() => {
-                  this.setState({
-                    _focus: true,
-                  });
-                }}
-                ref={input => {
-                  this.textInput = input;
-                }}
-                returnKeyType="search"
-                onSubmitEditing={this._handleSubmitText}
-                placeholder="Search places"
-                value={this.state.inputValue}
-                onChangeText={this._handleTextChange}
-                onBlur={() => {
-                  this.setState({
-                    _focus: false,
-                  });
-                }}
-              />
-              {(this.state.inputValue !== '' && this.state._focus)
-              ? <TouchableHighlight onPress={() => {
-                this.textInput.clear();
-                this.textInput.focus();
-                this.setState({
-                  inputValue: '',
-                });
-              }}>
-                  <Ionicons
-                    name="ios-close-circle"
-                    size={20}
-                    style={{ paddingLeft: 5 }}
-                    color="#8e8e93"
-                  />
-                </TouchableHighlight>
-              : null}
-            </View>
-            */}
             {this.state._focus
               ? <TouchableOpacity
                   onPress={() => {

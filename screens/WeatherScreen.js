@@ -264,7 +264,7 @@ export default class WeatherScreen extends Component {
                 onPress={() => goBack()}>
                 <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20 }}>
                     <Ionicons name={'ios-arrow-back'} size={28}/> 
-                    <Text style={{fontSize: 20, fontWeight: 'bold',}}> Back</Text>
+                    <Text style={{fontSize: 20,}}> Back</Text>
                 </View>
               </TouchableOpacity>
               <View style={{ paddingTop: 5, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row'}}>

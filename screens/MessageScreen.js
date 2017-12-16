@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import {
   TouchableHighlight,
   Text,
+  TextInput,
   View,
   Image,
   ScrollView,
   ListView,
   Dimensions,
   StyleSheet,
-  FlatList,
-  ListItem,
   TouchableOpacity
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -18,9 +17,11 @@ import {RkText, RkTextInput, RkTheme} from 'react-native-ui-kitten';
 import myStyles from '../assets/styles/myStyles';
 import { Constants } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
+import MessageListItem from '../components/MessageListItem';
 
 const SCREEN_LABEL = 'Message';
-const STICKY_HEADER_HEIGHT = 110;
+const STICKY_HEADER_HEIGHT = 40;
+const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 export default class MessageScreen extends Component {
   constructor(props) {
@@ -30,8 +31,12 @@ export default class MessageScreen extends Component {
       editable: false,
       _focus: false,
       inputValue: '',
-      conversations: null,
+      conversations: [],
+      userCons: [],
+      dataSource: ds.cloneWithRows([]),
     };
+
+    this.database = firebaseApp.database();
 
     this._handleTextChange = this._handleTextChange.bind(this);
     this._handleSubmitText = this._handleSubmitText.bind(this);
@@ -60,17 +65,89 @@ export default class MessageScreen extends Component {
     console.log(this.state.inputValue);
   };
 
+  renderChatList() {
+    return (
+      <View>
+        <ListView
+          style={{ padding: 10 }}
+          dataSource={this.state.dataSource}
+          renderRow={rowData => (
+            <TouchableOpacity onPress={() => 
+              navigate('MessageDetail', { id: rowData.id })
+            }>
+              <MessageListItem
+                name={rowData.name}
+                //text={rowData.text}
+                //image={rowData.image}
+              />
+            </TouchableOpacity>
+          )}
+          renderSeparator={(
+            sectionID,
+            rowID,
+            adjacentRowHighlighted
+          ) => (
+            <View
+              key={rowID}
+              style={{ height: 1, backgroundColor: 'lightgray' }}
+            />
+          )}
+        />
+      </View>
+    );
+  }
+
   componentDidMount() {
     firebaseApp.auth().onAuthStateChanged(user => {
       if (user != null) {
-        var userRef = firebaseApp.database().ref('users/' + user.uid);
-        userRef.on('value', snap => {
-          if(snap.val().conversations != null) {
-            this.setState({
-              conversations: snap.val().conversations,
+        var conversationRef = firebaseApp.database().ref('users/' + user.uid + '/conversations/');
+        
+        if(conversationRef) {
+          var userCons = [];
+          conversationRef.on('value', snap => {
+          snap.forEach(child => {
+            userCons.push({
+              conversation_id: child.val()._id,
             });
-          }
-        });
+          });
+
+          this.database.ref('conversations').on('value', snap => {
+            var events = [];
+            var data = [];
+            var lastIndex = 0;
+            var lastMsg = [];
+            snap.forEach(child => {
+              lastMsg = child.val().messages;
+              lastIndex = lastMsg.length - 1;
+              events.push({
+                name: child.val().name,
+                _key: child.key,
+                last_text: lastMsg[lastIndex].text,
+                last_time: lastMsg[lastIndex].time,
+              });
+            });
+      
+            events.map((item, index) => {
+              userCons.map((cons, i) => {
+                if (item._key == cons.conversation_id) {
+                  data.push({
+                    conversation_id: item._key,
+                    name: item.name,
+                    last_text: item.last_text,
+                    last_time: item.last_time,
+                  });
+                }
+              });
+            });
+      
+            this.setState({
+              //conversations: events,
+              dataSource: ds.cloneWithRows(data),
+            });
+            console.log(this.state.dataSource);
+          });
+          });
+        }
       } else {
         console.log('user bị null');
       }
@@ -119,6 +196,7 @@ export default class MessageScreen extends Component {
   }
 
   render() {
+    const { navigate } = this.props.navigation;
     return (
       <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
       <ParallaxScrollView
@@ -174,45 +252,37 @@ export default class MessageScreen extends Component {
         <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center',justifyContent: 'flex-end',paddingTop: Constants.statusBarHeight,}}>
           <Text style={{fontSize: 18, fontWeight: 'bold',margin: 10}}
           onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{SCREEN_LABEL}</Text>
-          <View style={{ flexDirection: 'row', padding: 10, alignItems: 'center' }}>
-            <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
-              style={{paddingRight: 10, flex: 1, }} clearButtonMode='always'
-              onFocus={() => {
-                this.setState({
-                  _focus: true,
-                });
-              }}
-              ref={input => {
-                this.textInput = input;
-              }}
-              returnKeyType="search"
-              onSubmitEditing={this._handleSubmitText}
-              placeholder="Search conversation"
-              value={this.state.inputValue}
-              onChangeText={this._handleTextChange}
-              onBlur={() => {
-                this.setState({
-                  _focus: false,
-                });
-              }}/>
-                {this.state._focus
-                  ? <TouchableOpacity
-                      onPress={() => {
-                        this.setState({
-                          _focus: false,
-                        });
-                        this.textInput.blur();
-                      }}>
-                      <Text style={{ fontSize: 18, color: '#007aff', margin: 10 }}>
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
-                  : null}
-            </View>
           </View>
       )}>
-          { this.state.conversations ? <View><Text>Hello user</Text></View>
-          : <View><Text>No conversation</Text></View>}
+          { this.state.dataSource.getRowCount() > 0 ? 
+            <View>
+              <ListView
+                style={{ padding: 10 }}
+                dataSource={this.state.dataSource}
+                renderRow={rowData => (
+                  <TouchableOpacity onPress={() => 
+                    navigate('MessageDetail', { conversation_id: rowData.conversation_id })
+                  }>
+                    <MessageListItem
+                      name={rowData.name}
+                      text={rowData.last_text}
+                      //image={rowData.image}
+                      time={rowData.last_time}
+                    />
+                  </TouchableOpacity>
+                )}/>
+            </View>
+          : <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>
+                No conversation
+              </Text>
+            </View>}
         
 
         </ParallaxScrollView>
