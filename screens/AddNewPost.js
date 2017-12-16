@@ -38,25 +38,59 @@ export default class AddNewPost extends Component {
     // }
 
     writeNewPost() {
-        // A post entry.
-        var postData = {
-          author: this.state.username,
-          uid: this.state.uid,
-          content: this.state.content,
-          description: this.state.description,
-          title: this.state.title,
-          //
-        };
-      
-        // Get a key for a new Post.
-        var newPostKey = firebaseApp.database().ref().child('posts').push().key;
-      
-        // Write the new post's data simultaneously in the posts list and the user's post list.
-        var updates = {};
-        updates['/posts/' + newPostKey] = postData;
-        //updates['/user-posts/' + uid + '/' + newPostKey] = postData;
-      
-        return firebase.database().ref().update(updates);
+        let d = new Date();
+        let n = (d.getTime() / 1000).toFixed();
+        
+        firebaseApp.auth().onAuthStateChanged((user) => {
+            if (user != null) {
+                this.setState({
+                    uid: user.uid,
+                });
+                
+                var tags = this.state.tags;
+                var postTags = {};
+                for ( var i = 0; i < this.state.tags.length; i ++) {
+                    postTags = Object.assign( { [i]: tags[i] }, postTags);
+                }
+
+                // A post entry.
+                var postData = {
+                  userId: this.state.uid,
+                  //author: this.state.username,
+                  title: this.state.title,
+                  content: this.state.content,
+                  description: this.state.description,
+                  tags: postTags,
+                  //featureImage
+                  //address: '',
+                  categoryId: 0,
+                  time: n,
+                  //
+                };
+
+                // Get a key for a new Post.
+                var newPostKey = firebaseApp.database().ref().child('posts').push().key;
+                
+                let numOfPosts = 0;
+                firebaseApp.database().ref('users/' + user.uid).child('posts').on("value", (snap) => {
+                    numOfPosts = snap.numChildren();
+                });
+                
+                // Write the new post's data simultaneously in the posts list and the user's post list.
+                var updates = {};
+                updates['/posts/' + newPostKey] = postData;
+                updates['/users/' + user.uid + '/posts/' + numOfPosts] = newPostKey;
+
+                this.setState({
+                    // goBack
+                });
+
+                return firebaseApp.database().ref().update(updates);
+            }
+            else {
+              console.log('chưa đăng nhập');
+            }
+          });
       }
 
       _pickImage = async () => {
@@ -218,9 +252,8 @@ export default class AddNewPost extends Component {
                 <View style={{ flexDirection:'row', justifyContent: 'space-around' }}>
                     <CustomButton text={'Cancel'} borderColor={'#FF5252'} borderWidth={2} color={'#FF5252'} fontSize={18} width={150} height={50} onPress={this.props.onCancelPress}/>
                     <CustomButton text={'Next'} backgroundColor={'#FF5252'} borderWidth={0} color={'#fff'} fontSize={18} width={150} height={50} onPress={() => {
-                        console.log(this.state.title);
-                        console.log(this.state.content);
-                        console.log(this.state.feature_image);
+                        this.writeNewPost();
+                        this.props.onCancelPress();
                     }}/>
                 </View>
             </View>

@@ -10,15 +10,18 @@ import myStyles from '../assets/styles/myStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Constants } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
-import Timeline from 'react-native-timeline-listview'
+import Timeline from 'react-native-timeline-listview';
+import { firebaseApp } from '../FirebaseConfig';
 
 const STICKY_HEADER_HEIGHT = 40;
-const SCREEN_LABEL = 'Schedule';
+const SCREEN_LABEL = 'Agenda';
 
-export default class ScheduleScreen extends Component {
+export default class AgendaScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      agenda: null,
+
       items: {
           "2017-12-25": [
             {
@@ -56,62 +59,49 @@ export default class ScheduleScreen extends Component {
     return [year, month, day].join('-');
     }
 
+  componentDidMount() {
+    firebaseApp.auth().onAuthStateChanged(user => {
+      if (user != null) {
+        var userRef = firebaseApp.database().ref('users/' + user.uid + '/agenda/');
+        userRef.on('value', snap => {
+          this.setState({
+            agenda: snap
+          });
+        });
+      } else {
+        console.log('user is null');
+      }
+    });
+  }
+
   render() {
     const { navigate, goBack } = this.props.navigation;
     var today = new Date();
     return (
         <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Constants.statusBarHeight, }}>
-        <ParallaxScrollView
-        ref={(scroll) => { this.scrollview = scroll; }}
-        backgroundColor="#fff"
-        contentBackgroundColor="#fff"
-        parallaxHeaderHeight={100}
-        stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
-        renderForeground={() => (
-          <View  style={{ flexDirection: 'column', paddingTop: 25 }}>
-            <TouchableOpacity 
-              onPress={() => goBack()}>
-              <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20 }}>
-                  <Ionicons name={'ios-arrow-back'} size={28}/> 
-                  <Text style={{fontSize: 20, fontWeight: 'bold',}}> Back</Text>
-              </View>
-            </TouchableOpacity>
-            <View style={{ paddingTop: 5, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row'}}>
-              <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
-              <TouchableOpacity onPress={()=>{ console.log('Edit'); }}>
-                <Text style={{ fontSize: 20, color: '#FF5252', marginBottom: 10, }}>Edit</Text>
-              </TouchableOpacity>
-            </View>
+        <View  style={{ flexDirection: 'column', paddingTop: 25 }}>
+        <TouchableOpacity 
+          onPress={() => goBack()}>
+          <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20 }}>
+              <Ionicons name={'ios-arrow-back'} size={28}/> 
+              <Text style={{fontSize: 20, fontWeight: 'bold',}}> Back</Text>
           </View>
-        )}
-          renderStickyHeader={() => (
-            <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center',justifyContent: 'flex-end',paddingTop: Constants.statusBarHeight,}}>
-              <Text style={{fontSize: 18, fontWeight: 'bold',margin: 10}}
-              onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{SCREEN_LABEL}</Text>
-            </View>
-          )}>
+        </TouchableOpacity>
+        <View style={{ paddingTop: 5, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row'}}>
+          <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
+          <TouchableOpacity onPress={()=>{ console.log('Edit'); }}>
+            <Text style={{ fontSize: 20, color: '#FF5252', marginBottom: 10, }}>Edit</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
         <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
         <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Calendar</Text>
-        <TouchableOpacity onPress={() => navigate('Agenda')}>
+        <TouchableOpacity>
             <Text style={{ fontSize: 16, color: '#FF5252', }}>More</Text>
         </TouchableOpacity>
         </View>
-        <Calendar
-            onDayPress={this.onDayPress}
-            style={styles.calendar}
-            markedDates={{[this.state.selected]: {selected: true}}}
-            hideArrows={false}
-            theme={{
-                dotColor: '#FF5252',
-                todayTextColor: '#FF5252',
-                textMonthFontSize: 20,
-                selectedDayBackgroundColor: '#FF5252',
-                arrowColor: '#FF5252',
-            }}
-        /> 
-        {/*
         <Agenda
-                items={this.state.items}
+                items={this.state.agenda}
                 loadItemsForMonth={this.loadItems.bind(this)}
                 selected={this.formatDate(today)}
                 renderItem={this.renderItem.bind(this)}
@@ -125,28 +115,6 @@ export default class ScheduleScreen extends Component {
                     textMonthFontSize: 20,
                 }}
             />
-        */}
-        <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Today's <Text style={{color: 'red'}}>Schedule</Text></Text>
-        <Text style={{ fontSize: 16, color: '#FF5252', }}>More</Text>
-        </View>
-        <Timeline 
-            style={{flex: 1, padding: 20, }}
-            data={this.state.data}
-            circleSize={30}
-            circleColor='rgba(0,0,0,0)'
-            lineColor='rgb(45,156,219)'
-            timeContainerStyle={{ minWidth: 65, marginTop: -5, borderRadius:50}}
-            timeStyle={{textAlign: 'center', fontSize: 18, backgroundColor:'transparent', color:'black', padding:5,}}
-            descriptionStyle={{color:'gray'}}
-            options={{
-                style:{paddingTop:5}
-            }}
-            innerCircle={'icon'}
-            separator={false}
-            detailContainerStyle={{marginBottom: 20, padding: 20, backgroundColor: "#BBDAFF", borderRadius: 20, shadowColor: '#000', shadowOffset: { width: -2, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 1,}}
-        />
-        </ParallaxScrollView>
         <TouchableOpacity onPress={() => {}}>
             <View style={{ backgroundColor: '#FF5252', width: 60, height: 60, borderRadius:30, position: 'absolute', bottom: 30, right: 30, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: -2, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 1,}}>
                 <Ionicons name={'md-add'} size={32} color={'#FFF'} />
@@ -162,6 +130,54 @@ export default class ScheduleScreen extends Component {
     });
   }
 
+  loadItems(day) {
+    setTimeout(() => {
+      for (let i = -15; i < 85; i++) {
+        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+        const strTime = this.timeToString(time);
+        console.log(this.state.agenda);
+        if (!this.state.agenda[strTime]) {
+          this.state.agenda[strTime] = [];
+          const numItems = Math.floor(Math.random() * 5);
+          for (let j = 0; j < numItems; j++) {
+            // this.state.items[strTime].push({
+            //   name: 'Item for ' + strTime,
+            //   height: Math.max(50, Math.floor(Math.random() * 150))
+            // });
+          }
+        }
+      }
+      //console.log(this.state.items);
+      const newItems = {};
+      Object.keys(this.state.agenda).forEach(key => {newItems[key] = this.state.agenda[key];});
+      this.setState({
+        //items: newItems,
+        agenda: newItems,
+      });
+    }, 1000);
+    // console.log(`Load Items for ${day.year}-${day.month}`);
+  }
+
+  renderItem(item) {
+    return (
+      <View style={{height: 100, flexDirection: 'row', borderRadius: 10, marginRight: 10, marginTop: 17}}>
+        <View style={{ backgroundColor: 'red', width: 5, height: 100}}></View>
+        <View style={styles.item}><Text>{item.name}</Text></View>
+        
+      </View>
+    );
+  }
+
+  renderEmptyDate() {
+    return (
+        <View style={[styles.emptyDate, {height: 50}]}><Text style={{fontSize: 18}}>This is empty date!</Text></View>
+    );
+  }
+
+  rowHasChanged(r1, r2) {
+    return r1.name !== r2.name;
+  }
+
   timeToString(time) {
     const date = new Date(time);
     return date.toISOString().split('T')[0];
@@ -175,20 +191,17 @@ const styles = StyleSheet.create({
       borderBottomWidth: 1,
       borderColor: '#eee',
       margin: 10,
-      borderRadius: 20,
-      shadowColor: '#000', 
-      shadowOffset: { width: -2, height: 2 }, 
-      shadowOpacity: 0.1, 
-      shadowRadius: 5, 
+      borderRadius: 15,
+      shadowColor: '#000',
+      shadowOffset: { width: -5, height: 5 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
       elevation: 1,
     },
   item: {
     backgroundColor: 'white',
     flex: 1,
-    borderRadius: 10,
     padding: 10,
-    marginRight: 10,
-    marginTop: 17
   },
   emptyDate: {
     height: 15,

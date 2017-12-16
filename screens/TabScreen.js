@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 
 import HomeScreen from './HomeScreen';
@@ -10,11 +12,29 @@ import SettingScreen from './SettingScreen';
 import AddNewPost from './AddNewPost';
 import WeatherScreen from './WeatherScreen';
 import ScheduleScreen from './ScheduleScreen';
+import AgendaScreen from './AgendaScreen';
 
 const TabInStack = TabNavigator({
-    Home: { screen: HomeScreen },
-    Message: { screen: MessageScreen },
-    Explore: { screen: ExploreScreen },
+    Home: { 
+      screen: HomeScreen,
+      navigationOptions: {
+        header: null,
+        tabBarLabel: 'Home',
+        tabBarIcon: ({ tintColor, focused }) => (
+          <Ionicons
+            name={focused ? 'ios-home' : 'ios-home-outline'}
+            size={26}
+            style={{ color: tintColor }}
+          />
+        ),
+      }
+    },
+    Message: { 
+      screen: MessageScreen 
+    },
+    Explore: { 
+      screen: ExploreScreen 
+    },
     Noti: { screen: NotiScreen }, 
     Search: { screen: SearchScreen },
   }, {
@@ -31,7 +51,8 @@ const TabScreen = StackNavigator({
   PostDetail: { screen: PostDetail },
   Setting: { screen: SettingScreen },
   //AddPost: { screen: AddNewPost },
-  Weather: { screen: WeatherScreen },
-  Schedule: { screen: ScheduleScreen },
+  // Weather: { screen: WeatherScreen },
+  // Schedule: { screen: ScheduleScreen },
+  // Agenda: { screen: AgendaScreen },
 });
 export default TabScreen;

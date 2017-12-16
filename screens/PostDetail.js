@@ -62,7 +62,7 @@ export default class PostDetail extends Component {
                 description: snap.val().description,
                 loves: snap.val().loves,
                 time: snap.val().time,
-                //tags: snap.val().tags,
+                tags: snap.val().tags,
             });
         });
     }

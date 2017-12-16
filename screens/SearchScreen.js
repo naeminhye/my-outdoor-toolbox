@@ -522,13 +522,6 @@ export default class SearchScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   paddingTop: Constants.statusBarHeight,
-  //   backgroundColor: '#fff',
-  // },
   searchBox: {
     backgroundColor: '#f0efec',
     flex: 1,
