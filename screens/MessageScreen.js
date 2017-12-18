@@ -123,7 +123,7 @@ export default class MessageScreen extends Component {
                 name: child.val().name,
                 _key: child.key,
                 last_text: lastMsg[lastIndex].text,
-                last_time: lastMsg[lastIndex].time,
+                last_time: lastMsg[lastIndex].createdAt,
               });
             });
       

@@ -4,12 +4,7 @@ const itemHeight = 80;
 
 export default class MessageListItem extends Component {
     timeConverter = (timestamp) => {
-        var today = new Date();
-        let date = new Date(timestamp * 1000),
-            months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        let	year = date.getFullYear(),
-            month = months[date.getMonth()],
-            day = date.getDate();
+        let date = new Date(timestamp * 1000);
         let hours = date.getHours(),
             minutes = "0" + date.getMinutes();
         
