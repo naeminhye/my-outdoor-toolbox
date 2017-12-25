@@ -45,8 +45,11 @@ export default class MessageDetail extends Component {
 
         firebaseApp.auth().onAuthStateChanged(user => {
           if (user != null) {
-            this.setState({
-                currentUser: user.uid
+            this.database.ref('users/' + user.uid).on('value', snap => {
+              this.setState({
+                currentUser: user.uid,
+                nameOfUser: snap.val().username,
+              });
             });
 
             this.database.ref('conversations/' + params.conversation_id).on('value', snap => {

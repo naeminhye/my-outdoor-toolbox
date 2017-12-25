@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Button } from 'react-native-elements'; // 0.17.0
 import { Facebook } from 'expo';
-import { firebaseApp } from '../FirebaseConfig';
 import TabScreen from './TabScreen';
 import Loading from '../components/Loading';
+import { firebaseApp } from '../FirebaseConfig';
+import Backend from '../Backend';
 
 export default class StartScreen extends Component {
   constructor(props) {
@@ -59,6 +60,19 @@ export default class StartScreen extends Component {
   };
 
   componentDidMount() {
+    // if(Backend.getUid()) {
+    //   setTimeout(() => {
+    //     this.setState({
+    //       isLoggedIn: true,
+    //       isLoading: false
+    //     })
+    //   }, 3000);
+    // }
+    // else {
+    //   this.setState({
+    //     isLoading: false
+    //   });
+    // }
     firebaseApp.auth().onAuthStateChanged((user) => {
       if (user) {
         setTimeout(() => {

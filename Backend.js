@@ -1,25 +1,18 @@
 import * as firebase from 'firebase';
+import { firebaseApp } from './FirebaseConfig';
 
 class Backend {
-    uid = '';
+    uid = null;
     database = null;
     postRef = null;
 
     constructor() {
-        firebase.initializeApp({
-            apiKey: "AIzaSyDuEoTFsDCQjE7ZYqGZEL87AmwQ_9ai4eE",
-            authDomain: "my-outdoor-toolbox.firebaseapp.com",
-            databaseURL: "https://my-outdoor-toolbox.firebaseio.com",
-            projectId: "my-outdoor-toolbox",
-            storageBucket: "my-outdoor-toolbox.appspot.com",
-            messagingSenderId: "824098795668"
-          });
         firebaseApp.auth().onAuthStateChanged((user) => {
             if (user) {
                 this.setUid(user.uid);
                 //this.database = firebaseApp.database();
             } else {
-                console.log('user bị null');
+                console.log('user :' + this.uid);
             }
         });
     }
@@ -30,6 +23,23 @@ class Backend {
 
     getUid() {
         return this.uid;
+    }
+
+    getState() {
+        setTimeout(() => {
+            firebaseApp.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.isLoggedIn = true;
+            }
+            else {
+                this.isLoggedIn = false;
+            }
+            });
+        }, 3000);
+    }
+
+    getProfilePicture() {
+
     }
 
     loadPosts(callback) {

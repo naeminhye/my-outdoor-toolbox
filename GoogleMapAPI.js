@@ -11,3 +11,14 @@ exports.nearbysearch = (lat, lon, radius, type, keyword) => {
     };
   });
 };
+
+exports.placephoto = (maxwidth, photo_reference) => {
+  let url = `${rootURL}/place/photo?maxwidth=${maxwidth}&photoreference=${photo_reference}&key=${key}`;
+  console.log(url);
+  // return fetch(url).then(res => res.json()).then(json => {
+  //   return {
+  //     photo_url: json
+  //   };
+  // });
+  return url;
+}

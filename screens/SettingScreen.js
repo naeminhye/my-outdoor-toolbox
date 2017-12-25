@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
-import { Constants } from 'expo';
+import { Constants, ImagePicker } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import { firebaseApp } from '../FirebaseConfig';
 
@@ -23,32 +23,65 @@ export default class SettingScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: 'Đỗ Khánh Tú', 
+      name: 'UNKNOWN', 
       email: 'UNKNOWN', 
       photoUrl: '', 
+      profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
       uid: '', 
-      emailVerified: false
+      emailVerified: false,
+      numOfPosts: 0,
+      bio: '',
     };
   }
 
   componentDidMount() {
     firebaseApp.auth().onAuthStateChanged((user) => {
       if (user != null) {
-      this.setState({
-      //name: user.displayName,
-      email: user.email,
-      photoUrl: user.photoURL, 
-      emailVerified: user.emailVerified,
-      uid: user.uid,  // The user's ID, unique to the Firebase project. Do NOT use
-                       // this value to authenticate with your backend server, if
-                       // you have one. Use User.getToken() instead.
-      });
+        var userRef = firebaseApp.database().ref('users/' + user.uid);
+        userRef.on('value', snap => {
+          this.setState({
+            profile_picture: snap.val().profile_picture,
+            name: snap.val().username,
+            bio: snap.val().bio,
+          });
+        });
+
+        firebaseApp.database().ref('users/' + user.uid).child('posts').on("value", (snap) => {
+          this.setState({
+            numOfPosts: snap.numChildren()
+          });
+        });
+
+        this.setState({
+          //name: user.displayName,
+          email: user.email,
+          photoUrl: user.photoURL, 
+          emailVerified: user.emailVerified,
+          uid: user.uid,  // The user's ID, unique to the Firebase project. Do NOT use
+                          // this value to authenticate with your backend server, if
+                          // you have one. Use User.getToken() instead.
+        });
+        console.log('user photo: ' + user.photoUrl + ' user email: ' + user.email);
     }});
   }
     
   static navigationOptions = {
     header: null,
     }
+
+    _pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+      });
+  
+      console.log(result);
+  
+      if (!result.cancelled) {
+        this.setState({ profile_picture: result.uri });
+        //TODO: upload hinh len firebase
+      }
+    };
 
     render() {
       const { navigate, goBack } = this.props.navigation;
@@ -84,27 +117,28 @@ export default class SettingScreen extends Component {
             </View>
           )}>
           <View style={{ flexDirection:'row' }}>
+          
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 5,}}>
-            <Image style={{borderRadius: AVATAR_SIZE / 2}} source={{
-              uri: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
-              width: AVATAR_SIZE,
-              height: AVATAR_SIZE }}
-            />
+            <TouchableOpacity onPress={this._pickImage}>
+              <Image style={{borderRadius: AVATAR_SIZE / 2, width: AVATAR_SIZE, height: AVATAR_SIZE}} source={{
+                uri: this.state.profile_picture, }}
+              />
+            </TouchableOpacity>
           </View>
           <View style={{ flex: 2, justifyContent: 'space-around', padding: 20, alignContent: 'center' }}>
           <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{this.state.name}</Text>
           <Text style={{ fontSize: 16, color: '#ccc' }}>
-            Yêu màu tím , thích màu hồng, sống nội tâm, hay khóc thầm, ghét sự giả dối.
+            {this.state.bio}
           </Text>
         </View>
       </View>
           <View style={{ height: 30, flexDirection: 'row', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center'}}>9</Text>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center'}}>{this.state.numOfPosts}</Text>
               <Text style={{ fontSize: 12, textAlign: 'center'}}>posts</Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center'}}>1M</Text>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center'}}>0</Text>
               <Text style={{ fontSize: 12, textAlign: 'center'}}>followers</Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -114,12 +148,15 @@ export default class SettingScreen extends Component {
           </View>
           <TouchableOpacity onPress={() => {
             firebaseApp.auth().signOut().then(function() {
-              //TODO: Hành động sau khi signout
+              //TODO: Hành động sau khi signout 
+              goBack('Tab');
             }).catch(function(error) {
               // An error happened.
             });
           }}>
-          <View style={{ backgroundColor: 'red', width: 100, height: 50}}></View>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{ color: 'red', fontSize: 20 }}>Sign Out</Text>
+            </View>
           </TouchableOpacity>
             </ParallaxScrollView>
           </View>

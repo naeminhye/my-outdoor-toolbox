@@ -119,7 +119,7 @@ export default class ExploreScreen extends Component {
       });
 
       this.setState({
-        dataSource: events,
+        dataSource: events.reverse(),
         isLoading: false,
       });
     });
@@ -461,7 +461,7 @@ export default class ExploreScreen extends Component {
                 </View>
                 {this._renderSpecialPost()}
 
-                {/*Headline*/}
+                {/*Headline
                 <View
                   style={{
                     paddingLeft: 20,
@@ -498,7 +498,7 @@ export default class ExploreScreen extends Component {
                   activeSlideAlignment={'start'}
                   inactiveSlideScale={1}
                   inactiveSlideOpacity={1}
-                />
+                />*/}
 
                 {/*Headline*/}
                 <View

@@ -214,39 +214,39 @@ export default class WeatherScreen extends Component {
     );
   }
   
-    _renderWeatherItem({ item, index }) { 
-      return(
-        <View>
-          <WeatherCard uri={item.image} cityId={item.cityId} />
-          <View
-          style={{
-            backgroundColor: '#fff',
-            position: 'absolute',
-            bottom: 10,
-            alignSelf: 'center',
-            borderRadius: 50,
-            padding: 10,
-            width: 100,
-            height: 50,
-            justifyContent: 'space-around',
-            flexDirection: 'row',
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: -2, height: 2 },
-            shadowOpacity: 0.3,
-            shadowRadius: 2,
-            elevation: 1,
-          }}>
-          <TouchableOpacity onPress={() => {
-            console.log('Shared');
-          }}>
-              <Ionicons name={'ios-share-outline'} size={25}/>
-          </TouchableOpacity>
-          <Text style={{ fontSize: 16 }}>Share</Text>
-        </View>
+  _renderWeatherItem({ item, index }) { 
+    return(
+      <View>
+        <WeatherCard uri={item.image} cityId={item.cityId} />
+        <View
+        style={{
+          backgroundColor: '#fff',
+          position: 'absolute',
+          bottom: 10,
+          alignSelf: 'center',
+          borderRadius: 50,
+          padding: 10,
+          width: 100,
+          height: 50,
+          justifyContent: 'space-around',
+          flexDirection: 'row',
+          alignItems: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: -2, height: 2 },
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+          elevation: 1,
+        }}>
+        <TouchableOpacity onPress={() => {
+          console.log('Shared');
+        }}>
+            <Ionicons name={'ios-share-outline'} size={25}/>
+        </TouchableOpacity>
+        <Text style={{ fontSize: 16 }}>Share</Text>
       </View>
-      );
-    }
+    </View>
+    );
+  }
 
     render() {
         const { navigate, goBack } = this.props.navigation;
