@@ -26,9 +26,9 @@ export default class PostDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            users: [],
             userId: 'User ID',
             username: 'User Name',
+            bio: '',
             profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
             postId: 'Post ID',
             title: 'Title',
@@ -41,6 +41,7 @@ export default class PostDetail extends Component {
             tags: [ 'travel', 'app', 'outdoor', 'quẩy', 'bôn', 'lành', 'ahihi', 'tag nè', 'app tuyệt vời'],
             loves: 0,
             time: 1511978923,
+            liked_posts: [],
         };
     }
 
@@ -64,7 +65,42 @@ export default class PostDetail extends Component {
                 time: snap.val().time,
                 tags: snap.val().tags,
             });
+
+            firebaseApp.database().ref('users/' + snap.val().userId).on("value", (userSnap) => {
+                this.setState({
+                    profile_picture: userSnap.val().profile_picture,
+                    username: userSnap.val().username,
+                    bio: userSnap.val().bio,
+                });
+            });
+
         });
+
+        firebaseApp.auth().onAuthStateChanged((user) => {
+            if (user != null) {
+                var userRef = firebaseApp.database().ref('users/' + user.uid);
+                userRef.on('value', snap => {
+                    this.setState({
+                        liked_posts: snap.val().liked_posts
+                    });
+                }); 
+            }
+        });
+    }
+
+    liked() {
+        const { params } = this.props.navigation.state;
+        var liked = false;
+        
+        if (this.state.liked_posts != []) {
+            this.state.liked_posts.forEach(post => {
+                if (post === params.postID) {
+                    console.log('you liked : ' + post);
+                    liked = true;
+                }
+            });
+        }
+        return liked;
     }
 
     timeConverter = (timestamp) => {
@@ -127,13 +163,13 @@ export default class PostDetail extends Component {
               renderStickyHeader={() => (
                 <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center',justifyContent: 'flex-end',}}>
                   <Text style={{fontSize: 18, fontWeight: 'bold',margin: 10}}
-                    onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{this.state.userId}'s Story</Text>
+                    onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{this.state.username}'s Story</Text>
                 </View>
               )}>
                 <View style={{ flex: 1, padding: 20 }}>
                         <Text style={{ fontSize: 20, fontWeight: '600', marginBottom: 10, textAlign: 'center'}}>{this.state.description}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', padding: 10 }}> 
-                            <Text style={{fontSize: 20, color: 'black', alignItems: 'center',}}><Ionicons name={'ios-heart-outline'} size={20}/> {this.state.loves}</Text>
+                            <Text style={{fontSize: 20, color: 'black', alignItems: 'center',}}><Ionicons name={this.liked() ? 'md-heart' : 'md-heart-outline'} size={24}/> {this.state.loves}</Text>
                             <Text style={{fontSize: 20, color: 'black',}}>something</Text>
                         </View>
                         <View
@@ -151,9 +187,7 @@ export default class PostDetail extends Component {
                     </View>
                     <View style={{ flex: 3, justifyContent: 'space-around', alignContent: 'center' }}>
                         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{this.state.username}</Text>
-                        <Text style={{ fontSize: 14, color: '#ff9797'}}>
-                        Yêu màu tím , thích màu hồng, sống nội tâm, hay khóc thầm, ghét sự giả dối.
-                        </Text>
+                        <Text style={{ fontSize: 18,  fontStyle: 'italic', color: '#ff9797'}}>{this.state.bio}</Text>
                     </View>
                 </View>
                 <View

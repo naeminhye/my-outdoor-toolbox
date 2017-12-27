@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Constants, ImagePicker } from 'expo';
 import { firebaseApp } from '../FirebaseConfig';
+//import RNFetchBlob from 'react-native-fetch-blob';
 import CustomButton from '../components/CustomButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -19,6 +20,13 @@ const colorpallete = [ '#ff6363', '#ff7474', '#ff8585', '#ff9797', '#ffa8a8', '#
 
 const SCREEN_LABEL = 'Add New Post';
 const TITLE = 'A short title here';
+
+// Prepare Blob support
+// const Blob = RNFetchBlob.polyfill.Blob
+// const fs = RNFetchBlob.fs
+// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+// window.Blob = Blob
+
 export default class AddNewPost extends Component {
     constructor(props) {
         super(props);
@@ -26,7 +34,7 @@ export default class AddNewPost extends Component {
             title: '',
             uid: '', 
             username: '', 
-            feature_image: null, 
+            feature_image: null, //'http://thelabyrinth-a5.com/wp-content/uploads/2015/08/slider-image.jpg' 
             description: '',
             content: '',
             tag: '',
@@ -81,6 +89,14 @@ export default class AddNewPost extends Component {
                 updates['/posts/' + newPostKey] = postData;
                 updates['/users/' + user.uid + '/posts/' + numOfPosts] = newPostKey;
 
+                // if (this.state.feature_image) {
+                //     this.uploadImage(this.state.feature_image)
+                //         .then(url => { console.log('uploaded ' + url); })
+                //         .catch(error => console.log(error))
+                // }
+                // else {
+                //     console.log('photo upload failed');
+                // }
                 this.setState({
                     // goBack
                 });
@@ -91,6 +107,34 @@ export default class AddNewPost extends Component {
               console.log('chưa đăng nhập');
             }
           });
+      }
+
+      uploadImage(uri, mime = 'application/octet-stream') {
+        return new Promise((resolve, reject) => {
+          const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+          let uploadBlob = null
+    
+          const imageRef = firebaseApp.storage().ref('images/post_images').child('image_001')
+    
+          fs.readFile(uploadUri, 'base64')
+            .then((data) => {
+              return Blob.build(data, { type: `${mime};BASE64` })
+            })
+            .then((blob) => {
+              uploadBlob = blob
+              return imageRef.put(blob, { contentType: mime })
+            })
+            .then(() => {
+              uploadBlob.close()
+              return imageRef.getDownloadURL()
+            })
+            .then((url) => {
+              resolve(url)
+            })
+            .catch((error) => {
+              reject(error)
+          })
+        })
       }
 
       _pickImage = async () => {
@@ -251,9 +295,8 @@ export default class AddNewPost extends Component {
                     </View>
                 <View style={{ flexDirection:'row', justifyContent: 'space-around' }}>
                     <CustomButton text={'Cancel'} borderColor={'#FF5252'} borderWidth={2} color={'#FF5252'} fontSize={18} width={150} height={50} onPress={this.props.onCancelPress}/>
-                    <CustomButton text={'Next'} backgroundColor={'#FF5252'} borderWidth={0} color={'#fff'} fontSize={18} width={150} height={50} onPress={() => {
-                        this.writeNewPost();
-                        this.props.onCancelPress();
+                    <CustomButton text={'OK'} backgroundColor={'#FF5252'} borderWidth={0} color={'#fff'} fontSize={18} width={150} height={50} onPress={() => {
+                        this.props.onOkPress();
                     }}/>
                 </View>
             </View>

@@ -6,11 +6,9 @@ import HomeScreen from './HomeScreen';
 import ExploreScreen from './ExploreScreen';
 import NotiScreen from './NotiScreen';
 import MessageScreen from './MessageScreen';
-import SearchScreen from './SearchScreen';
 import PostDetail from './PostDetail';
 import SettingScreen from './SettingScreen';
 import MapScreen from './MapScreen';
-import AddNewPost from './AddNewPost';
 import WeatherScreen from './WeatherScreen';
 import ScheduleScreen from './ScheduleScreen';
 import AgendaScreen from './AgendaScreen';
@@ -38,7 +36,6 @@ const TabInStack = TabNavigator({
       screen: ExploreScreen 
     },
     Noti: { screen: NotiScreen }, 
-    Search: { screen: SearchScreen },
   }, {
     tabBarOptions: { 
       activeTintColor: '#FF5252',
@@ -54,9 +51,5 @@ const TabScreen = StackNavigator({
   Setting: { screen: SettingScreen },
   Map: { screen: MapScreen },
   MessageDetail: { screen: MessageDetail },
-  //AddPost: { screen: AddNewPost },
-  // Weather: { screen: WeatherScreen },
-  // Schedule: { screen: ScheduleScreen },
-  // Agenda: { screen: AgendaScreen },
 });
 export default TabScreen;

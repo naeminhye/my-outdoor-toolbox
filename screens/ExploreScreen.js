@@ -14,7 +14,7 @@ import { firebaseApp } from '../FirebaseConfig';
 import { Constants, LinearGradient } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import Modal from 'react-native-modal';
-import AddNewPost from './AddNewPost';
+import AddNewPost from '../components/AddNewPost';
 import Loading from '../components/Loading';
 
 const SCREEN_LABEL = 'Explore';

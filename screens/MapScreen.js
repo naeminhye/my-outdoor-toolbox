@@ -7,17 +7,22 @@ import {
     TextInput,
     TouchableOpacity,
     FlatList,
-    Modal,
     TouchableHighlight,
     Picker,
     Image,
     Dimensions,
+    KeyboardAvoidingView
 } from 'react-native';
 import { Constants, MapView, Location, Permissions } from 'expo';
 import {RkText, RkTextInput, RkTheme} from 'react-native-ui-kitten';
+import CustomButton from '../components/CustomButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import GridView from 'react-native-super-grid';
 import GoogleMapAPI from '../GoogleMapAPI';
 import Carousel from 'react-native-snap-carousel';
+
+import Modal from 'react-native-modal';
+import SearchPlaceFilter from '../components/SearchPlaceFilter';
 
 let { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -25,108 +30,117 @@ const LATITUDE = 0;
 const LONGITUDE = 0;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+
 const placeType = [
-  { name: 'All', value: '' },
-  { name: 'Accounting', value: 'accounting' },
-  { name: 'Airport', value: 'airport' },
-  { name: 'Amusement Park', value: 'amusement_park' },
-  { name: 'Aquarium', value: 'aquarium' },
-  { name: 'Art Gallery', value: 'art_gallery' },
-  { name: 'ATM', value: 'atm' },
-  { name: 'Bakery', value: 'bakery' },
-  { name: 'Bank', value: 'bank' },
-  { name: 'Bar', value: 'bar' },
-  { name: 'Beauty Salon', value: 'beauty_salon' },
-  { name: 'Bicycle Store', value: 'bicycle_store' },
-  { name: 'Book Store', value: 'book_store' },
-  { name: 'Bowling Alley', value: 'bowling_alley' },
-  { name: 'Bus Station', value: 'bus_station' },
-  { name: 'Café', value: 'cafe' },
-  { name: 'Campground', value: 'campground' },
-  { name: 'Car Dealer', value: 'car_dealer' },
-  { name: 'Car Rental', value: 'car_rental' },
-  { name: 'Car Repair', value: 'car_repair' },
-  { name: 'Car Wash', value: 'car_wash' },
-  { name: 'Casino', value: 'casino' },
-  { name: 'Cemetery', value: 'cemetery' },
-  { name: 'Church', value: 'church' },
-  { name: 'City Hall', value: 'city_hall' },
-  { name: 'Clothing Store', value: 'clothing_store' },
-  { name: 'Convenience Store', value: 'convenience_store' },
-  { name: 'Courthouse', value: 'courthouse' },
-  { name: 'Dentist', value: 'dentist' },
-  { name: 'Department Store', value: 'department_store' },
-  { name: 'Doctor', value: 'doctor' },
-  { name: 'Electrician', value: 'electrician' },
-  { name: 'Electronics Store', value: 'electronics_store' },
-  { name: 'Embassy', value: 'embassy' },
-  { name: 'Fire Station', value: 'fire_station' },
-  { name: 'Florist', value: 'florist' },
-  { name: 'Funeral Home', value: 'funeral_home' },
-  { name: 'Furniture Store', value: 'furniture_store' },
-  { name: 'Gas Station', value: 'gas_station' },
-  { name: 'Gym', value: 'gym' },
-  { name: 'Hair Care', value: 'hair_care' },
-  { name: 'Hardware Store', value: 'hardware_store' },
-  { name: 'Hindu Temple', value: 'hindu_temple' },
-  { name: 'Home Goods Store', value: 'home_goods_store' },
-  { name: 'Hospital', value: 'hospital' },
-  { name: 'Insurance Agency', value: 'insurance_agency' },
-  { name: 'Jewelry Store', value: 'jewelry_store' },
-  { name: 'Laundry', value: 'laundry' },
-  { name: 'Lawyer', value: 'lawyer' },
-  { name: 'Library', value: 'library' },
-  { name: 'Liquor Store', value: 'liquor_store' },
-  { name: 'Local Government Office', value: 'local_government_office' },
-  { name: 'Locksmith', value: 'locksmith' },
-  { name: 'Lodging', value: 'lodging' },
-  { name: 'Meal Delivery', value: 'meal_delivery' },
-  { name: 'Meal Takeaway', value: 'meal_takeaway' },
-  { name: 'Mosque', value: 'mosque' },
-  { name: 'Movie Rental', value: 'movie_rental' },
-  { name: 'Movie Theater', value: 'movie_theater' },
-  { name: 'Moving Company', value: 'moving_company' },
-  { name: 'Museum', value: 'museum' },
-  { name: 'Night Club', value: 'night_club' },
-  { name: 'Painter', value: 'painter' },
-  { name: 'Park', value: 'park' },
-  { name: 'Parking', value: 'parking' },
-  { name: 'Pet Store', value: 'pet_store' },
-  { name: 'Pharmacy', value: 'pharmacy' },
-  { name: 'Physiotherapist', value: 'physiotherapist' },
-  { name: 'Plumber', value: 'plumber' },
-  { name: 'Police', value: 'police' },
-  { name: 'Post Office', value: 'post_office' },
-  { name: 'Real Estate Agency', value: 'real_estate_agency' },
-  { name: 'Restaurant', value: 'restaurant' },
-  { name: 'Roofing Contractor', value: 'roofing_contractor' },
-  { name: 'RV Park', value: 'rv_park' },
-  { name: 'School', value: 'school' },
-  { name: 'Shoe Store', value: 'shoe_store' },
-  { name: 'Shopping Mall', value: 'shopping_mall' },
-  { name: 'Spa', value: 'spa' },
-  { name: 'Stadium', value: 'stadium' },
-  { name: 'Storage', value: 'storage' },
-  { name: 'Store', value: 'store' },
-  { name: 'Subway Station', value: 'subway_station' },
-  { name: 'Synagogue', value: 'synagogue' },
-  { name: 'Taxi Stand', value: 'taxi_stand' },
-  { name: 'Train Station', value: 'train_station' },
-  { name: 'Transit Station', value: 'transit_station' },
-  { name: 'Travel Agency', value: 'travel_agency' },
-  { name: 'University', value: 'university' },
-  { name: 'Veterinary Care', value: 'veterinary_care' },
-  { name: 'Zoo', value: 'zoo' },
+  { name: 'All', value: '', image: require('../assets/icons/place/all.png') },
+  { name: 'Accounting', value: 'accounting', image: require('../assets/icons/place/accounting.png') },
+  { name: 'Airport', value: 'airport', image: require('../assets/icons/place/airport.png') },
+  { name: 'Amusement Park', value: 'amusement_park', image: require('../assets/icons/place/amusement_park.png') },
+  { name: 'Aquarium', value: 'aquarium', image: require('../assets/icons/place/aquarium.png') },
+  { name: 'Art Gallery', value: 'art_gallery', image: require('../assets/icons/place/art_gallery.png') },
+  { name: 'ATM', value: 'atm', image: require('../assets/icons/place/atm.png') },
+  { name: 'Bakery', value: 'bakery', image: require('../assets/icons/place/bakery.png') },
+  { name: 'Bank', value: 'bank', image: require('../assets/icons/place/bank.png') },
+  { name: 'Bar', value: 'bar', image: require('../assets/icons/place/bar.png') },
+  { name: 'Beauty Salon', value: 'beauty_salon', image: require('../assets/icons/place/beauty_salon.png') },
+  { name: 'Bicycle Store', value: 'bicycle_store', image: require('../assets/icons/place/bicycle_store.png') },
+  { name: 'Book Store', value: 'book_store', image: require('../assets/icons/place/book_store.png') },
+  { name: 'Bowling Alley', value: 'bowling_alley', image: require('../assets/icons/place/bowling_alley.png') },
+  { name: 'Bus Station', value: 'bus_station', image: require('../assets/icons/place/bus_station.png') },
+  { name: 'Café', value: 'cafe', image: require('../assets/icons/place/cafe.png') },
+  { name: 'Campground', value: 'campground', image: require('../assets/icons/place/campground.png') },
+  { name: 'Car Dealer', value: 'car_dealer', image: require('../assets/icons/place/car_dealer.png') },
+  { name: 'Car Rental', value: 'car_rental', image: require('../assets/icons/place/car_rental.png') },
+  { name: 'Car Repair', value: 'car_repair', image: require('../assets/icons/place/car_repair.png') },
+  { name: 'Car Wash', value: 'car_wash', image: require('../assets/icons/place/car_wash.png') },
+  { name: 'Casino', value: 'casino', image: require('../assets/icons/place/casino.png') },
+  { name: 'Cemetery', value: 'cemetery', image: require('../assets/icons/place/cemetery.png') },
+  { name: 'Church', value: 'church', image: require('../assets/icons/place/church.png') },
+  { name: 'City Hall', value: 'city_hall', image: require('../assets/icons/place/city_hall.png') },
+  { name: 'Clothing Store', value: 'clothing_store', image: require('../assets/icons/place/clothing_store.png') },
+  { name: 'Convenience Store', value: 'convenience_store', image: require('../assets/icons/place/convenience_store.png') },
+  { name: 'Courthouse', value: 'courthouse', image: require('../assets/icons/place/courthouse.png') },
+  { name: 'Dentist', value: 'dentist', image: require('../assets/icons/place/dentist.png') },
+  { name: 'Department Store', value: 'department_store', image: require('../assets/icons/place/department_store.png') },
+  { name: 'Doctor', value: 'doctor', image: require('../assets/icons/place/doctor.png') },
+  { name: 'Electrician', value: 'electrician', image: require('../assets/icons/place/electrician.png') },
+  { name: 'Electronics Store', value: 'electronics_store', image: require('../assets/icons/place/electronics_store.png') },
+  { name: 'Embassy', value: 'embassy', image: require('../assets/icons/place/embassy.png') },
+  { name: 'Fire Station', value: 'fire_station', image: require('../assets/icons/place/fire_station.png') },
+  { name: 'Florist', value: 'florist', image: require('../assets/icons/place/florist.png') },
+  { name: 'Funeral Home', value: 'funeral_home', image: require('../assets/icons/place/funeral_home.png') },
+  { name: 'Furniture Store', value: 'furniture_store', image: require('../assets/icons/place/furniture_store.png') },
+  { name: 'Gas Station', value: 'gas_station', image: require('../assets/icons/place/gas_station.png') },
+  { name: 'Gym', value: 'gym', image: require('../assets/icons/place/gym.png') },
+  { name: 'Hair Care', value: 'hair_care', image: require('../assets/icons/place/hair_care.png') },
+  { name: 'Hardware Store', value: 'hardware_store', image: require('../assets/icons/place/hardware_store.png') },
+  { name: 'Hindu Temple', value: 'hindu_temple', image: require('../assets/icons/place/hindu_temple.png') },
+  { name: 'Home Goods Store', value: 'home_goods_store', image: require('../assets/icons/place/home_goods_store.png') },
+  { name: 'Hospital', value: 'hospital', image: require('../assets/icons/place/hospital.png') },
+  { name: 'Insurance Agency', value: 'insurance_agency', image: require('../assets/icons/place/insurance_agency.png') },
+  { name: 'Jewelry Store', value: 'jewelry_store', image: require('../assets/icons/place/jewelry_store.png') },
+  { name: 'Laundry', value: 'laundry', image: require('../assets/icons/place/laundry.png') },
+  { name: 'Lawyer', value: 'lawyer', image: require('../assets/icons/place/lawyer.png') },
+  { name: 'Library', value: 'library', image: require('../assets/icons/place/library.png') },
+  { name: 'Liquor Store', value: 'liquor_store', image: require('../assets/icons/place/liquor_store.png') },
+  { name: 'Local Government Office', value: 'local_government_office', image: require('../assets/icons/place/local_government_office.png') },
+  { name: 'Locksmith', value: 'locksmith', image: require('../assets/icons/place/locksmith.png') },
+  { name: 'Lodging', value: 'lodging', image: require('../assets/icons/place/lodging.png') },
+  { name: 'Meal Delivery', value: 'meal_delivery', image: require('../assets/icons/place/meal_delivery.png') },
+  { name: 'Meal Takeaway', value: 'meal_takeaway', image: require('../assets/icons/place/meal_takeaway.png') },
+  { name: 'Mosque', value: 'mosque', image: require('../assets/icons/place/mosque.png') },
+  { name: 'Movie Rental', value: 'movie_rental', image: require('../assets/icons/place/movie_rental.png') },
+  { name: 'Movie Theater', value: 'movie_theater', image: require('../assets/icons/place/movie_theater.png') },
+  { name: 'Moving Company', value: 'moving_company', image: require('../assets/icons/place/moving_company.png') },
+  { name: 'Museum', value: 'museum', image: require('../assets/icons/place/museum.png') },
+  { name: 'Night Club', value: 'night_club', image: require('../assets/icons/place/night_club.png') },
+  { name: 'Painter', value: 'painter', image: require('../assets/icons/place/painter.png') },
+  { name: 'Park', value: 'park', image: require('../assets/icons/place/park.png') },
+  { name: 'Parking', value: 'parking', image: require('../assets/icons/place/parking.png') },
+  { name: 'Pet Store', value: 'pet_store', image: require('../assets/icons/place/pet_store.png') },
+  { name: 'Pharmacy', value: 'pharmacy', image: require('../assets/icons/place/pharmacy.png') },
+  { name: 'Physiotherapist', value: 'physiotherapist', image: require('../assets/icons/place/physiotherapist.png') },
+  { name: 'Plumber', value: 'plumber', image: require('../assets/icons/place/plumber.png') },
+  { name: 'Police', value: 'police', image: require('../assets/icons/place/police.png') },
+  { name: 'Post Office', value: 'post_office', image: require('../assets/icons/place/post_office.png') },
+  { name: 'Real Estate Agency', value: 'real_estate_agency', image: require('../assets/icons/place/real_estate_agency.png') },
+  { name: 'Restaurant', value: 'restaurant', image: require('../assets/icons/place/restaurant.png') },
+  { name: 'Roofing Contractor', value: 'roofing_contractor', image: require('../assets/icons/place/roofing_contractor.png') },
+  { name: 'RV Park', value: 'rv_park', image: require('../assets/icons/place/rv_park.png') },
+  { name: 'School', value: 'school', image: require('../assets/icons/place/school.png') },
+  { name: 'Shoe Store', value: 'shoe_store', image: require('../assets/icons/place/shoe_store.png') },
+  { name: 'Shopping Mall', value: 'shopping_mall', image: require('../assets/icons/place/shopping_mall.png') },
+  { name: 'Spa', value: 'spa', image: require('../assets/icons/place/spa.png') },
+  { name: 'Stadium', value: 'stadium', image: require('../assets/icons/place/stadium.png') },
+  { name: 'Storage', value: 'storage', image: require('../assets/icons/place/storage.png') },
+  { name: 'Store', value: 'store', image: require('../assets/icons/place/store.png') },
+  { name: 'Subway Station', value: 'subway_station', image: require('../assets/icons/place/subway_station.png') },
+  { name: 'Synagogue', value: 'synagogue', image: require('../assets/icons/place/synagogue.png') },
+  { name: 'Taxi Stand', value: 'taxi_stand', image: require('../assets/icons/place/taxi_stand.png') },
+  { name: 'Train Station', value: 'train_station', image: require('../assets/icons/place/train_station.png') },
+  { name: 'Transit Station', value: 'transit_station', image: require('../assets/icons/place/transit_station.png') },
+  { name: 'Travel Agency', value: 'travel_agency', image: require('../assets/icons/place/travel_agency.png') },
+  { name: 'University', value: 'university', image: require('../assets/icons/place/university.png') },
+  { name: 'Veterinary Care', value: 'veterinary_care', image: require('../assets/icons/place/veterinary_care.png') },
+  { name: 'Zoo', value: 'zoo', image: require('../assets/icons/place/zoo.png') },
 ];
 
 const placeRadius = [
-  { name: '500m', value: 500 },
-  { name: '1km', value: 1000 },
-  { name: '5km', value: 5000 },
-  { name: '10km', value: 10000 },
-  { name: '50km', value: 50000 },
-  { name: '100km', value: 100000 },
+{ name: '500m', value: 500 },
+{ name: '1km', value: 1000 },
+{ name: '5km', value: 5000 },
+{ name: '10km', value: 10000 },
+{ name: '50km', value: 50000 },
+{ name: '100km', value: 100000 },
 ];
+
+const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
+  'window'
+);
+
+const selectedColor = '#FF5252',
+  unSelectedColor = '#e5e5e5';
 
 export default class MapScreen extends Component {
     constructor() {
@@ -138,8 +152,9 @@ export default class MapScreen extends Component {
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA,
         },
-        typeModalVisible: false,
-        radiusModalVisible: false,
+        //typeModalVisible: false,
+        //radiusModalVisible: false,
+        filterModalVisible: false,
         locationResult: null,
         currentLat: 0,
         lon: 0,
@@ -160,15 +175,15 @@ export default class MapScreen extends Component {
         this._handleSubmitText = this._handleSubmitText.bind(this);
     }
     
-    getTypeName(_type) {
+    getTypeName = (_type) => {
         return placeType.find(
             (place) => {return place.value === _type;}
         ).name;
     }
     
-    getRadiusName(_type) {
+    getRadiusName = (_radius) => {
         return placeRadius.find(
-            (place) => {return place.value === _type;}
+            (place) => {return place.value === _radius;}
         ).name;
     }
 
@@ -181,6 +196,10 @@ export default class MapScreen extends Component {
     
     setRadiusModalVisible(visible) {
         this.setState({ radiusModalVisible: visible });
+    }
+    
+    setFilterModalVisible(visible) {
+        this.setState({ filterModalVisible: visible });
     }
 
     componentDidMount() {
@@ -239,26 +258,28 @@ export default class MapScreen extends Component {
       };
     
       _handleSubmitText = () => {
-        GoogleMapAPI.nearbysearch(
-          this.state.currentLat,
-          this.state.currentLon,
-          this.state.radius,
-          this.state.type,
-          this.state.inputValue
-        ).then(data => {
-          this.setState({
-            status: data.status,
-            results: data.results,
-            _lat: data.results[this.state.activeSlide].geometry.location.lat,
-            _lon: data.results[this.state.activeSlide].geometry.location.lng,
-            region: {
-              latitude: data.results[this.state.activeSlide].geometry.location.lat,
-              longitude: data.results[this.state.activeSlide].geometry.location.lng,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            }
+        if (this.state.inputValue != '') {
+          GoogleMapAPI.nearbysearch(
+            this.state.currentLat,
+            this.state.currentLon,
+            this.state.radius,
+            this.state.type,
+            this.state.inputValue
+          ).then(data => {
+            this.setState({
+              status: data.status,
+              results: data.results,
+              _lat: data.results[this.state.activeSlide].geometry.location.lat,
+              _lon: data.results[this.state.activeSlide].geometry.location.lng,
+              region: {
+                latitude: data.results[this.state.activeSlide].geometry.location.lat,
+                longitude: data.results[this.state.activeSlide].geometry.location.lng,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              }
+            });
           });
-        });
+        }
       };
 
     componentWillUnmount() {
@@ -269,6 +290,7 @@ export default class MapScreen extends Component {
       const { navigate, goBack } = this.props.navigation;
         return(
             <View style={{ flex: 1,}}>
+            {/*
             <Modal
             animationType="slide"
             transparent={true}
@@ -397,6 +419,7 @@ export default class MapScreen extends Component {
             </View>
           </View>
         </Modal>
+            */}
                 <MapView
                     style={ styles.container }
                     showsUserLocation={ true }
@@ -417,8 +440,8 @@ export default class MapScreen extends Component {
                 <View style={{ flexDirection: 'row', paddingLeft: 20, paddingRight: 20, alignItems: 'center', position: 'absolute', top: 40, }}>
                   <TouchableOpacity 
                     onPress={() => goBack()}>
-                    <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20 }}>
-                        <Ionicons name={'ios-arrow-back'} size={28}/> 
+                    <View style={{ flexDirection: 'row', marginRight: 20 }}>
+                        <Ionicons name={'md-close'} size={28}/> 
                     </View>
                   </TouchableOpacity>    
                 <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
@@ -433,6 +456,7 @@ export default class MapScreen extends Component {
                         value={this.state.inputValue}
                         onChangeText={this._handleTextChange}/>
                 </View>
+                {/*
                 <View
                 style={{
                     flexDirection: 'row',
@@ -449,6 +473,7 @@ export default class MapScreen extends Component {
                     style={{flex: 1}}
                     onPress={()=> {
                         this.setTypeModalVisible(!this.state.typeModalVisible);
+                        this._handleSubmitText
                     }}>
                         <Text style={{ fontSize: 18, backgroundColor: 'transparent' }}>Type: {this.getTypeName(this.state.type)}</Text>
                     </TouchableOpacity>
@@ -456,13 +481,15 @@ export default class MapScreen extends Component {
                     style={{flex: 1}}
                     onPress={()=> {
                         this.setRadiusModalVisible(!this.state.radiusModalVisible);
+                        this._handleSubmitText
                     }}>
                         <Text style={{ fontSize: 18, backgroundColor: 'transparent' }}>Radius: {this.getRadiusName(this.state.radius)}</Text>
                     </TouchableOpacity>
                 </View>
+                */}
 
                 {/* RESULT HERE */}
-                <View style={{ height: 300, width: width, position: 'absolute', bottom: 20 }}>
+                <View style={{ height: 300, width: width, position: 'absolute', bottom: 70 }}>
                     <Carousel
                         data={this.state.results}
                         renderItem={this._renderResultItem}
@@ -481,9 +508,44 @@ export default class MapScreen extends Component {
                         } }
                     /> 
                   </View>
+
+                  <KeyboardAvoidingView behavior={'position'}>
+                  <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 10, backgroundColor: 'transparent', width: width }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.setFilterModalVisible(!this.state.filterModalVisible);
+                      }}>
+                      <View
+                        style={{
+                          backgroundColor: '#FF5252',
+                          width: 150,
+                          height: 50,
+                          borderRadius: 30,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          shadowColor: '#000',
+                          shadowOffset: { width: -2, height: 2 },
+                          shadowOpacity: 0.1,
+                          shadowRadius: 5,
+                          elevation: 1,
+                        }}>
+                        <Text style={{ color: '#fff', fontSize: 20 }}>FILTER</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                  </KeyboardAvoidingView>
+                  <Modal isVisible={this.state.filterModalVisible} style={{margin: 20}}>
+                    {this._renderModal()}
+                  </Modal>
             </View>
         );
     }
+
+    _renderModalContent = () => (
+        <SearchPlaceFilter
+          onCancelPress={() => {this.setFilterModalVisible(!this.state.filterModalVisible);}}
+        />
+    );
 
     _renderResultItem({ item, index }) { 
       var photoURL = 'http://thelabyrinth-a5.com/wp-content/uploads/2015/08/slider-image.jpg';
@@ -515,6 +577,18 @@ export default class MapScreen extends Component {
             <View style={{ marginLeft: 200, padding: 5, flexDirection: 'column', }}>
               <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.name}</Text>
               <Text style={{ fontSize: 18, }}>{item.vicinity}</Text>
+              <View style={{
+                marginTop: 10, 
+                flexDirection: 'row',
+                flexWrap: 'wrap', }}>
+                { item.types.map((t, i) => {
+                  return (
+                    <View key={i}>
+                      <Text style={{ fontSize: 14, fontStyle: 'italic', paddingRight: 5}}>{t}</Text>
+                    </View>
+                  );
+                })}
+              </View>
             </View>
           </View>
           <Image
@@ -559,6 +633,74 @@ export default class MapScreen extends Component {
           <Text style={{ fontSize: 16 }}>Share</Text>
         </View>
       </View>
+      );
+    }
+
+    _renderModal() {
+      return(
+          <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 15, }}>
+              <View
+                  style={{
+                      width: window.width,
+                      height: 50,
+                      marginLeft: 10,
+                      marginRight: 10
+                  }}>
+              <ScrollView 
+                  horizontal={true}
+                  contentContainerStyle={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                  }}>
+                  { placeRadius.map((r, i) => {
+                      return(
+                          <TouchableOpacity key={i} onPress={() => { this.setState({ tmpRadius: r.value }); }}>
+                              <View style={{ borderRadius: 20, backgroundColor: (this.state.tmpRadius == r.value ? selectedColor : unSelectedColor) , flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'center',  margin: 5, padding: 10}}>
+                                  <Text style={{ fontSize: 18, color: (this.state.tmpRadius == r.value ? '#fff' : '#999999') }}>{r.name}</Text>
+                              </View>
+                          </TouchableOpacity>
+                      );
+                  })} 
+              </ScrollView>
+              </View>
+              <ScrollView>
+                  <GridView
+                      itemWidth={120}
+                      items={placeType}
+                      style={{flex: 1, }}
+                      renderItem={item => (  
+                          <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
+                              <TouchableOpacity onPress={() => { this.setState({ tmpType: item.value }); }}>
+                                  <View style={{ borderRadius: 100, margin: 10, padding: 10, height: 80, width: 80, backgroundColor: (this.state.tmpType == item.value ? selectedColor : unSelectedColor), justifyContent: 'center', alignItems: 'center' }}>
+                                  <Image source={item.image} style={{width: 32, height: 32, tintColor: (this.state.tmpType == item.value ? '#fff' : '#999999') }} resizeMode='cover' />
+                                  </View>
+                              </TouchableOpacity>
+                              <Text style={{ fontSize : 16, fontWeight: 'bold',}}>{item.name}</Text>
+                          </View>
+                      )}/>
+              </ScrollView>
+              <View style={{ flexDirection:'row', justifyContent: 'space-around' }}>
+                  <CustomButton text={'Cancel'} borderColor={'#FF5252'} borderWidth={2} color={'#FF5252'} fontSize={18} width={150} height={50} onPress={() => {
+                    this.setFilterModalVisible(!this.state.filterModalVisible);
+                    this.setState({
+                      tmpRadius: this.state.radius,
+                      tmpType: this.state.type,
+                    });
+                  }}/>
+                  <CustomButton text={'OK'} backgroundColor={'#FF5252'} borderWidth={0} color={'#fff'} fontSize={18} width={150} height={50} onPress={() => {
+                      let _type = this.state.tmpType;
+                      let _radius = this.state.tmpRadius;
+                      this.setState({
+                        type: _type,
+                        tmpType: _type,
+                        radius: _radius,
+                        tmpRadius: _radius,
+                      });
+                      this.setFilterModalVisible(!this.state.filterModalVisible);
+                      this._handleSubmitText;
+                  }}/>
+              </View>
+          </View>
       );
     }
 }
