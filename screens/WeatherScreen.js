@@ -33,26 +33,48 @@ const loIcon = <Ionicons name="ios-pin-outline" size={26} color="black" />;
 //   Drizzle: 'md-umbrella'
 // }
 
-const iconNames = {
-  '01d': '../assets/icons/weather/01d.png',
-  '01n': '../assets/icons/weather/01n.png',
-  '02d': '../assets/icons/weather/02d.png',
-  '02n': '../assets/icons/weather/02n.png',
-  '03d': '../assets/icons/weather/03d.png',
-  '03n': '../assets/icons/weather/03n.png',
-  '04d': '../assets/icons/weather/08d.png',
-  '04n': '../assets/icons/weather/08n.png',
-  '09d': '../assets/icons/weather/09d.png',
-  '09n': '../assets/icons/weather/09n.png',
-  '10d': '../assets/icons/weather/10d.png',
-  '10n': '../assets/icons/weather/10n.png',
-  '11d': '../assets/icons/weather/11d.png',
-  '11n': '../assets/icons/weather/11n.png',
-  '13d': '../assets/icons/weather/13d.png',
-  '13n': '../assets/icons/weather/13n.png',
-  '50d': '../assets/icons/weather/50d.png',
-  '50n': '../assets/icons/weather/50n.png',
-}
+const weather = [
+	{ icon: 'chanceflurries', image: require('../assets/icons/weather/chanceflurries.png') },
+	{ icon: 'chancerain', image: require('../assets/icons/weather/chancerain.png') },
+	{ icon: 'chancesleet', image: require('../assets/icons/weather/chancesleet.png') },
+	{ icon: 'chancesnow', image: require('../assets/icons/weather/chancesnow.png') },
+	{ icon: 'chancetstorms', image: require('../assets/icons/weather/chancetstorms.png') },
+	{ icon: 'clear', image: require('../assets/icons/weather/clear.png') },
+	{ icon: 'cloudy', image: require('../assets/icons/weather/cloudy.png') },
+	{ icon: 'flurries', image: require('../assets/icons/weather/flurries.png') },
+	{ icon: 'fog', image: require('../assets/icons/weather/fog.png') },
+	{ icon: 'hazy', image: require('../assets/icons/weather/hazy.png') },
+	{ icon: 'mostlycloudy', image: require('../assets/icons/weather/mostlycloudy.png') },
+	{ icon: 'mostlysunny', image: require('../assets/icons/weather/mostlysunny.png') },
+	{ icon: 'nt_chanceflurries', image: require('../assets/icons/weather/nt_chanceflurries.png') },
+	{ icon: 'nt_chancerain', image: require('../assets/icons/weather/nt_chancerain.png') },
+	{ icon: 'nt_chancesleet', image: require('../assets/icons/weather/nt_chancesleet.png') },
+	{ icon: 'nt_chancesnow', image: require('../assets/icons/weather/nt_chancesnow.png') },
+	{ icon: 'nt_chancetstorms', image: require('../assets/icons/weather/nt_chancetstorms.png') },
+	{ icon: 'nt_clear', image: require('../assets/icons/weather/nt_clear.png') },
+	{ icon: 'nt_cloudy', image: require('../assets/icons/weather/nt_cloudy.png') },
+	{ icon: 'nt_flurries', image: require('../assets/icons/weather/nt_flurries.png') },
+	{ icon: 'nt_fog', image: require('../assets/icons/weather/nt_fog.png') },
+	{ icon: 'nt_hazy', image: require('../assets/icons/weather/nt_hazy.png') },
+	{ icon: 'nt_mostlycloudy', image: require('../assets/icons/weather/nt_mostlycloudy.png') },
+	{ icon: 'nt_mostlysunny', image: require('../assets/icons/weather/nt_mostlysunny.png') },
+	{ icon: 'nt_partlycloudy', image: require('../assets/icons/weather/nt_partlycloudy.png') },
+	{ icon: 'nt_partlysunny', image: require('../assets/icons/weather/nt_partlysunny.png') },
+	{ icon: 'nt_rain', image: require('../assets/icons/weather/nt_rain.png') },
+	{ icon: 'nt_sleet', image: require('../assets/icons/weather/nt_sleet.png') },
+	{ icon: 'nt_snow', image: require('../assets/icons/weather/nt_snow.png') },
+	{ icon: 'nt_sunny', image: require('../assets/icons/weather/nt_sunny.png') },
+	{ icon: 'nt_tstorms', image: require('../assets/icons/weather/nt_tstorms.png') },
+	{ icon: 'nt_unknown', image: require('../assets/icons/weather/nt_unknown.png') },
+	{ icon: 'partlycloudy', image: require('../assets/icons/weather/partlycloudy.png') },
+	{ icon: 'partlysunny', image: require('../assets/icons/weather/partlysunny.png') },
+	{ icon: 'rain', image: require('../assets/icons/weather/rain.png') },
+	{ icon: 'sleet', image: require('../assets/icons/weather/sleet.png') },
+	{ icon: 'snow', image: require('../assets/icons/weather/snow.png') },
+	{ icon: 'sunny', image: require('../assets/icons/weather/sunny.png') },
+	{ icon: 'tstorms', image: require('../assets/icons/weather/tstorms.png') },
+	{ icon: 'unknown', image: require('../assets/icons/weather/unknown.png') },
+]
 
 const SCREEN_LABEL = 'Weather';
 const STICKY_HEADER_HEIGHT = 40;
@@ -82,7 +104,7 @@ export default class WeatherScreen extends Component {
         weather_subscribes: [],
         activeSlide: 0,
         isLoading: true,
-        icon: '01d',
+        icon: 'chanceflurries',
 
         conditions: null,
       };
@@ -154,7 +176,7 @@ export default class WeatherScreen extends Component {
             lon: posData.coords.longitude,
             name: res.name,
             weather: res.weather,
-            temp_c: res.temp_c,
+            temp_c: res.temp_c.toFixed(),
             relative_humidity: res.relative_humidity,
             wind_string: res.wind_string,
             UV: res.UV,
@@ -162,8 +184,9 @@ export default class WeatherScreen extends Component {
             precip_today_metric: res.precip_today_metric,
             visibility_km: res.visibility_km,
             pressure_mb: res.pressure_mb,
-            wind_kph: res.wind_kph,
+            wind_kph: res.wind_kph.toFixed(),
             wind_degrees: res.wind_degrees,
+            icon: res.icon,
           })),
         (error) => alert(error),
         { timeout: 10000 } 
@@ -300,7 +323,14 @@ export default class WeatherScreen extends Component {
                       <View style={{flexDirection: 'column', flex: 1,}}>
                         <Text style={styles.status}>{this.state.weather}</Text>
                         <Text style={styles.description}>Feels like {this.state.feelslike_c}°C</Text>
-                        <Image source={require('../assets/icons/weather/50n.png')} style={{width: 100, height: 100}} resizeMode='cover' />
+                        { weather.map((w, i) => {
+                          if(this.state.icon == w.icon){
+                            console.log(this.state.icon)
+                            return(
+                                <Image key={i} source={w.image} style={{width: 100, height: 100}} resizeMode='cover' />
+                            );
+                          }
+                        })}
                       </View>
                     </View>
                     <View style={{ paddingLeft: 20}}>

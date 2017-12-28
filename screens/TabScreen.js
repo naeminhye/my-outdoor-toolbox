@@ -7,6 +7,7 @@ import ExploreScreen from './ExploreScreen';
 import NotiScreen from './NotiScreen';
 import MessageScreen from './MessageScreen';
 import PostDetail from './PostDetail';
+import PlaceDetail from './PlaceDetail';
 import SettingScreen from './SettingScreen';
 import MapScreen from './MapScreen';
 import WeatherScreen from './WeatherScreen';
@@ -48,6 +49,7 @@ const TabInStack = TabNavigator({
 const TabScreen = StackNavigator({
   TabInStack: { screen: TabInStack },
   PostDetail: { screen: PostDetail },
+  PlaceDetail: { screen: PlaceDetail },
   Setting: { screen: SettingScreen },
   Map: { screen: MapScreen },
   MessageDetail: { screen: MessageDetail },

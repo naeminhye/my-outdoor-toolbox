@@ -63,6 +63,7 @@ exports.fetchConditions = (lat, lon) => {
         visibility_km: json.current_observation.visibility_km,
         pressure_mb: json.current_observation.pressure_mb,
         dewpoint_c: json.current_observation.dewpoint_c,
+        icon: json.current_observation.icon,
     }))
 }
 

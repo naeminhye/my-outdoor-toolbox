@@ -89,7 +89,6 @@ export default class ExploreScreen extends Component {
           title: child.val().title,
           _key: child.key,
           featuredImage: child.val().featuredImage,
-          loves: child.val().loves,
           categoryId: child.val().categoryId,
           category: 'Unknown',
           userId: child.val().userId, // tam thoi dung user name thay cho id
@@ -203,18 +202,9 @@ export default class ExploreScreen extends Component {
                   width: ITEM_WIDTH,
                   flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
+                  justifyContent: 'flex-end',
                   padding: 10,
                 }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: '#fff',
-                    backgroundColor: 'transparent',
-                    alignItems: 'center',
-                  }}>
-                  <Ionicons name={'ios-heart-outline'} size={24} /> {item.loves}
-                </Text>
                 <Text
                   style={{
                     fontSize: 16,

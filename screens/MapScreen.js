@@ -31,7 +31,6 @@ const LONGITUDE = 0;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-
 const placeType = [
   { name: 'All', value: '', image: require('../assets/icons/place/all.png') },
   { name: 'Accounting', value: 'accounting', image: require('../assets/icons/place/accounting.png') },
@@ -135,10 +134,6 @@ const placeRadius = [
 { name: '100km', value: 100000 },
 ];
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
-  'window'
-);
-
 const selectedColor = '#FF5252',
   unSelectedColor = '#e5e5e5';
 
@@ -231,9 +226,9 @@ export default class MapScreen extends Component {
           }
         );
         
-        console.log('index: ' + this.state.activeSlide);
-        console.log('lat: ' + this.state._lat);
-        console.log('lon: ' + this.state._lon);
+        // console.log('index: ' + this.state.activeSlide);
+        // console.log('lat: ' + this.state._lat);
+        // console.log('lon: ' + this.state._lon);
     }
 
     _getLocationAsync = async () => {
@@ -492,7 +487,15 @@ export default class MapScreen extends Component {
                 <View style={{ height: 300, width: width, position: 'absolute', bottom: 70 }}>
                     <Carousel
                         data={this.state.results}
-                        renderItem={this._renderResultItem}
+                        renderItem={({item,index}) => {
+                          return(
+                            <TouchableOpacity onPress={() => {
+                              navigate('PlaceDetail', { placeID: item.place_id });
+                            }}>
+                              { this._renderResultItem({item,index}) }
+                            </TouchableOpacity>
+                          );
+                        }}
                         sliderWidth={width}
                         itemWidth={400}
                         activeSlideAlignment={'center'}
@@ -605,32 +608,6 @@ export default class MapScreen extends Component {
             }}
             resizeMode="cover"
           />
-        </View>
-          <View
-          style={{
-            backgroundColor: '#fff',
-            position: 'absolute',
-            bottom: 10,
-            alignSelf: 'center',
-            borderRadius: 50,
-            padding: 10,
-            width: 100,
-            height: 50,
-            justifyContent: 'space-around',
-            flexDirection: 'row',
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: -2, height: 2 },
-            shadowOpacity: 0.3,
-            shadowRadius: 2,
-            elevation: 1,
-          }}>
-          <TouchableOpacity onPress={() => {
-            console.log('Shared');
-          }}>
-              <Ionicons name={'ios-share-outline'} size={25}/>
-          </TouchableOpacity>
-          <Text style={{ fontSize: 16 }}>Share</Text>
         </View>
       </View>
       );
