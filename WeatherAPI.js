@@ -68,11 +68,11 @@ exports.fetchConditions = (lat, lon) => {
 }
 
 exports.fetchForecast = (lat, lon) => {
-    let url = `http://api.wunderground.com/api/${wuKEY}/forecast/q/${lat},${lon}.json`;
+    let url = `http://api.wunderground.com/api/${wuKEY}/forecast10day/q/${lat},${lon}.json`;
     console.log(url);
     return fetch(url)
-    .then(json => ({
-        
+    .then(res => res.json()).then(json => ({
+        data: json.forecast.simpleforecast
     }))
 }
 

@@ -20,7 +20,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import GridView from 'react-native-super-grid';
 import GoogleMapAPI from '../GoogleMapAPI';
 import Carousel from 'react-native-snap-carousel';
-
+import SlidingUpPanel from 'rn-sliding-up-panel';
 import Modal from 'react-native-modal';
 import SearchPlaceFilter from '../components/SearchPlaceFilter';
 
@@ -149,7 +149,7 @@ export default class MapScreen extends Component {
         },
         //typeModalVisible: false,
         //radiusModalVisible: false,
-        filterModalVisible: false,
+        filterVisible: false,
         locationResult: null,
         currentLat: 0,
         lon: 0,
@@ -193,8 +193,8 @@ export default class MapScreen extends Component {
         this.setState({ radiusModalVisible: visible });
     }
     
-    setFilterModalVisible(visible) {
-        this.setState({ filterModalVisible: visible });
+    setFilterVisible(visible) {
+        this.setState({ filterVisible: visible });
     }
 
     componentDidMount() {
@@ -517,7 +517,7 @@ export default class MapScreen extends Component {
                   <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 10, backgroundColor: 'transparent', width: width }}>
                     <TouchableOpacity
                       onPress={() => {
-                        this.setFilterModalVisible(!this.state.filterModalVisible);
+                        this.setFilterVisible(!this.state.filterVisible);
                       }}>
                       <View
                         style={{
@@ -538,18 +538,52 @@ export default class MapScreen extends Component {
                     </TouchableOpacity>
                   </View>
                   </KeyboardAvoidingView>
-                  <Modal isVisible={this.state.filterModalVisible} style={{margin: 20}}>
+                  <SlidingUpPanel
+                    ref={c => this._panel = c}
+                    visible={this.state.filterVisible}
+                    onRequestClose={() => this.setFilterVisible(false)}>
+                    <View style={{
+                      flex: 1,
+                      paddingTop: 60,
+                    }}>
+                      {this._renderModal()}
+                      <View
+                        style={{
+                          backgroundColor: '#fff',
+                          position: 'absolute',
+                          top: 40,
+                          alignSelf: 'center',
+                          borderRadius: 20,
+                          padding: 10,
+                          width: 40,
+                          height: 40,
+                          justifyContent: 'center',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          shadowColor: '#000',
+                          shadowOffset: { width: -2, height: 2 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 2,
+                          elevation: 1,
+                        }}>
+                        <TouchableOpacity onPress={() => {this._panel.transitionTo(0)}}>
+                            <Ionicons name={'ios-arrow-down'} size={25}/>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </SlidingUpPanel>
+                  {/*<Modal isVisible={this.state.filterModalVisible} style={{margin: 20}}>
                     {this._renderModal()}
-                  </Modal>
+                  </Modal>*/}
             </View>
         );
     }
 
-    _renderModalContent = () => (
-        <SearchPlaceFilter
-          onCancelPress={() => {this.setFilterModalVisible(!this.state.filterModalVisible);}}
-        />
-    );
+    // _renderModalContent = () => (
+    //     <SearchPlaceFilter
+    //       onCancelPress={() => {this.setFilterModalVisible(!this.state.filterModalVisible);}}
+    //     />
+    // );
 
     _renderResultItem({ item, index }) { 
       var photoURL = 'http://thelabyrinth-a5.com/wp-content/uploads/2015/08/slider-image.jpg';
@@ -616,7 +650,7 @@ export default class MapScreen extends Component {
 
     _renderModal() {
       return(
-          <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 15, }}>
+          <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 15, borderTopLeftRadius: 20, borderTopRightRadius: 20, }}>
               <View
                   style={{
                       width: window.width,
@@ -659,7 +693,7 @@ export default class MapScreen extends Component {
               </ScrollView>
               <View style={{ flexDirection:'row', justifyContent: 'space-around' }}>
                   <CustomButton text={'Cancel'} borderColor={'#FF5252'} borderWidth={2} color={'#FF5252'} fontSize={18} width={150} height={50} onPress={() => {
-                    this.setFilterModalVisible(!this.state.filterModalVisible);
+                    this.setFilterVisible(!this.state.filterVisible);
                     this.setState({
                       tmpRadius: this.state.radius,
                       tmpType: this.state.type,
@@ -674,8 +708,8 @@ export default class MapScreen extends Component {
                         radius: _radius,
                         tmpRadius: _radius,
                       });
-                      this.setFilterModalVisible(!this.state.filterModalVisible);
                       this._handleSubmitText;
+                      this.setFilterVisible(!this.state.filterVisible);
                   }}/>
               </View>
           </View>
