@@ -29,6 +29,7 @@
     "react-native-parallax-scroll-view": "^0.20.1",
     "react-native-popup-dialog": "^0.9.39",
     "react-native-snap-carousel": "^3.4.0",
+    "react-native-star-rating": "^1.0.8",
     "react-native-super-grid": "^1.0.4",
     "react-native-timeline-listview": "^0.2.2",
     "react-native-ui-kitten": "^2.0.1",

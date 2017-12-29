@@ -74,6 +74,12 @@ const weather = [
 	{ icon: 'sunny', image: require('../assets/icons/weather/sunny.png') },
 	{ icon: 'tstorms', image: require('../assets/icons/weather/tstorms.png') },
 	{ icon: 'unknown', image: require('../assets/icons/weather/unknown.png') },
+];
+
+const carousel = [
+  { id: 0 },
+  { id: 1 },
+  { id: 2 },
 ]
 
 const SCREEN_LABEL = 'Weather';
@@ -310,11 +316,11 @@ export default class WeatherScreen extends Component {
                 <Text style={{ fontSize: 16, color: '#FF5252', }}>Edit</Text>
               </View>
               <View style={styles.todayContainer}>
-                <View style={styles.upperContainer}>
+                <View>
                   <View style={styles.locationContainer}>
                     <Text style={styles.location}>{loIcon} {this.state.name}</Text>
                   </View>
-                  <View style={styles.centerContainer}>
+                  <View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
                       <View style={styles.tempContainer}>
                         <Text style={styles.temp}>{this.state.temp_c}</Text>
@@ -325,7 +331,6 @@ export default class WeatherScreen extends Component {
                         <Text style={styles.description}>Feels like {this.state.feelslike_c}°C</Text>
                         { weather.map((w, i) => {
                           if(this.state.icon == w.icon){
-                            console.log(this.state.icon)
                             return(
                                 <Image key={i} source={w.image} style={{width: 100, height: 100}} resizeMode='cover' />
                             );
@@ -391,8 +396,137 @@ export default class WeatherScreen extends Component {
                   </View>
                 </View>
               </View>
+              <View style={{ marginBottom: 50 }}>
+                <Carousel
+                    data={carousel}
+                    renderItem={({ item, index }) => { 
+                      return(
+                        <View style={{ borderWidth: 2, borderRadius: 20, borderColor: 'red', width: 300, paddingBottom: 20, marginBottom: 50,
+                          shadowColor: '#000',
+                          shadowOffset: { width: -3, height: 3 },
+                          shadowOpacity: 0.1,
+                          shadowRadius: 10,
+                          elevation: 1, }}>
+                        <View style={styles.todayContainer}>
+                          <View style={styles.locationContainer}>
+                            <Text style={{fontSize: 16}}>{loIcon} {this.state.name}</Text>
+                          </View>
+                          <View>
+                            <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                              <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: 15}}>
+                                <Text style={{ fontSize: 80 }}>{this.state.temp_c}</Text>
+                                <Text style={{ fontSize: 30, marginTop: -20,}}>°C</Text>
+                              </View>
+                              <View style={{ flexDirection: 'column', flex: 1, marginBottom: 20 }}>
+                                <Text style={{ fontSize: 16 }}>{this.state.weather}</Text>
+                                <Text style={{ fontSize: 12 }}>Feels like {this.state.feelslike_c}°C</Text>
+                                { weather.map((w, i) => {
+                                  if(this.state.icon == w.icon){
+                                    return(
+                                        <Image key={i} source={w.image} style={{width: 80, height: 80}} resizeMode='cover' />
+                                    );
+                                  }
+                                })}
+                              </View>
+                            </View>
+                            <View style={{ paddingLeft: 15}}>
+                              <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                                <View style={{ flex: 1, flexDirection: 'row', padding: 5, justifyContent: 'flex-start', alignItems: 'center'}}>
+                                  <Image source={require('../assets/icons/pressure.png')} style={{width: 28, height: 28}} resizeMode='cover' />
+                                  <View style={{ flexDirection: 'column', paddingLeft: 5}}>
+                                    <Text style={{fontSize: 12 }}>{this.state.pressure_mb}mb</Text>
+                                    <Text style={{fontSize: 12 }}>Pressure</Text>
+                                  </View>    
+                                </View>
+                  
+                                <View style={{ flex: 1, flexDirection: 'row', padding: 5, justifyContent: 'flex-start', alignItems: 'center'}}>
+                                  <Image source={require('../assets/icons/humidity.png')} style={{width: 28, height: 28}} resizeMode='cover' />
+                                  <View style={{ flexDirection: 'column', paddingLeft: 5}}>
+                                    <Text style={{fontSize: 12 }}>{this.state.relative_humidity}</Text>
+                                    <Text style={{fontSize: 12 }}>Humidity</Text>
+                                  </View>    
+                                </View>
+                              </View>
+                  
+                              <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                                <View style={{ flex: 1, flexDirection: 'row', padding: 5, justifyContent: 'flex-start', alignItems: 'center'}}>
+                                  <Image source={require('../assets/icons/wind.png')} style={{width: 28, height: 28, tintColor: '#000'}} resizeMode='cover' />
+                                  <View style={{ flexDirection: 'column', paddingLeft: 5}}>
+                                    <Text style={{fontSize: 12 }}>{this.state.wind_degrees ? `${this.state.wind_degrees}° at ` : ''}{this.state.wind_kph * 3.6}km/h</Text>
+                                    <Text style={{fontSize: 12 }}>Wind</Text>
+                                  </View>    
+                                </View>
+                                
+                                <View style={{ flex: 1, flexDirection: 'row', padding: 5, justifyContent: 'flex-start', alignItems: 'center'}}>
+                                  <Image source={require('../assets/icons/UV.png')} style={{width: 28, height: 28}} resizeMode='cover' />
+                                  <View style={{ flexDirection: 'column', paddingLeft: 5}}>
+                                    <Text style={{fontSize: 12 }}>{this.state.UV}</Text>
+                                    <Text style={{fontSize: 12 }}>UV Index</Text>
+                                  </View>    
+                                </View>
+                              </View>
+                  
+                              <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                              <View style={{ flex: 1, flexDirection: 'row', padding: 5, justifyContent: 'flex-start', alignItems: 'center'}}>
+                                <Image source={require('../assets/icons/precipitation.png')} style={{width: 28, height: 28, tintColor: '#000'}} resizeMode='cover' />
+                                <View style={{ flexDirection: 'column', paddingLeft: 5}}>
+                                  <Text style={{fontSize: 12 }}>{this.state.precip_today_metric > 0 ? `${this.state.precip_today_metric}` : 'Almost 0'}mm</Text>
+                                  <Text style={{fontSize: 12 }}>Precipitation</Text>
+                                </View>    
+                              </View>
+                              
+                              <View style={{ flex: 1, flexDirection: 'row', padding: 5, justifyContent: 'flex-start', alignItems: 'center'}}>
+                                <Image source={require('../assets/icons/visibility.png')} style={{width: 28, height: 28}} resizeMode='cover' />
+                                <View style={{ flexDirection: 'column', paddingLeft: 5}}>
+                                  <Text style={{fontSize: 12 }}>{this.state.visibility_km}km</Text>
+                                  <Text style={{fontSize: 12 }}>Visibility</Text>
+                                </View>    
+                              </View>
+                            </View>
+                            </View>
+                          </View>
+                      </View>
+                          <View
+                          style={{
+                            backgroundColor: '#fff',
+                            position: 'absolute',
+                            bottom: -25,
+                            alignSelf: 'center',
+                            borderRadius: 50,
+                            padding: 10,
+                            width: 50,
+                            height: 50,
+                            justifyContent: 'space-around',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            shadowColor: '#000',
+                            shadowOffset: { width: -2, height: 2 },
+                            shadowOpacity: 0.3,
+                            shadowRadius: 2,
+                            elevation: 1,
+                          }}>
+                          <TouchableOpacity onPress={() => {
+                            console.log('Plus');
+                          }}>
+                              <Ionicons name={'md-add'} size={25}/>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      );
+                    }}
+                    sliderWidth={viewportWidth}
+                    itemWidth={300}
+                    activeSlideAlignment={'center'}
+                    inactiveSlideScale={0.8}
+                    inactiveSlideOpacity={0.5}
+                    onSnapToItem={(index) => this.setState({ activeSlide: index }) }
+                /> 
+              </View>
 
-              <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
+
+              {/*
+              
+                <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold',}}>My subcribes</Text>
                 <Text style={{ fontSize: 16, color: '#FF5252', }}>Edit</Text>
               </View>
@@ -413,6 +547,9 @@ export default class WeatherScreen extends Component {
                       { this.pagination } 
                     </View> :  <Loading /> }
                   </View> : this._renderPlaceHolder() }
+
+
+              */}
                 
           </ParallaxScrollView>
         </View>
@@ -436,10 +573,6 @@ const styles = StyleSheet.create({
     },
     todayContainer: {
       padding: 20,
-    },
-    upperContainer: {
-    },
-    centerContainer: {
     },
     tempContainer: {
       flex: 1,

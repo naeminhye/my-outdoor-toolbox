@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   TouchableHighlight,
+  ListView,
 } from 'react-native';
 import { Constants } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -17,6 +18,8 @@ import GoogleMapAPI from '../GoogleMapAPI';
 const STICKY_HEADER_HEIGHT = 60;
 const PARALLAX_HEADER_HEIGHT = 300;
 import Carousel from 'react-native-snap-carousel';
+import StarRating from 'react-native-star-rating';
+const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const { width: SCREENWIDTH, height: SCREENHEIGHT } = Dimensions.get('window');
 
@@ -31,6 +34,9 @@ export default class PlaceDetail extends Component {
             activeSlide: 0,
             rating: 0,
             reviews: [],
+            dataSource: ds.cloneWithRows([]),
+            starCount: 0,
+            voted: false,
         };
     }
 
@@ -44,10 +50,10 @@ export default class PlaceDetail extends Component {
         GoogleMapAPI.placedetails(params.placeID).then(data => {
             this.setState({
               name: data.result.name,
-              open_now: data.result.opening_hours.open_now,
               formatted_address: data.result.formatted_address,
               rating: data.result.rating,
               reviews: data.result.reviews,
+              starCount: data.result.rating,
             });
 
             if (data.result.opening_hours) {
@@ -56,31 +62,46 @@ export default class PlaceDetail extends Component {
                 });
             }
 
+            if (data.result.reviews) {
+                var reviews = [];
+                data.result.reviews.map((re, i) => {
+                    reviews.push({
+                        author_name: re.author_name,
+                        profile_photo_url: re.profile_photo_url,
+                        rating: re.rating,
+                        relative_time_description: re.relative_time_description,
+                        text: re.text,
+                    });
+                });
+
+                this.setState({
+                    //reviews: reviews,
+                    dataSource: ds.cloneWithRows(reviews),
+                });
+
+                //console.log('reviews: ' + JSON.stringify(this.state.reviews));
+            }
+
             if (data.result.photos) {
                 var photoArray = [];
                 data.result.photos.map((p, i) => {
                     let uri = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${p.width}&photoreference=${p.photo_reference}&key=AIzaSyCKuaY_WP-TZRLarY__psDaVxCFO5ZyQvc`;
-                    // photoArray.push({
-                    //     uri: uri,
-                    // });
                     photoArray[i] = uri;
-                    //console.log('[' + i + ']: ' + uri);
                 });
-
-                // data.result.photos.forEach(photo => {
-                //     let uri = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${photo.width}&photoreference=${photo.photo_reference}&key=AIzaSyCKuaY_WP-TZRLarY__psDaVxCFO5ZyQvc`;
-                //     photoArray.push({
-                //         uri: uri,
-                //     });
-                // });
 
                 this.setState({
                     photos: photoArray,
                 });
-                //console.log('photos: ' + JSON.stringify(this.state.photos));
             }
         });
 
+    }
+
+    onStarRatingPress(rating) {
+        this.setState({
+            starCount: rating,
+            voted: true,
+        });
     }
 
     render() {
@@ -131,16 +152,26 @@ export default class PlaceDetail extends Component {
                 <View style={{ flex: 1, padding: 20 }}>
                         <Text style={{ fontSize: 20, fontWeight: '600', marginBottom: 10, textAlign: 'center'}}>{this.state.formatted_address}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', padding: 10 }}> 
-                            <Text style={{fontSize: 20, color: 'black', alignItems: 'center',}}>something</Text>
-                            <Text style={{fontSize: 20, color: 'black',}}>something</Text>
+                            <Text style={{fontSize: 20, color: 'black', alignItems: 'center',}}>{this.state.rating}</Text>
+                            <StarRating
+                                disabled={false}
+                                maxStars={5}
+                                rating={this.state.starCount}
+                                selectedStar={(rating) => this.onStarRatingPress(rating)}
+                                emptyStar={'md-star-outline'}
+                                fullStar={'md-star'}
+                                halfStar={'md-star-half'}
+                                iconSet={'Ionicons'}
+                                starColor={this.state.voted ? 'yellow' : 'black'}
+                            />
                         </View>
 
                 <Text style={{ fontSize: 20, fontStyle: 'italic', fontWeight: '600', color: '#ff9797'}}>{this.state.open_now ? 'Open now' : 'Closed now'}</Text>
                 <Text style={{ fontSize: 20}}>something</Text> 
               </View>
-              <View style={{ height: 300, width: SCREENWIDTH }}>
+              <View style={{ marginBottom: 20 }}>
                 <View style={{ marginLeft: 20 }}>
-                    <Text style={{ fontSize: 20}}>Gallery:</Text> 
+                    <Text style={{ fontSize: 26, fontWeight: 'bold'}}>Gallery:</Text>
                 </View>
                     <Carousel
                         data={this.state.photos}
@@ -160,6 +191,19 @@ export default class PlaceDetail extends Component {
                 </View>
 
                 {/* REVIEWS HERE */} 
+                <View style={{ marginLeft: 20 }}>
+                    <Text style={{ fontSize: 26, fontWeight: 'bold'}}>Reviews:</Text>
+                </View>
+                <View>
+                { this.state.dataSource.getRowCount() > 0 ? 
+                    <ListView
+                        style={{ padding: 10 }}
+                        dataSource={this.state.dataSource}
+                        renderRow={rowData => this.renderReviews(rowData)}
+                        />
+                    : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold'}}>No review</Text>
+                }
+                </View>
             </ParallaxScrollView>
             </View>
         ); 
@@ -191,4 +235,51 @@ export default class PlaceDetail extends Component {
             </View>
         );
     }
+
+    renderReviews(rowData) {
+        return (
+            <View style={{ padding: 10 }}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              flexDirection: 'row',
+              padding: 10,
+            }}>
+            <View style={{
+                height: 60,
+                width: 60, 
+                justifyContent: 'center',
+              }}>
+                <Image
+                    style={{ borderRadius: 60 / 2, width: 60, height: 60 }}
+                    resizeMode="cover"
+                    source={{uri: rowData.profile_photo_url }}
+                />
+            </View>
+            <View
+              style={{
+                flex: 1,
+                marginLeft: 20,
+                flexDirection: 'column',
+                justifyContent: 'space-around' 
+              }}>
+              <Text
+                style={{ fontSize: 20}}
+                ellipsizeMode="clip"
+                numberOfLines={1}>
+                {rowData.author_name}
+              </Text>
+              <Text style={{ fontSize: 18, color: '#D3D3D3' }}
+                numberOfLines={1}>{rowData.relative_time_description}</Text>
+            </View>
+            
+          </View>
+            <Text style={{ fontSize: 16,}}
+                numberOfLines={5}>
+                {rowData.text}
+            </Text>
+          </View>
+        );
+      }
 }

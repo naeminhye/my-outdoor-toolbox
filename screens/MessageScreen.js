@@ -144,7 +144,7 @@ export default class MessageScreen extends Component {
               //conversations: events,
               dataSource: ds.cloneWithRows(data),
             });
-            console.log(this.state.dataSource);
+            //console.log(this.state.dataSource);
           });
           });
         }

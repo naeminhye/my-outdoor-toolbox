@@ -271,7 +271,8 @@ export default class MapScreen extends Component {
                 longitude: data.results[this.state.activeSlide].geometry.location.lng,
                 latitudeDelta: LATITUDE_DELTA,
                 longitudeDelta: LONGITUDE_DELTA,
-              }
+              },
+              activeSlide: 0,
             });
           });
         }
