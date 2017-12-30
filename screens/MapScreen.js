@@ -11,7 +11,9 @@ import {
     Picker,
     Image,
     Dimensions,
-    KeyboardAvoidingView
+    Animated,
+    KeyboardAvoidingView,
+    Keyboard
 } from 'react-native';
 import { Constants, MapView, Location, Permissions } from 'expo';
 import {RkText, RkTextInput, RkTheme} from 'react-native-ui-kitten';
@@ -138,223 +140,161 @@ const selectedColor = '#FF5252',
   unSelectedColor = '#e5e5e5';
 
 export default class MapScreen extends Component {
-    constructor() {
-      super();
-      this.state = {
-        region: {
-          latitude: LATITUDE,
-          longitude: LONGITUDE,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        },
-        //typeModalVisible: false,
-        //radiusModalVisible: false,
-        filterVisible: false,
-        locationResult: null,
-        currentLat: 0,
-        lon: 0,
-        _lat: 0,
-        _lon: 0,
-        radius: 500, // meters
-        tmpRadius: 500,
-        type: '',
-        tmpType: '',
-        inputValue: '',
-        status: '',
-        results: [],
-        activeSlide: 0,
-      };
-      
-        this._getLocationAsync = this._getLocationAsync.bind(this);
-        this._handleTextChange = this._handleTextChange.bind(this);
-        this._handleSubmitText = this._handleSubmitText.bind(this);
-    }
-    
-    getTypeName = (_type) => {
-        return placeType.find(
-            (place) => {return place.value === _type;}
-        ).name;
-    }
-    
-    getRadiusName = (_radius) => {
-        return placeRadius.find(
-            (place) => {return place.value === _radius;}
-        ).name;
-    }
-
-    static navigationOptions = {
-      header: null,
+  constructor() {
+    super();
+    this.state = {
+      region: {
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      },
+      //typeModalVisible: false,
+      //radiusModalVisible: false,
+      filterVisible: false,
+      locationResult: null,
+      currentLat: 0,
+      lon: 0,
+      _lat: 0,
+      _lon: 0,
+      radius: 500, // meters
+      tmpRadius: 500,
+      type: '',
+      tmpType: '',
+      inputValue: '',
+      status: '',
+      results: [],
+      activeSlide: 0,
     };
-    setTypeModalVisible(visible) {
-        this.setState({ typeModalVisible: visible });
-    }
     
-    setRadiusModalVisible(visible) {
-        this.setState({ radiusModalVisible: visible });
-    }
-    
-    setFilterVisible(visible) {
-        this.setState({ filterVisible: visible });
-    }
+      this._getLocationAsync = this._getLocationAsync.bind(this);
+      this._handleTextChange = this._handleTextChange.bind(this);
+      this._handleSubmitText = this._handleSubmitText.bind(this);
+  }
+  
+  getTypeName = (_type) => {
+      return placeType.find(
+          (place) => {return place.value === _type;}
+      ).name;
+  }
+  
+  getRadiusName = (_radius) => {
+      return placeRadius.find(
+          (place) => {return place.value === _radius;}
+      ).name;
+  }
 
-    componentDidMount() {
-        this._getLocationAsync();
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            this.setState({
-              region: {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                latitudeDelta: LATITUDE_DELTA,
-                longitudeDelta: LONGITUDE_DELTA,
-              }
-            });
-          },
-        (error) => console.log('Error message: ' + error.message),
-        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
-        );
-        this.watchID = navigator.geolocation.watchPosition(
-          position => {
-            this.setState({
-              region: {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                latitudeDelta: LATITUDE_DELTA,
-                longitudeDelta: LONGITUDE_DELTA,
-              }
-            });
-          }
-        );
-        
-        // console.log('index: ' + this.state.activeSlide);
-        // console.log('lat: ' + this.state._lat);
-        // console.log('lon: ' + this.state._lon);
-    }
+  static navigationOptions = {
+    header: null,
+  };
+  setTypeModalVisible(visible) {
+      this.setState({ typeModalVisible: visible });
+  }
+  
+  setRadiusModalVisible(visible) {
+      this.setState({ radiusModalVisible: visible });
+  }
+  
+  setFilterVisible(visible) {
+      this.setState({ filterVisible: visible });
+  }
 
-    _getLocationAsync = async () => {
-        let { status } = await Permissions.askAsync(Permissions.LOCATION);
-        if (status !== 'granted') {
+  componentDidMount() {
+      this._getLocationAsync();
+      navigator.geolocation.getCurrentPosition(
+        position => {
           this.setState({
-            locationResult: 'Permission to access location was denied',
+            region: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            }
+          });
+        },
+      (error) => console.log('Error message: ' + error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+      );
+      this.watchID = navigator.geolocation.watchPosition(
+        position => {
+          this.setState({
+            region: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            }
           });
         }
-    
-        let location = await Location.getCurrentPositionAsync({});
+      );
+      
+      // console.log('index: ' + this.state.activeSlide);
+      // console.log('lat: ' + this.state._lat);
+      // console.log('lon: ' + this.state._lon);
+  }
+
+  _getLocationAsync = async () => {
+      let { status } = await Permissions.askAsync(Permissions.LOCATION);
+      if (status !== 'granted') {
         this.setState({
-          locationResult: JSON.stringify(location),
-          currentLat: location.coords.latitude,
-          currentLon: location.coords.longitude,
+          locationResult: 'Permission to access location was denied',
         });
-        //this._getUVIndex(this.state.lat, this.state.lon);
-      };
-    
-      _handleTextChange = inputValue => {
-        this.setState({ inputValue });
-      };
-    
-      _handleSubmitText = () => {
-        if (this.state.inputValue != '') {
-          GoogleMapAPI.nearbysearch(
-            this.state.currentLat,
-            this.state.currentLon,
-            this.state.radius,
-            this.state.type,
-            this.state.inputValue
-          ).then(data => {
-            this.setState({
-              status: data.status,
-              results: data.results,
-              _lat: data.results[this.state.activeSlide].geometry.location.lat,
-              _lon: data.results[this.state.activeSlide].geometry.location.lng,
-              region: {
-                latitude: data.results[this.state.activeSlide].geometry.location.lat,
-                longitude: data.results[this.state.activeSlide].geometry.location.lng,
-                latitudeDelta: LATITUDE_DELTA,
-                longitudeDelta: LONGITUDE_DELTA,
-              },
-              activeSlide: 0,
-            });
-          });
-        }
-      };
-
-    componentWillUnmount() {
-        navigator.geolocation.clearWatch(this.watchID);
+      }
+  
+      let location = await Location.getCurrentPositionAsync({});
+      this.setState({
+        locationResult: JSON.stringify(location),
+        currentLat: location.coords.latitude,
+        currentLon: location.coords.longitude,
+      });
+      //this._getUVIndex(this.state.lat, this.state.lon);
+    };
+  
+  _handleTextChange = inputValue => {
+    this.setState({ inputValue });
+  };
+  
+  _handleSubmitText = () => {
+    if (this.state.inputValue != '') {
+      GoogleMapAPI.nearbysearch(
+        this.state.currentLat,
+        this.state.currentLon,
+        this.state.radius,
+        this.state.type,
+        this.state.inputValue
+      ).then(data => {
+        if(this.state.activeSlide != 0)
+          this.carousel.snapToItem(0);
+        this.setState({
+          status: data.status,
+          results: data.results,
+          _lat: data.results[this.state.activeSlide].geometry.location.lat,
+          _lon: data.results[this.state.activeSlide].geometry.location.lng,
+          region: {
+            latitude: data.results[this.state.activeSlide].geometry.location.lat,
+            longitude: data.results[this.state.activeSlide].geometry.location.lng,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          },
+          activeSlide: 0,
+        });
+      });
     }
+  };
 
-    render() {
-      const { navigate, goBack } = this.props.navigation;
-        return(
-            <View style={{ flex: 1,}}>
-            {/*
-            <Modal
-            animationType="slide"
-            transparent={true}
-            visible={this.state.typeModalVisible}
-            onRequestClose={() => {
-              alert('Modal has been closed.');
-            }}>
-            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-              <View style={{ padding: 20, backgroundColor: 'white', height: 300 }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    paddingBottom: 20,
-                    height: 40,
-                  }}>
-                  <TouchableHighlight
-                    onPress={() => {
-                      this.setTypeModalVisible(!this.state.typeModalVisible);
-                      this.setState({
-                        tmpType: this.state.type,
-                      });
-                    }}>
-                    <Text style={{ fontSize: 18, textAlign: 'center' }}>
-                      Cancel
-                    </Text>
-                  </TouchableHighlight>
-                  <TouchableHighlight
-                    onPress={() => {
-                      this.setTypeModalVisible(!this.state.typeModalVisible);
-                      let _type = this.state.tmpType;
-                      this.setState({
-                        type: _type,
-                        tmpType: _type,
-                      });
-                      console.log(this.state.type + this.state.radius);
-                    }}>
-                    <Text style={{ fontSize: 18, textAlign: 'center' }}>
-                      Done
-                    </Text>
-                  </TouchableHighlight>
-                </View>
-                  <View style={{ flexDirection: 'column', flex: 1 }}>
-                    <Text style={{ textAlign: 'center', fontSize: 20 }}>
-                      Type of Place
-                    </Text>
-                    <Picker
-                      selectedValue={this.state.tmpType}
-                      onValueChange={(itemValue, itemIndex) =>
-                        this.setState({ tmpType: itemValue })}>
-                      {placeType.map((type, i) => {
-                        return (
-                          <Picker.Item
-                            key={i}
-                            label={type.name}
-                            value={type.value}
-                          />
-                        );
-                      })}
-                    </Picker>
-                  </View>
-              </View>
-            </View>
-          </Modal>
+  componentWillUnmount() {
+      navigator.geolocation.clearWatch(this.watchID);
+  }
+
+  render() {
+    const { navigate, goBack } = this.props.navigation;
+      return(
+          <View style={{ flex: 1,}}>
+          {/*
           <Modal
           animationType="slide"
           transparent={true}
-          visible={this.state.radiusModalVisible}
+          visible={this.state.typeModalVisible}
           onRequestClose={() => {
             alert('Modal has been closed.');
           }}>
@@ -369,9 +309,9 @@ export default class MapScreen extends Component {
                 }}>
                 <TouchableHighlight
                   onPress={() => {
-                    this.setRadiusModalVisible(!this.state.radiusModalVisible);
+                    this.setTypeModalVisible(!this.state.typeModalVisible);
                     this.setState({
-                      tmpRadius: this.state.radius,
+                      tmpType: this.state.type,
                     });
                   }}>
                   <Text style={{ fontSize: 18, textAlign: 'center' }}>
@@ -380,11 +320,11 @@ export default class MapScreen extends Component {
                 </TouchableHighlight>
                 <TouchableHighlight
                   onPress={() => {
-                    this.setRadiusModalVisible(!this.state.radiusModalVisible);
-                    let _radius = this.state.tmpRadius;
+                    this.setTypeModalVisible(!this.state.typeModalVisible);
+                    let _type = this.state.tmpType;
                     this.setState({
-                      radius: _radius,
-                      tmpRadius: this.state.radius,
+                      type: _type,
+                      tmpType: _type,
                     });
                     console.log(this.state.type + this.state.radius);
                   }}>
@@ -398,10 +338,10 @@ export default class MapScreen extends Component {
                     Type of Place
                   </Text>
                   <Picker
-                    selectedValue={this.state.tmpRadius}
+                    selectedValue={this.state.tmpType}
                     onValueChange={(itemValue, itemIndex) =>
-                      this.setState({ tmpRadius: itemValue })}>
-                    {placeRadius.map((type, i) => {
+                      this.setState({ tmpType: itemValue })}>
+                    {placeType.map((type, i) => {
                       return (
                         <Picker.Item
                           key={i}
@@ -415,306 +355,372 @@ export default class MapScreen extends Component {
             </View>
           </View>
         </Modal>
-            */}
-                <MapView
-                    style={ styles.container }
-                    showsUserLocation={ true }
-                    region={ this.state.region }
-                    onRegionChange={ region => this.setState({region}) }
-                    onRegionChangeComplete={ region => this.setState({region}) }
-                >
-                    <MapView.Marker
-                    coordinate={ {
-                        latitude: this.state._lat, 
-                        longitude: this.state._lon, 
-                        latitudeDelta: LATITUDE_DELTA,
-                        longitudeDelta: LONGITUDE_DELTA,
-                    } }
-                    />
-                </MapView>
-
-                <View style={{ flexDirection: 'row', paddingLeft: 20, paddingRight: 20, alignItems: 'center', position: 'absolute', top: 40, }}>
-                  <TouchableOpacity 
-                    onPress={() => goBack()}>
-                    <View style={{ flexDirection: 'row', marginRight: 20 }}>
-                        <Ionicons name={'md-close'} size={28}/> 
-                    </View>
-                  </TouchableOpacity>    
-                <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
-                        style={{paddingRight: 10, flex: 1, }} clearButtonMode='always'
-                        
-                        ref={input => {
-                        this.textInput = input;
-                        }}
-                        returnKeyType="search"
-                        onSubmitEditing={this._handleSubmitText}
-                        placeholder="Search places"
-                        value={this.state.inputValue}
-                        onChangeText={this._handleTextChange}/>
-                </View>
-                {/*
-                <View
-                style={{
-                    flexDirection: 'row',
-                    padding: 10,
-                    alignItems: 'center',
-                    justifyContent: 'space-around',
-                    height: 50,
-                    width: width,
-                    position: 'absolute',
-                    top: 80,
-                    left: 0,
-                }}>
-                    <TouchableOpacity
-                    style={{flex: 1}}
-                    onPress={()=> {
-                        this.setTypeModalVisible(!this.state.typeModalVisible);
-                        this._handleSubmitText
-                    }}>
-                        <Text style={{ fontSize: 18, backgroundColor: 'transparent' }}>Type: {this.getTypeName(this.state.type)}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                    style={{flex: 1}}
-                    onPress={()=> {
-                        this.setRadiusModalVisible(!this.state.radiusModalVisible);
-                        this._handleSubmitText
-                    }}>
-                        <Text style={{ fontSize: 18, backgroundColor: 'transparent' }}>Radius: {this.getRadiusName(this.state.radius)}</Text>
-                    </TouchableOpacity>
-                </View>
-                */}
-
-                {/* RESULT HERE */}
-                <View style={{ height: 300, width: width, position: 'absolute', bottom: 70 }}>
-                    <Carousel
-                        data={this.state.results}
-                        renderItem={({item,index}) => {
-                          return(
-                            <TouchableOpacity onPress={() => {
-                              navigate('PlaceDetail', { placeID: item.place_id });
-                            }}>
-                              { this._renderResultItem({item,index}) }
-                            </TouchableOpacity>
-                          );
-                        }}
-                        sliderWidth={width}
-                        itemWidth={400}
-                        activeSlideAlignment={'center'}
-                        inactiveSlideScale={0.8}
-                        inactiveSlideOpacity={0.5}
-                        ref={(c) => { this.carousel = c; }}
-                        onSnapToItem={(index) => {
-                          this.setState({ 
-                            activeSlide: index,
-                            _lat: this.state.results[index].geometry.location.lat,
-                            _lon: this.state.results[index].geometry.location.lng,
-                          });
-                        } }
-                    /> 
-                  </View>
-
-                  <KeyboardAvoidingView behavior={'position'}>
-                  <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 10, backgroundColor: 'transparent', width: width }}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        this.setFilterVisible(!this.state.filterVisible);
-                      }}>
-                      <View
-                        style={{
-                          backgroundColor: '#FF5252',
-                          width: 150,
-                          height: 50,
-                          borderRadius: 30,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          shadowColor: '#000',
-                          shadowOffset: { width: -2, height: 2 },
-                          shadowOpacity: 0.1,
-                          shadowRadius: 5,
-                          elevation: 1,
-                        }}>
-                        <Text style={{ color: '#fff', fontSize: 20 }}>FILTER</Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                  </KeyboardAvoidingView>
-                  <SlidingUpPanel
-                    ref={c => this._panel = c}
-                    visible={this.state.filterVisible}
-                    onRequestClose={() => this.setFilterVisible(false)}>
-                    <View style={{
-                      flex: 1,
-                      paddingTop: 60,
-                    }}>
-                      {this._renderModal()}
-                      <View
-                        style={{
-                          backgroundColor: '#fff',
-                          position: 'absolute',
-                          top: 40,
-                          alignSelf: 'center',
-                          borderRadius: 20,
-                          padding: 10,
-                          width: 40,
-                          height: 40,
-                          justifyContent: 'center',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          shadowColor: '#000',
-                          shadowOffset: { width: -2, height: 2 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 2,
-                          elevation: 1,
-                        }}>
-                        <TouchableOpacity onPress={() => {this._panel.transitionTo(0)}}>
-                            <Ionicons name={'ios-arrow-down'} size={25}/>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </SlidingUpPanel>
-                  {/*<Modal isVisible={this.state.filterModalVisible} style={{margin: 20}}>
-                    {this._renderModal()}
-                  </Modal>*/}
-            </View>
-        );
-    }
-
-    // _renderModalContent = () => (
-    //     <SearchPlaceFilter
-    //       onCancelPress={() => {this.setFilterModalVisible(!this.state.filterModalVisible);}}
-    //     />
-    // );
-
-    _renderResultItem({ item, index }) { 
-      var photoURL = 'http://thelabyrinth-a5.com/wp-content/uploads/2015/08/slider-image.jpg';
-
-      if (item.photos) {
-        photoURL = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${item.photos[0].width}&photoreference=${item.photos[0].photo_reference}&key=AIzaSyCKuaY_WP-TZRLarY__psDaVxCFO5ZyQvc`;
-      }
-      return(
-        <View>
-          <View
-          style={{
-            width: 400,
-            height: 250,
-            marginTop: 20,
-            marginBottom: 20,
-            padding: 10,
-            flexDirection: 'row',
-            backgroundColor: 'transparent'
-          }}>
-          <View style={{ 
-            flex: 1, 
-            shadowColor: '#000',
-            shadowOffset: { width: -2, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 10,
-            elevation: 1,
-            backgroundColor: 'white'
-          }}>
-            <View style={{ marginLeft: 200, padding: 5, flexDirection: 'column', }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.name}</Text>
-              <Text style={{ fontSize: 18, }}>{item.vicinity}</Text>
-              <View style={{
-                marginTop: 10, 
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={this.state.radiusModalVisible}
+        onRequestClose={() => {
+          alert('Modal has been closed.');
+        }}>
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <View style={{ padding: 20, backgroundColor: 'white', height: 300 }}>
+            <View
+              style={{
                 flexDirection: 'row',
-                flexWrap: 'wrap', }}>
-                { item.types.map((t, i) => {
-                  return (
-                    <View key={i}>
-                      <Text style={{ fontSize: 14, fontStyle: 'italic', paddingRight: 5}}>{t}</Text>
-                    </View>
-                  );
-                })}
+                justifyContent: 'space-between',
+                paddingBottom: 20,
+                height: 40,
+              }}>
+              <TouchableHighlight
+                onPress={() => {
+                  this.setRadiusModalVisible(!this.state.radiusModalVisible);
+                  this.setState({
+                    tmpRadius: this.state.radius,
+                  });
+                }}>
+                <Text style={{ fontSize: 18, textAlign: 'center' }}>
+                  Cancel
+                </Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                onPress={() => {
+                  this.setRadiusModalVisible(!this.state.radiusModalVisible);
+                  let _radius = this.state.tmpRadius;
+                  this.setState({
+                    radius: _radius,
+                    tmpRadius: this.state.radius,
+                  });
+                  console.log(this.state.type + this.state.radius);
+                }}>
+                <Text style={{ fontSize: 18, textAlign: 'center' }}>
+                  Done
+                </Text>
+              </TouchableHighlight>
+            </View>
+              <View style={{ flexDirection: 'column', flex: 1 }}>
+                <Text style={{ textAlign: 'center', fontSize: 20 }}>
+                  Type of Place
+                </Text>
+                <Picker
+                  selectedValue={this.state.tmpRadius}
+                  onValueChange={(itemValue, itemIndex) =>
+                    this.setState({ tmpRadius: itemValue })}>
+                  {placeRadius.map((type, i) => {
+                    return (
+                      <Picker.Item
+                        key={i}
+                        label={type.name}
+                        value={type.value}
+                      />
+                    );
+                  })}
+                </Picker>
               </View>
+          </View>
+        </View>
+      </Modal>
+          */}
+              <MapView
+                  style={ styles.container }
+                  showsUserLocation={ true }
+                  region={ this.state.region }
+                  onRegionChange={ region => this.setState({region}) }
+                  onRegionChangeComplete={ region => this.setState({region}) }
+              >
+                  <MapView.Marker
+                  coordinate={ {
+                      latitude: this.state._lat, 
+                      longitude: this.state._lon, 
+                      latitudeDelta: LATITUDE_DELTA,
+                      longitudeDelta: LONGITUDE_DELTA,
+                  } }
+                  />
+              </MapView>
+
+              <View style={{ flexDirection: 'row', paddingLeft: 20, paddingRight: 20, alignItems: 'center', position: 'absolute', top: 40, }}>
+                <TouchableOpacity 
+                  onPress={() => goBack()}>
+                  <View style={{ flexDirection: 'row', marginRight: 20 }}>
+                      <Ionicons name={'md-close'} size={28}/> 
+                  </View>
+                </TouchableOpacity>    
+              <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
+                      style={{paddingRight: 10, flex: 1, }} clearButtonMode='always'
+                      
+                      ref={input => {
+                      this.textInput = input;
+                      }}
+                      returnKeyType="search"
+                      onSubmitEditing={this._handleSubmitText}
+                      placeholder="Search places"
+                      value={this.state.inputValue}
+                      onChangeText={this._handleTextChange}/>
+              </View>
+              {/*
+              <View
+              style={{
+                  flexDirection: 'row',
+                  padding: 10,
+                  alignItems: 'center',
+                  justifyContent: 'space-around',
+                  height: 50,
+                  width: width,
+                  position: 'absolute',
+                  top: 80,
+                  left: 0,
+              }}>
+                  <TouchableOpacity
+                  style={{flex: 1}}
+                  onPress={()=> {
+                      this.setTypeModalVisible(!this.state.typeModalVisible);
+                      this._handleSubmitText
+                  }}>
+                      <Text style={{ fontSize: 18, backgroundColor: 'transparent' }}>Type: {this.getTypeName(this.state.type)}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                  style={{flex: 1}}
+                  onPress={()=> {
+                      this.setRadiusModalVisible(!this.state.radiusModalVisible);
+                      this._handleSubmitText
+                  }}>
+                      <Text style={{ fontSize: 18, backgroundColor: 'transparent' }}>Radius: {this.getRadiusName(this.state.radius)}</Text>
+                  </TouchableOpacity>
+              </View>
+              */}
+
+              {/* RESULT HERE */}
+              <View style={{ height: 300, width: width, position: 'absolute', bottom: 70 }}>
+                  <Carousel
+                      data={this.state.results}
+                      renderItem={({item,index}) => {
+                        return(
+                          <TouchableOpacity onPress={() => {
+                            navigate('PlaceDetail', { placeID: item.place_id });
+                          }}>
+                            { this._renderResultItem({item,index}) }
+                          </TouchableOpacity>
+                        );
+                      }}
+                      sliderWidth={width}
+                      itemWidth={400}
+                      activeSlideAlignment={'center'}
+                      inactiveSlideScale={0.8}
+                      inactiveSlideOpacity={0.5}
+                      ref={(c) => { this.carousel = c; }}
+                      onSnapToItem={(index) => {
+                        this.setState({ 
+                          activeSlide: index,
+                          _lat: this.state.results[index].geometry.location.lat,
+                          _lon: this.state.results[index].geometry.location.lng,
+                        });
+                      } }
+                  /> 
+                </View>
+
+                <KeyboardAvoidingView behavior={'position'}>
+                <View style={{ justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 10, backgroundColor: 'transparent', width: width }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      //Keyboard.dismiss();
+                      this.setFilterVisible(!this.state.filterVisible);
+                    }}>
+                    <View
+                      style={{
+                        backgroundColor: '#FF5252',
+                        width: 150,
+                        height: 50,
+                        borderRadius: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOffset: { width: -2, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 5,
+                        elevation: 1,
+                      }}>
+                      <Text style={{ color: '#fff', fontSize: 20 }}>FILTER</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                </KeyboardAvoidingView>
+                <SlidingUpPanel
+                  allowDragging={false}
+                  ref={c => this._panel = c}
+                  visible={this.state.filterVisible}
+                  onRequestClose={() => this.setFilterVisible(false)}>
+                  <View style={{
+                    flex: 1,
+                    paddingTop: 60,
+                  }}>
+                    {this._renderModal()}
+                    <View
+                      style={{
+                        backgroundColor: '#fff',
+                        position: 'absolute',
+                        top: 40,
+                        alignSelf: 'center',
+                        borderRadius: 20,
+                        padding: 10,
+                        width: 40,
+                        height: 40,
+                        justifyContent: 'center',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOffset: { width: -2, height: 2 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 2,
+                        elevation: 1,
+                      }}>
+                      <TouchableOpacity onPress={() => {this._panel.transitionTo(0)}}>
+                          <Ionicons name={'ios-arrow-down'} size={25}/>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </SlidingUpPanel>
+                {/*<Modal isVisible={this.state.filterModalVisible} style={{margin: 20}}>
+                  {this._renderModal()}
+                </Modal>*/}
+          </View>
+      );
+  }
+
+  // _renderModalContent = () => (
+  //     <SearchPlaceFilter
+  //       onCancelPress={() => {this.setFilterModalVisible(!this.state.filterModalVisible);}}
+  //     />
+  // );
+
+  _renderResultItem({ item, index }) { 
+    var photoURL = 'http://thelabyrinth-a5.com/wp-content/uploads/2015/08/slider-image.jpg';
+
+    if (item.photos) {
+      photoURL = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${item.photos[0].width}&photoreference=${item.photos[0].photo_reference}&key=AIzaSyCKuaY_WP-TZRLarY__psDaVxCFO5ZyQvc`;
+    }
+    return(
+      <View>
+        <View
+        style={{
+          width: 400,
+          height: 250,
+          marginTop: 20,
+          marginBottom: 20,
+          padding: 10,
+          flexDirection: 'row',
+          backgroundColor: 'transparent'
+        }}>
+        <View style={{ 
+          flex: 1, 
+          shadowColor: '#000',
+          shadowOffset: { width: -2, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          elevation: 1,
+          backgroundColor: 'white'
+        }}>
+          <View style={{ marginLeft: 200, padding: 5, flexDirection: 'column', }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.name}</Text>
+            <Text style={{ fontSize: 18, }}>{item.vicinity}</Text>
+            <View style={{
+              marginTop: 10, 
+              flexDirection: 'row',
+              flexWrap: 'wrap', }}>
+              { item.types.map((t, i) => {
+                return (
+                  <View key={i}>
+                    <Text style={{ fontSize: 14, fontStyle: 'italic', paddingRight: 5}}>{t}</Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
-          <Image
-            source={{ uri: photoURL }}
-            style={{
-              width: 200,
-              height: 250,
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'absolute',
-              top: 0,
-              left: 10,
-            }}
-            resizeMode="cover"
-          />
         </View>
+        <Image
+          source={{ uri: photoURL }}
+          style={{
+            width: 200,
+            height: 250,
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            top: 0,
+            left: 10,
+          }}
+          resizeMode="cover"
+        />
       </View>
-      );
-    }
+    </View>
+    );
+  }
 
-    _renderModal() {
-      return(
-          <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 15, borderTopLeftRadius: 20, borderTopRightRadius: 20, }}>
-              <View
-                  style={{
-                      width: window.width,
-                      height: 50,
-                      marginLeft: 10,
-                      marginRight: 10
-                  }}>
-              <ScrollView 
-                  horizontal={true}
-                  contentContainerStyle={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                  }}>
-                  { placeRadius.map((r, i) => {
-                      return(
-                          <TouchableOpacity key={i} onPress={() => { this.setState({ tmpRadius: r.value }); }}>
-                              <View style={{ borderRadius: 20, backgroundColor: (this.state.tmpRadius == r.value ? selectedColor : unSelectedColor) , flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'center',  margin: 5, padding: 10}}>
-                                  <Text style={{ fontSize: 18, color: (this.state.tmpRadius == r.value ? '#fff' : '#999999') }}>{r.name}</Text>
-                              </View>
-                          </TouchableOpacity>
-                      );
-                  })} 
-              </ScrollView>
-              </View>
-              <ScrollView>
-                  <GridView
-                      itemWidth={120}
-                      items={placeType}
-                      style={{flex: 1, }}
-                      renderItem={item => (  
-                          <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
-                              <TouchableOpacity onPress={() => { this.setState({ tmpType: item.value }); }}>
-                                  <View style={{ borderRadius: 100, margin: 10, padding: 10, height: 80, width: 80, backgroundColor: (this.state.tmpType == item.value ? selectedColor : unSelectedColor), justifyContent: 'center', alignItems: 'center' }}>
-                                  <Image source={item.image} style={{width: 32, height: 32, tintColor: (this.state.tmpType == item.value ? '#fff' : '#999999') }} resizeMode='cover' />
-                                  </View>
-                              </TouchableOpacity>
-                              <Text style={{ fontSize : 16, fontWeight: 'bold',}}>{item.name}</Text>
-                          </View>
-                      )}/>
-              </ScrollView>
-              <View style={{ flexDirection:'row', justifyContent: 'space-around' }}>
-                  <CustomButton text={'Cancel'} borderColor={'#FF5252'} borderWidth={2} color={'#FF5252'} fontSize={18} width={150} height={50} onPress={() => {
-                    this.setFilterVisible(!this.state.filterVisible);
+  _renderModal() {
+    return(
+        <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 15, borderTopLeftRadius: 20, borderTopRightRadius: 20, }}>
+            <View
+                style={{
+                    width: window.width,
+                    height: 50,
+                    marginLeft: 10,
+                    marginRight: 10
+                }}>
+            <ScrollView 
+                horizontal={true}
+                contentContainerStyle={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                { placeRadius.map((r, i) => {
+                    return(
+                        <TouchableOpacity key={i} onPress={() => { this.setState({ tmpRadius: r.value }); }}>
+                            <View style={{ borderRadius: 20, backgroundColor: (this.state.tmpRadius == r.value ? selectedColor : unSelectedColor) , flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'center',  margin: 5, padding: 10}}>
+                                <Text style={{ fontSize: 18, color: (this.state.tmpRadius == r.value ? '#fff' : '#999999') }}>{r.name}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })} 
+            </ScrollView>
+            </View>
+            <ScrollView>
+                <GridView
+                    itemWidth={120}
+                    items={placeType}
+                    style={{flex: 1, }}
+                    renderItem={item => (  
+                        <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
+                            <TouchableOpacity onPress={() => { this.setState({ tmpType: item.value }); }}>
+                                <View style={{ borderRadius: 100, margin: 10, padding: 10, height: 80, width: 80, backgroundColor: (this.state.tmpType == item.value ? selectedColor : unSelectedColor), justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={item.image} style={{width: 32, height: 32, tintColor: (this.state.tmpType == item.value ? '#fff' : '#999999') }} resizeMode='cover' />
+                                </View>
+                            </TouchableOpacity>
+                            <Text style={{ fontSize : 16, fontWeight: 'bold',}}>{item.name}</Text>
+                        </View>
+                    )}/>
+            </ScrollView>
+            <View style={{ flexDirection:'row', justifyContent: 'space-around' }}>
+                <CustomButton text={'Cancel'} borderColor={'#FF5252'} borderWidth={2} color={'#FF5252'} fontSize={18} width={150} height={50} onPress={() => {
+                  this.setFilterVisible(!this.state.filterVisible);
+                  this.setState({
+                    tmpRadius: this.state.radius,
+                    tmpType: this.state.type,
+                  });
+                }}/>
+                <CustomButton text={'OK'} backgroundColor={'#FF5252'} borderWidth={0} color={'#fff'} fontSize={18} width={150} height={50} onPress={() => {
+                    let _type = this.state.tmpType;
+                    let _radius = this.state.tmpRadius;
                     this.setState({
-                      tmpRadius: this.state.radius,
-                      tmpType: this.state.type,
+                      type: _type,
+                      tmpType: _type,
+                      radius: _radius,
+                      tmpRadius: _radius,
                     });
-                  }}/>
-                  <CustomButton text={'OK'} backgroundColor={'#FF5252'} borderWidth={0} color={'#fff'} fontSize={18} width={150} height={50} onPress={() => {
-                      let _type = this.state.tmpType;
-                      let _radius = this.state.tmpRadius;
-                      this.setState({
-                        type: _type,
-                        tmpType: _type,
-                        radius: _radius,
-                        tmpRadius: _radius,
-                      });
-                      this._handleSubmitText;
-                      this.setFilterVisible(!this.state.filterVisible);
-                  }}/>
-              </View>
-          </View>
-      );
-    }
+                    this._handleSubmitText();
+                    this.setFilterVisible(!this.state.filterVisible);
+                }}/>
+            </View>
+        </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

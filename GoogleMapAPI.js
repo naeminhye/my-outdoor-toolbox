@@ -3,7 +3,7 @@ let rootURL = 'https://maps.googleapis.com/maps/api',
   
 exports.nearbysearch = (lat, lon, radius, type, keyword) => {
   let url = `${rootURL}/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&types=${type}&keyword=${keyword}&key=${key}`;
-  console.log('nearbysearch: ' + url);
+  //console.log('nearbysearch: ' + url);
   return fetch(url).then(res => res.json()).then(json => {
     return {
       status: json.status,
@@ -14,7 +14,7 @@ exports.nearbysearch = (lat, lon, radius, type, keyword) => {
 
 exports.placedetails = (placeid) => {
   let url = `${rootURL}/place/details/json?placeid=${placeid}&key=${key}`;
-  console.log('placedetails: ' + url);
+  //console.log('placedetails: ' + url);
   return fetch(url).then(res => res.json()).then(json => {
     return {
       status: json.status,

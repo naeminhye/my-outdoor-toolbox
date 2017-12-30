@@ -64,11 +64,19 @@ export default class WeatherDetail extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            hourly: [],
             month: '',
             day: '',
-            daily: ds1.cloneWithRows([]),
-            hourlySource: ds2.cloneWithRows([]),
+            daily: ds1.cloneWithRows([{
+                weekday: '',
+                icon: 'sunny',
+                high: 0,    
+                low: 0,
+            }]),
+            hourly: ds2.cloneWithRows([{
+                civil: '12:00 AM',
+                icon: 'sunny',
+                temp: 0
+            }]),
         };
         fetchForecast(this.props.lat, this.props.lon).then(data => {
             var daily = [];
@@ -86,38 +94,66 @@ export default class WeatherDetail extends React.Component {
         });
 
         fetchHourly(this.props.lat, this.props.lon).then(data => {
+            var hourly = [];
+            data.data.map((d, i) => {
+                hourly.push({
+                    civil: d.FCTTIME.civil,
+                    icon: d.icon,
+                    temp: d.temp.metric
+                });
+            });
             this.setState({
-                hourly: data.data,
+                hourly: ds2.cloneWithRows(hourly),
             });
         });
     }
-
 
     render() {
         return (
             <View
               style={{
                   flex: 1,
-                  padding: 20,
+                  padding: 10,
+                  paddingTop: 40,
+                  paddingBottom: 60
               }}>
-              <ListView
-                dataSource={this.state.daily}
-                renderRow={rowData => (
-                    <View style={{ height: 50, width: width - 20, flexDirection: 'row', }}>
-                        <View style={{ flex: 3, justifyContent: 'center', alignItems : 'flex-start' }}><Text style={{ fontSize: 16, textAlign: 'left' }}>{rowData.weekday}</Text></View>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}>
-                            { weather.map((w, i) => {
-                                if(rowData.icon == w.icon){
-                                return(
-                                    <Image key={i} source={w.image} style={{width: 40, height: 40}} resizeMode='cover' />
-                                );
-                                }
-                            })}
+                <ListView 
+                    style={{ marginBottom: 20, paddingBottom: 10 }}
+                    horizontal={true}
+                    dataSource={this.state.hourly}
+                    renderRow={rowData => (
+                        <View style={{ height: 100, width: 60, flexDirection: 'column', }}>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}><Text style={{ fontSize: 16 }}>{rowData.temp}°</Text></View>
+                            <View style={{ flex: 2, justifyContent: 'center', alignItems : 'center' }}>
+                                { weather.map((w, i) => {
+                                    if(rowData.icon == w.icon){
+                                    return(
+                                        <Image key={i} source={w.image} style={{width: 60, height: 60}} resizeMode='cover' />
+                                    );
+                                    }
+                                })}
+                            </View>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}><Text style={{ fontSize: 12, color: '#999' }}>{rowData.civil}</Text></View>
                         </View>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}><Text style={{ fontSize: 16 }}>{rowData.high}°C</Text></View>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}><Text style={{ fontSize: 16, color: '#999' }}>{rowData.low}°C</Text></View>
-                    </View>
-                )}/>
+                    )}/>
+                <ListView
+                    dataSource={this.state.daily}
+                    renderRow={rowData => (
+                        <View style={{ height: 50, width: width - 20, flexDirection: 'row', }}>
+                            <View style={{ flex: 3, justifyContent: 'center', alignItems : 'flex-start' }}><Text style={{ fontSize: 16, textAlign: 'left' }}>{rowData.weekday}</Text></View>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}>
+                                { weather.map((w, i) => {
+                                    if(rowData.icon == w.icon){
+                                    return(
+                                        <Image key={i} source={w.image} style={{width: 40, height: 40}} resizeMode='cover' />
+                                    );
+                                    }
+                                })}
+                            </View>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}><Text style={{ fontSize: 16 }}>{rowData.high}°</Text></View>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems : 'center' }}><Text style={{ fontSize: 16, color: '#999' }}>{rowData.low}°</Text></View>
+                        </View>
+                    )}/>
             </View>
           );
     }

@@ -28,7 +28,7 @@ export default class PlaceDetail extends Component {
         super(props);
         this.state = {
             name: '',
-            open_now: false,
+            status: 'This place have no opening hours.',
             formatted_address: '',
             photos: [],
             activeSlide: 0,
@@ -57,9 +57,15 @@ export default class PlaceDetail extends Component {
             });
 
             if (data.result.opening_hours) {
-                this.setState({
-                    open_now: data.result.opening_hours.open_now,
+                if (data.result.opening_hours.open_now)
+                    this.setState({
+                        status: 'Open Now',
                 });
+                else {
+                    this.setState({
+                        status: 'Closed Now',
+                    });
+                }
             }
 
             if (data.result.reviews) {
@@ -166,8 +172,7 @@ export default class PlaceDetail extends Component {
                             />
                         </View>
 
-                <Text style={{ fontSize: 20, fontStyle: 'italic', fontWeight: '600', color: '#ff9797'}}>{this.state.open_now ? 'Open now' : 'Closed now'}</Text>
-                <Text style={{ fontSize: 20}}>something</Text> 
+                <Text style={{ fontSize: 20, fontStyle: 'italic', fontWeight: '600', color: '#ff9797'}}>{this.state.status}</Text>
               </View>
               <View style={{ marginBottom: 20 }}>
                 <View style={{ marginLeft: 20 }}>
