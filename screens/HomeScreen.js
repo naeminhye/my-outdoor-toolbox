@@ -31,7 +31,7 @@ const STICKY_HEADER_HEIGHT = 40;
 const SCREEN_LABEL = 'Home';
 const AVATAR_SIZE = 80;
 const profileItems = [
-  { name: 'Weather', icon: 'ios-partly-sunny-outline', code: '#888888', navigate: 'Weather' }, 
+  //{ name: 'Weather', icon: 'ios-partly-sunny-outline', code: '#888888', navigate: 'Weather' }, 
   { name: 'Guide Me', icon: 'ios-navigate-outline', code: '#888888', navigate: 'Map'  },
   { name: 'Schedule', icon: 'ios-calendar-outline', code: '#888888', navigate: 'Schedule'  }, 
 ];
@@ -83,7 +83,7 @@ class HomeScreen extends Component {
       renderForeground={() => (
         <View style={[myStyles.screenHeader]}>
           <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
-          <TouchableOpacity onPress={() => { this.props.navigation.navigate('Setting'); }}
+          <TouchableOpacity onPress={() => { this.props.navigation.navigate('Profile'); }}
           style={{ marginBottom: 10, alignItems: 'center', justifyContent: 'center', padding: 5, borderRadius: 50 / 2, borderColor: '#FF5252'}}>
             <Image style={{borderRadius: 40 / 2, width: 40, height: 40}}
               source={{ uri: this.state.profile_picture }}

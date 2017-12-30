@@ -35,7 +35,8 @@ export default class PostDetail extends Component {
             featuredImage: 'http://drpattydental.com/wp-content/uploads/2017/05/placeholder.png',
             content: 'Nothing.',
             address: '',
-            categoryId: 'Unknown',
+            categoryId: -1,
+            placeId: '',
             description: '',
             images: [],
             tags: [ 'travel', 'app', 'outdoor', 'quẩy', 'bôn', 'lành', 'ahihi', 'tag nè', 'app tuyệt vời'],
@@ -106,6 +107,9 @@ export default class PostDetail extends Component {
                 description: snap.val().description,
                 time: snap.val().time,
                 tags: snap.val().tags,
+                placeId: snap.val().placeId,
+                categoryId: snap.val().categoryId,
+                address: snap.val().address
             });
 
             if(snap.val().whoLoves) {
@@ -217,6 +221,31 @@ export default class PostDetail extends Component {
         }
     }
 
+    _renderAddress = () => {
+        const { navigate } = this.props.navigation;
+        if(this.state.address != '') {
+            return (
+                <View>
+                    <View
+                    style={{
+                        marginTop: 20, 
+                        marginBottom: 20,
+                        borderBottomColor: '#d2d2d2',
+                        borderBottomWidth: 1,
+                    }} />
+                    <Text style={{ fontSize: 20, fontWeight: '600'}}>Address</Text>
+                    <Text style={{ fontSize: 18 }}>{this.state.address}</Text>
+                    { this.state.placeId != '' ? 
+                        <TouchableOpacity onPress={() => {navigate('PlaceDetail', { placeID: this.state.placeId });}}>
+                            <Text style={{ fontSize: 18, color: '#ff6363' }}>Guide me</Text>
+                        </TouchableOpacity> 
+                    : null }
+                </View>
+            );
+        }
+        return null;
+    }
+
     render() {
         const { goBack } = this.props.navigation;
         return (
@@ -317,6 +346,7 @@ export default class PostDetail extends Component {
                         );
                     })}
                 </View>
+                {this._renderAddress()}
               </View>
             </ParallaxScrollView>
             </View>

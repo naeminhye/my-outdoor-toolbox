@@ -21,6 +21,7 @@ const SCREEN_LABEL = 'Explore';
 const STICKY_HEADER_HEIGHT = 40;
 const window = Dimensions.get('window');
 const ITEM_WIDTH = 240, ITEM_HEIGHT = 280;
+const MAX_POST = 10;
 
 export default class ExploreScreen extends Component {
   constructor(props) {
@@ -29,13 +30,15 @@ export default class ExploreScreen extends Component {
     this.state = {
       isLoading: true,
       visibleModal: false,
-      dataSource: [],
+      lastestPosts: [],
       categories: [],
       users: [],
+      myLastPost: null,
       profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
     };
 
     this.database = firebaseApp.database();
+    this._renderSpecialPost = this._renderSpecialPost.bind(this);
   }
 
   static navigationOptions = {
@@ -91,10 +94,10 @@ export default class ExploreScreen extends Component {
           featuredImage: child.val().featuredImage,
           categoryId: child.val().categoryId,
           category: 'Unknown',
-          userId: child.val().userId, // tam thoi dung user name thay cho id
+          userId: child.val().userId, 
           username: child.val().userId,
           address: child.val().address,
-          //description: child.val().description,
+          description: child.val().description,
           //content: child.val().content,
           //uri: child.val().uri,
           //time: child.val().time,
@@ -118,7 +121,7 @@ export default class ExploreScreen extends Component {
       });
 
       this.setState({
-        dataSource: events.reverse(),
+        lastestPosts: events.reverse().slice(0, MAX_POST),
         isLoading: false,
       });
     });
@@ -132,6 +135,22 @@ export default class ExploreScreen extends Component {
           this.setState({
             profile_picture: snap.val().profile_picture,
           });
+
+          if (snap.val().posts) {
+            let lastPostId = snap.val().posts.slice(-1)[0];
+            var postRef = firebaseApp.database().ref('posts/' + lastPostId);
+            postRef.on('value', child => {
+              //let events = [];
+              //events.push();
+              this.setState({
+                myLastPost: {
+                  _key: child.key,
+                  title: child.val().title,
+                  featuredImage: child.val().featuredImage,
+                },
+              });
+            });
+          }
         });
       } else {
         console.log('user bị null');
@@ -224,7 +243,7 @@ export default class ExploreScreen extends Component {
           <Text
             numberOfLines={2}
             style={{ fontSize: 14, textAlign: 'left', color: '#d2d2d2' }}>
-            {item.address}
+            {item.description}
           </Text>
         </View>
       </View>
@@ -309,7 +328,8 @@ export default class ExploreScreen extends Component {
       }}>
       <Image
         source={{
-          uri: 'http://kenh14cdn.com/thumb_w/660/2017/lang-phap-kt-1510804667959.jpg',
+          //uri: 'http://kenh14cdn.com/thumb_w/660/2017/lang-phap-kt-1510804667959.jpg',
+          uri: this.state.myLastPost.featuredImage
         }}
         style={{
           width: window.width - 40,
@@ -327,7 +347,7 @@ export default class ExploreScreen extends Component {
             color: '#fff',
             backgroundColor: 'transparent',
           }}>
-          Special This Week
+          {this.state.myLastPost.title}
         </Text>
       </Image>
     </View>
@@ -358,7 +378,7 @@ export default class ExploreScreen extends Component {
               </Text>
               <TouchableOpacity
                 onPress={() => {
-                  navigate('Setting');
+                  navigate('Profile');
                 }}
                 style={{
                   marginBottom: 10,
@@ -413,7 +433,7 @@ export default class ExploreScreen extends Component {
                   </Text>
                 </View>
                 <Carousel
-                  data={this.state.dataSource}
+                  data={this.state.lastestPosts}
                   renderItem={({ item, index }) => {
                     return (
                       <TouchableOpacity
@@ -432,6 +452,7 @@ export default class ExploreScreen extends Component {
                 />
 
                 {/*Headline*/}
+                { this.state.myLastPost != null ? <View>
                 <View
                   style={{
                     paddingLeft: 20,
@@ -443,13 +464,19 @@ export default class ExploreScreen extends Component {
                     flexDirection: 'row',
                   }}>
                   <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                    Take your backpack and go
+                    Your last post
                   </Text>
                   <Text style={{ fontSize: 16, color: '#FF5252' }}>
                     See all <Ionicons name={'ios-arrow-forward'} size={16} />
                   </Text>
                 </View>
-                {this._renderSpecialPost()}
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate('PostDetail', { postID: this.state.myLastPost._key });
+                  }}>
+                  {this._renderSpecialPost()}
+                </TouchableOpacity>
+                </View> : null}
 
                 {/*Headline
                 <View
