@@ -14,6 +14,7 @@ import { Constants } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import { firebaseApp } from '../FirebaseConfig';
+import SegmentedControlTab from 'react-native-segmented-control-tab';
 
 const stories = { userId: 'ABC001', storyId: 'DEF001', storyBanner: 'https://media.cntraveler.com/photos/59f2628a36ffdc5d6930ae2d/master/w_1440,c_limit/Sighisoara-GettyImages-178961954.jpg', storyTitle: 'Sighișoara', storyTags: ['romania', 'beautiful', 'transylvania', 'UNESCO'], storyContent: 'This small, medieval town in Transylvania has a UNESCO-protected historic center and charming streets lined with colorful houses. But beware: It\'s also the the birthplace of Vlad the Impaler, and is considered one of the world\'s most haunted cities.', storyLoves: 155, storyComments: 3, };
 const window = Dimensions.get('window');
@@ -45,12 +46,20 @@ export default class PostDetail extends Component {
             liked_posts: [],
             whoLoves: [],
             liked: false,
+            customStyleIndex: 0,
         };
     }
 
     static navigationOptions = {
         header: null,
-      }
+    }
+
+    handleCustomIndexSelect = (index) => {
+        this.setState({
+            ...this.state,
+            customStyleIndex: index,
+        });
+    }
 
     componentDidMount() {
         //const { params } = this.props.navigation.state;
@@ -109,15 +118,17 @@ export default class PostDetail extends Component {
                 tags: snap.val().tags,
                 placeId: snap.val().placeId,
                 categoryId: snap.val().categoryId,
-                address: snap.val().address
+                address: snap.val().address,
+                whoLoves: snap.val().whoLoves ? snap.val().whoLoves : [],
+                loves: snap.val().whoLoves ? snap.val().whoLoves.length : 0,
             });
 
-            if(snap.val().whoLoves) {
-                this.setState({
-                    whoLoves: snap.val().whoLoves,
-                    loves: snap.val().whoLoves.length,
-                });
-            }
+            // if(snap.val().whoLoves) {
+            //     this.setState({
+            //         whoLoves: snap.val().whoLoves,
+            //         loves: snap.val().whoLoves.length,
+            //     });
+            // }
 
             firebaseApp.database().ref('users/' + snap.val().userId).on("value", (userSnap) => {
                 this.setState({
@@ -291,6 +302,18 @@ export default class PostDetail extends Component {
                 </View>
               )}>
                 <View style={{ flex: 1, padding: 20 }}>
+                <SegmentedControlTab
+                    values={['Post', 'Comments']}
+                    selectedIndex={this.state.customStyleIndex}
+                    onTabPress={this.handleCustomIndexSelect}
+                    borderRadius={0}
+                    tabsContainerStyle={{ height: 60, backgroundColor: '#fff', marginBottom: 20 }}
+                    tabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', }}
+                    activeTabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', borderBottomColor: '#333' }}
+                    tabTextStyle={{ color: '#999', fontWeight: 'bold', fontSize: 18 }}
+                    activeTabTextStyle={{ color: '#333', fontWeight: 'bold', fontSize: 18 }} />
+                {this.state.customStyleIndex === 0 &&
+                    <View>
                         <Text style={{ fontSize: 20, fontWeight: '600', marginBottom: 10, textAlign: 'center'}}>{this.state.description}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', padding: 10 }}> 
                             <TouchableOpacity onPress={() => this._onLikePress()}>
@@ -347,6 +370,10 @@ export default class PostDetail extends Component {
                     })}
                 </View>
                 {this._renderAddress()}
+                </View> }
+                
+                {this.state.customStyleIndex === 1 &&
+                    <Text>Comments</Text>}
               </View>
             </ParallaxScrollView>
             </View>

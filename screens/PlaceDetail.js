@@ -204,7 +204,7 @@ export default class PlaceDetail extends Component {
                     <ListView
                         style={{ padding: 10 }}
                         dataSource={this.state.dataSource}
-                        renderRow={rowData => this.renderReviews(rowData)}
+                        renderRow={rowData => this._renderReview(rowData)}
                         />
                     : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold'}}>No review</Text>
                 }
@@ -241,7 +241,7 @@ export default class PlaceDetail extends Component {
         );
     }
 
-    renderReviews(rowData) {
+    _renderReview(rowData) {
         return (
             <View style={{ padding: 10 }}>
           <View

@@ -30,10 +30,12 @@ export default class ExploreScreen extends Component {
     this.state = {
       isLoading: true,
       visibleModal: false,
-      lastestPosts: [],
+      latestPosts: [],
       categories: [],
+      latestEvents: [],
       users: [],
       myLastPost: null,
+      myUid: '',
       profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
     };
 
@@ -85,6 +87,35 @@ export default class ExploreScreen extends Component {
       });
     });
 
+    database.ref('events').on('value', snap => {
+      let events = [{ flag: 0 }];
+      snap.forEach(child => {
+        events.push({
+          flag: 1,
+          title : child.val().title,
+          _key: child.key,
+          featuredImage: child.val().featuredImage,
+          description: child.val().description,
+          userId: child.val().userId, 
+          username: "",
+          address: child.val().address,
+        });
+      });
+
+      events.map((item, index) => {
+        let users = this.state.users;
+        users.map((user, i) => {
+          if (item.userId == user.userId) {
+            item.username = user.username;
+          }
+        });
+      });
+
+      this.setState({
+        latestEvents: events.reverse().slice(0, MAX_POST),
+      });
+    });
+
     database.ref('posts').on('value', snap => {
       let events = [];
       snap.forEach(child => {
@@ -121,7 +152,7 @@ export default class ExploreScreen extends Component {
       });
 
       this.setState({
-        lastestPosts: events.reverse().slice(0, MAX_POST),
+        latestPosts: events.reverse().slice(0, MAX_POST),
         isLoading: false,
       });
     });
@@ -134,6 +165,7 @@ export default class ExploreScreen extends Component {
         userRef.on('value', snap => {
           this.setState({
             profile_picture: snap.val().profile_picture,
+            myUid: user.uid,
           });
 
           if (snap.val().posts) {
@@ -246,6 +278,117 @@ export default class ExploreScreen extends Component {
             {item.description}
           </Text>
         </View>
+      </View>
+    );
+  }
+
+  _renderEvents({ item, index }) {
+    return (
+      item.flag !== 0 ? 
+      <View
+        style={{
+          marginTop: 20,
+          marginBottom: 20,
+          marginLeft: 20,
+        }}>
+        <View
+          style={{
+            borderRadius: 10,
+            marginBottom: 5,
+          }}>
+          <Image
+            source={{ uri: item.featuredImage }}
+            style={{
+              width: ITEM_WIDTH,
+              height: ITEM_HEIGHT,
+              borderRadius: 10,
+              flex: 1,
+            }}
+            resizeMode="cover">
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'column',
+              }}>
+              <LinearGradient
+                colors={[
+                  'rgba(0, 0, 0, 0.25)',
+                  'rgba(0, 0, 0, 0.125)',
+                  'rgba(0, 0, 0, 0)',
+                ]}
+                style={{
+                  width: ITEM_WIDTH,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 10,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: '#fff',
+                    backgroundColor: 'transparent',
+                    fontWeight: 'bold',
+                  }}>
+                  {item.address}
+                </Text>
+              </LinearGradient>
+              <LinearGradient
+                colors={[
+                  'rgba(0, 0, 0, 0)',
+                  'rgba(0, 0, 0, 0.125)',
+                  'rgba(0, 0, 0, 0.25)',
+                ]}
+                style={{
+                  width: ITEM_WIDTH,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  padding: 10,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: '#fff',
+                    backgroundColor: 'transparent',
+                  }}>
+                  by <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
+                </Text>
+              </LinearGradient>
+            </View>
+          </Image>
+        </View>
+        <View style={{ width: ITEM_WIDTH }}>
+          <Text style={{ fontSize: 18, textAlign: 'left', fontWeight: 'bold' }}>
+            {item.title}
+          </Text>
+          <Text
+            numberOfLines={2}
+            style={{ fontSize: 14, textAlign: 'left', color: '#d2d2d2' }}>
+            {item.description}
+          </Text>
+        </View>
+      </View> : 
+      <View
+      style={{
+        width: ITEM_WIDTH,
+        height: ITEM_HEIGHT,
+        borderRadius: 10,
+        flex: 1,
+        borderWidth: 2,
+        borderColor: 'grey',
+        borderStyle: 'dashed',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginTop: 20,
+        marginBottom: 20,
+        marginLeft: 20,
+      }}>
+        <Ionicons name={'md-add'} color={'black'} size={30} />
+        <Text style={{fontSize: 18}}> Add new events</Text>
       </View>
     );
   }
@@ -378,6 +521,7 @@ export default class ExploreScreen extends Component {
               </Text>
               <TouchableOpacity
                 onPress={() => {
+                  //navigate('Profile', { userId: this.state.myUid });
                   navigate('Profile');
                 }}
                 style={{
@@ -433,7 +577,7 @@ export default class ExploreScreen extends Component {
                   </Text>
                 </View>
                 <Carousel
-                  data={this.state.lastestPosts}
+                  data={this.state.latestPosts}
                   renderItem={({ item, index }) => {
                     return (
                       <TouchableOpacity
@@ -516,6 +660,47 @@ export default class ExploreScreen extends Component {
                   inactiveSlideScale={1}
                   inactiveSlideOpacity={1}
                 />*/}
+
+                <View
+                  style={{
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    justifyContent: 'space-between',
+                    alignSelf: 'stretch',
+                    flexDirection: 'row',
+                  }}>
+                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                    Latest Events
+                  </Text>
+                  <Text style={{ fontSize: 16, color: '#FF5252' }}>
+                    See more <Ionicons name={'ios-arrow-forward'} size={16} />
+                  </Text>
+                </View>
+                <Carousel
+                  data={this.state.latestEvents}
+                  renderItem={({ item, index }) => {
+                    return (
+                      <View>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (item.flag === 0) 
+                              console.log('you\'ve just clicked event flag ' + item.flag);
+                            else 
+                              navigate('EventDetail', { eventID: item._key });
+                          }}>
+                          {this._renderEvents({ item, index })}
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  }}
+                  sliderWidth={window.width}
+                  itemWidth={260}
+                  activeSlideAlignment={'start'}
+                  inactiveSlideScale={1}
+                  inactiveSlideOpacity={1}
+                />
 
                 {/*Headline*/}
                 <View

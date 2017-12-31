@@ -444,17 +444,18 @@ export default class MapScreen extends Component {
                       <Ionicons name={'md-close'} size={28}/> 
                   </View>
                 </TouchableOpacity>    
-              <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
-                      style={{paddingRight: 10, flex: 1, }} clearButtonMode='always'
-                      
-                      ref={input => {
-                      this.textInput = input;
-                      }}
-                      returnKeyType="search"
-                      onSubmitEditing={this._handleSubmitText}
-                      placeholder="Search places"
-                      value={this.state.inputValue}
-                      onChangeText={this._handleTextChange}/>
+                <RkTextInput 
+                  rkType='searchbox' 
+                  label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
+                  style={{paddingRight: 10, flex: 1, }} clearButtonMode='always'
+                  ref={input => {
+                  this.textInput = input;
+                  }}
+                  returnKeyType="search"
+                  onSubmitEditing={this._handleSubmitText}
+                  placeholder="Search places"
+                  value={this.state.inputValue}
+                  onChangeText={this._handleTextChange}/>
               </View>
               {/*
               <View

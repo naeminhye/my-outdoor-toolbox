@@ -28,6 +28,7 @@
     "react-native-modal": "^4.1.1",
     "react-native-parallax-scroll-view": "^0.20.1",
     "react-native-popup-dialog": "^0.9.39",
+    "react-native-segmented-control-tab": "^3.2.1",
     "react-native-snap-carousel": "^3.4.0",
     "react-native-star-rating": "^1.0.8",
     "react-native-super-grid": "^1.0.4",

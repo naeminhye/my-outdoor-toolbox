@@ -51,6 +51,7 @@ export default class ProfileScreen extends Component {
             name: snap.val().username,
             bio: snap.val().bio,
             numOfFollowing: snap.val().following ? snap.val().following.length : 0,
+            numOfFollowers: snap.val().followers ? snap.val().followers.length : 0,
             numOfPosts: snap.val().posts ? snap.val().posts.length : 0,
           });
 
@@ -130,8 +131,8 @@ export default class ProfileScreen extends Component {
           </TouchableOpacity>
           <View style={{ paddingTop: 5, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row'}}>
             <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10, }}>{SCREEN_LABEL}</Text>
-            <TouchableOpacity onPress={()=>{ console.log('Edit'); }}>
-              <Text style={{ fontSize: 20, color: '#FF5252', marginBottom: 10, }}>Edit</Text>
+            <TouchableOpacity onPress={()=>{ console.log('Setting'); }}>
+              <Text style={{ marginBottom: 10 }}><Ionicons name={'ios-settings-outline'} size={30} /></Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -139,12 +140,12 @@ export default class ProfileScreen extends Component {
       renderStickyHeader={() => (
         <View key="sticky-header" style={{height: STICKY_HEADER_HEIGHT, alignItems:'center',justifyContent: 'flex-end',paddingTop: Constants.statusBarHeight,}}>
           <Text style={{fontSize: 18, fontWeight: 'bold',margin: 10}}
-          onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{SCREEN_LABEL}</Text>
+          onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{this.state.name}</Text>
         </View>
       )}>
       <View style={{ flexDirection:'row' }}>
       
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 5,}}>
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 5, marginBottom: 20}}>
         <TouchableOpacity onPress={this._pickImage}>
           <Image style={{borderRadius: AVATAR_SIZE / 2, width: AVATAR_SIZE, height: AVATAR_SIZE}} source={{
             uri: this.state.profile_picture, }}
@@ -164,7 +165,7 @@ export default class ProfileScreen extends Component {
           <Text style={{ fontSize: 12, textAlign: 'center'}}>posts</Text>
         </View>
         <View style={{ flex: 1, justifyContent: 'center' }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center'}}>0</Text>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center'}}>{this.state.numOfFollowers}</Text>
           <Text style={{ fontSize: 12, textAlign: 'center'}}>followers</Text>
         </View>
         <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -172,10 +173,22 @@ export default class ProfileScreen extends Component {
           <Text style={{ fontSize: 12, textAlign: 'center'}}>following</Text>
         </View>
       </View>
-
+      <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 20, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold',}}>About me</Text>
+        <Text style={{ fontSize: 16, color: '#FF5252' }}>Edit</Text>
+      </View>
+      <View
+        style={{
+            marginLeft: 10, 
+            marginRight: 10,
+            borderBottomColor: '#d2d2d2',
+            borderBottomWidth: 1,
+        }} />
       <View style={{paddingLeft: 20, paddingRight: 20, paddingTop: 20, paddingBottom: 10, justifyContent: 'space-between', alignSelf: 'stretch', flexDirection: 'row' }}>
         <Text style={{ fontSize: 18, fontWeight: 'bold',}}>{this.state.name}'s recent posts</Text>
-        <Text style={{ fontSize: 16, color: '#FF5252', }}>See All</Text>
+        <Text style={{ fontSize: 16, color: '#FF5252' }}>
+          See all <Ionicons name={'ios-arrow-forward'} size={16} />
+        </Text>
       </View>
       <Carousel
         data={this.state.myPosts}
@@ -195,7 +208,13 @@ export default class ProfileScreen extends Component {
         inactiveSlideScale={1}
         inactiveSlideOpacity={1}
       />
-
+      <View
+        style={{
+            marginLeft: 10, 
+            marginRight: 10,
+            borderBottomColor: '#d2d2d2',
+            borderBottomWidth: 1,
+        }} />
       <TouchableOpacity onPress={() => {
         firebaseApp.auth().signOut().then(function() {
           //TODO: Hành động sau khi signout 

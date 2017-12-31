@@ -7,6 +7,7 @@ import ExploreScreen from './ExploreScreen';
 import NotiScreen from './NotiScreen';
 import MessageScreen from './MessageScreen';
 import PostDetail from './PostDetail';
+import EventDetail from './EventDetail';
 import PlaceDetail from './PlaceDetail';
 import ProfileScreen from './ProfileScreen';
 import MapScreen from './MapScreen';
@@ -49,6 +50,7 @@ const TabInStack = TabNavigator({
 const TabScreen = StackNavigator({
   TabInStack: { screen: TabInStack },
   PostDetail: { screen: PostDetail },
+  EventDetail: { screen: EventDetail },
   PlaceDetail: { screen: PlaceDetail },
   Profile: { screen: ProfileScreen },
   Map: { screen: MapScreen },

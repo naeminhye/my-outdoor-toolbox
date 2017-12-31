@@ -31,9 +31,11 @@ const STICKY_HEADER_HEIGHT = 40;
 const SCREEN_LABEL = 'Home';
 const AVATAR_SIZE = 80;
 const profileItems = [
-  //{ name: 'Weather', icon: 'ios-partly-sunny-outline', code: '#888888', navigate: 'Weather' }, 
+  { name: 'Weather', icon: 'ios-partly-sunny-outline', code: '#888888', navigate: 'Weather' }, 
   { name: 'Guide Me', icon: 'ios-navigate-outline', code: '#888888', navigate: 'Map'  },
   { name: 'Schedule', icon: 'ios-calendar-outline', code: '#888888', navigate: 'Schedule'  }, 
+  { name: 'Events', icon: 'ios-calendar-outline', code: '#888888', navigate: 'Schedule'  }, 
+  { name: 'Stories', icon: 'ios-calendar-outline', code: '#888888', navigate: 'Schedule'  }, 
 ];
 
 class HomeScreen extends Component {
