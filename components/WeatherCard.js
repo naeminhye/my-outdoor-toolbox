@@ -169,7 +169,7 @@ export default class WeatherCard extends React.Component {
                   <View style={{ flex: 1, flexDirection: 'row', padding: 5, paddingLeft: 35, justifyContent: 'flex-start', alignItems: 'center'}}>
                     <Image source={require('../assets/icons/UV.png')} style={{width: 28, height: 28}} resizeMode='cover' />
                     <View style={{ flexDirection: 'column', paddingLeft: 5}}>
-                      <Text style={{fontSize: 12, backgroundColor: 'transparent' }}>{this.state.UV.toFixed(0)}</Text>
+                      <Text style={{fontSize: 12, backgroundColor: 'transparent' }}>{this.state.UV}</Text>
                       <Text style={{fontSize: 12, backgroundColor: 'transparent' }}>UV Index</Text>
                     </View>    
                   </View>

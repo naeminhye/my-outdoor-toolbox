@@ -22,7 +22,11 @@ const window = Dimensions.get('window');
 const STICKY_HEADER_HEIGHT = 60;
 const PARALLAX_HEADER_HEIGHT = 300;
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-
+import Timeline from 'react-native-timeline-listview'
+const data = [
+  {time: 'Jan 18', title: 'Lễ Ra Quân Chiến Dịch Xuân Tình Nguyện 2018', description: 'Lễ Ra Quân Chiến Dịch Xuân Tình Nguyện 2018', icon: require('../assets/icons/task-undone.png') },
+  {time: 'Jan 20', title: 'Play Badminton', description: 'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.', icon: require('../assets/icons/task-undone.png')},
+]
 export default class EventDetail extends Component {
     constructor(props) {
         super(props);
@@ -47,6 +51,9 @@ export default class EventDetail extends Component {
             content: '',
             time: 1514734131,
             inputValue: '',
+            isMine: false,
+            followed: false,
+            itinerary: [],
         };
     }
 
@@ -81,8 +88,9 @@ export default class EventDetail extends Component {
                 time: snap.val().time,
                 fee: snap.val().fee,
                 currency: snap.val().currency,
+                itinerary: snap.val().itinerary ? snap.val().itinerary : [],
             });
-
+            
             if (snap.val().comments) {
                 var comments = [];
                 snap.val().comments.map((cmt, i) => {
@@ -108,26 +116,41 @@ export default class EventDetail extends Component {
             });
         });
 
-        // firebaseApp.auth().onAuthStateChanged((user) => {
-        //     if (user != null) {
-        //         var userRef = firebaseApp.database().ref('users/' + user.uid);
-        //         userRef.on('value', snap => {
-        //             this.setState({
-        //                 liked_posts: snap.val().liked_posts
-        //             });
+        firebaseApp.auth().onAuthStateChanged((user) => {
+            if (user != null) {
+                if (this.state.userId === user.uid) {
+                    this.setState({
+                        isMine: true
+                    });
+                }
+                else {
+                    var userRef = firebaseApp.database().ref('users/' + user.uid);
+                    userRef.on('value', snap => {
+                        let following = snap.val().following ? snap.val().following : [];
+                        //let liked_posts = snap.val().liked_posts ? snap.val().liked_posts : [];
+                        if (following != []) {
+                            following.map((u, index) => {
+                                if (u === this.state.userId) {
+                                    this.setState({
+                                        followed: true
+                                    });
+                                }
+                            });
+                        }
 
-        //             if (snap.val().liked_posts != []) {
-        //                 snap.val().liked_posts.map((post, index) => {
-        //                     if (post === params.postID) {
-        //                         this.setState({
-        //                             liked: true
-        //                         });
-        //                     }
-        //                 });
-        //             }
-        //         }); 
-        //     }
-        // });
+                        // if (liked_posts != []) {
+                        //     liked_posts.map((post, index) => {
+                        //         if (post === params.postID) {
+                        //             this.setState({
+                        //                 liked: true
+                        //             });
+                        //         }
+                        //     });
+                        // }
+                    }); 
+                }
+            }
+        });
     }
 
     _handleTextChange = inputValue => {
@@ -215,7 +238,7 @@ export default class EventDetail extends Component {
     render() {
         const { goBack } = this.props.navigation;
         return (
-            <View style={{ flex: 1, backgroundColor: '#fff', }}>
+            <View style={{ flex: 1, backgroundColor: '#fff'}}>
             <ParallaxScrollView
                 ref={(scroll) => { this.scrollview = scroll; }}
               backgroundColor="white"
@@ -256,7 +279,7 @@ export default class EventDetail extends Component {
                     onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>Event</Text>
                 </View>
               )}>
-                <View style={{ flex: 1, padding: 20}}>
+                <View style={{ flex: 1, padding: 20, paddingBottom: 60 }}>
                     <SegmentedControlTab
                         values={['About', 'Itinerary', 'Comments']}
                         selectedIndex={this.state.customStyleIndex}
@@ -264,9 +287,9 @@ export default class EventDetail extends Component {
                         borderRadius={0}
                         tabsContainerStyle={{ height: 60, backgroundColor: '#fff', marginBottom: 20 }}
                         tabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', }}
-                        activeTabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', borderBottomColor: '#333' }}
+                        activeTabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', borderBottomColor: '#FF5252' }}
                         tabTextStyle={{ color: '#999', fontWeight: 'bold', fontSize: 18 }}
-                        activeTabTextStyle={{ color: '#333', fontWeight: 'bold', fontSize: 18 }} />
+                        activeTabTextStyle={{ color: '#FF5252', fontWeight: 'bold', fontSize: 18 }} />
                     {this.state.customStyleIndex === 0 &&
                     <View>
                     <View
@@ -294,17 +317,20 @@ export default class EventDetail extends Component {
                             borderBottomColor: '#d2d2d2',
                             borderBottomWidth: 1,
                         }} />
-                <View style={{flexDirection:'row', marginTop: 10}}>
-                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', }}>
-                        <Image style={{borderRadius: 40, width: 80, height: 80 }} 
-                        source={{uri: this.state.profile_picture}}
-                        />
+                        <View style={{flexDirection:'row', marginTop: 10}}>
+                        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', }}>
+                            <Image style={{borderRadius: 30, width: 60, height: 60 }} 
+                            source={{uri: this.state.profile_picture}}
+                            />
+                        </View>
+                        <View style={{ flex: 2, justifyContent: 'space-around', alignItems: 'flex-start', padding: 10 }}>
+                            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{this.state.username}</Text>
+                            <Text style={{ fontSize: 12,  fontStyle: 'italic', color: '#ff9797'}}>{this.state.bio}</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            {!this.state.isMine ? <View style={{ width: 80, height: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10, borderWidth: 2, backgroundColor: (this.state.followed ? '#FF5252' : '#fff'), borderColor: '#FF5252', padding: 5 }}><Text style={{ backgroundColor: 'transparent', color: (this.state.followed ? '#fff' : '#FF5252'), fontSize: 14 }}>{this.state.followed ? 'Following' : 'Follow'}</Text></View> : <View></View>}
+                        </View>
                     </View>
-                    <View style={{ flex: 3, justifyContent: 'space-around', alignContent: 'center' }}>
-                        <Text style={{ fontSize: 18,  fontStyle: 'italic', color: '#ff9797'}}>Guided by</Text>
-                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{this.state.username}</Text>
-                    </View>
-                </View>
                 <View
                 style={{
                     marginTop: 20, 
@@ -342,7 +368,24 @@ export default class EventDetail extends Component {
                 </View> }
                 
                 {this.state.customStyleIndex === 1 &&
-                    <Text> Tab two</Text>}
+                    <View>
+                    { this.state.itinerary.length > 0 ? 
+                        <Timeline 
+                        style={{flex: 1}}
+                        data={this.state.itinerary}
+                        circleSize={10}
+                        circleColor='#ff6363'
+                        lineColor='#ff6363'
+                        timeContainerStyle={{ minWidth: 65, marginTop: -5, borderRadius:50}}
+                        timeStyle={{textAlign: 'center', fontSize: 18, backgroundColor:'transparent', color:'black', padding:5,}}
+                        descriptionStyle={{color:'gray'}}
+                        options={{
+                            style:{paddingTop:5}
+                        }}
+                        separator={false}
+                        detailContainerStyle={{marginBottom: 20, padding: 20, backgroundColor: "#f5f4f2", borderRadius: 10, shadowColor: '#000', shadowOffset: { width: -2, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 1,}}
+                    /> : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold'}}>No Itinerary</Text> }
+                    </View>}
                 
                 {this.state.customStyleIndex === 2 &&
                     <View>
@@ -359,22 +402,32 @@ export default class EventDetail extends Component {
             </ParallaxScrollView>
 
             <KeyboardAvoidingView behavior={'position'}>
-                <RkTextInput rkType='cmtbox'
-                    style={{ 
-                        position: 'absolute',
-                        bottom: 0,
-                        margin: 10,
-                        paddingRight: 10, 
-                        flex: 1,
-                     }} 
-                    clearButtonMode='always'
-                    ref={input => {
-                        this.textInput = input;
-                    }}
-                    returnKeyType='send'
-                    placeholder="Write a comment..."
-                    value={this.state.inputValue}
-                    onChangeText={this._handleTextChange}/>
+                <View style={{ 
+                    position: 'absolute',
+                    bottom: 0,
+                    paddingRight: 10, 
+                    paddingLeft: 10,
+                    flex: window.width,
+                    height: 60,
+                    backgroundColor: '#fff',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <RkTextInput rkType='cmtbox'
+                        style={{ 
+                            paddingRight: 10, 
+                            paddingLeft: 10,
+                            flex: 1,
+                        }} 
+                        clearButtonMode='always'
+                        ref={input => {
+                            this.textInput = input;
+                        }}
+                        returnKeyType='send'
+                        placeholder="Write a comment..."
+                        value={this.state.inputValue}
+                        onChangeText={this._handleTextChange}/>
+                </View>
             </KeyboardAvoidingView>
             </View>
         ); 
@@ -431,7 +484,7 @@ export default class EventDetail extends Component {
 RkTheme.setType('RkTextInput','cmtbox',{
   height: 40,
   borderRadius: 50,
-  underlineColor:'#444',
-  backgroundColor: '#999', 
+  underlineColor:'#0000',
+  backgroundColor: '#f5f4f2', 
   width: window.width - 20
 }); 

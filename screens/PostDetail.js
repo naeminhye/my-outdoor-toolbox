@@ -9,17 +9,20 @@ import {
   Platform,
   ScrollView,
   TouchableHighlight,
+  ListView, 
+  KeyboardAvoidingView
 } from 'react-native';
 import { Constants } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import { firebaseApp } from '../FirebaseConfig';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
+import {RkText, RkTextInput, RkTheme} from 'react-native-ui-kitten';
 
-const stories = { userId: 'ABC001', storyId: 'DEF001', storyBanner: 'https://media.cntraveler.com/photos/59f2628a36ffdc5d6930ae2d/master/w_1440,c_limit/Sighisoara-GettyImages-178961954.jpg', storyTitle: 'Sighișoara', storyTags: ['romania', 'beautiful', 'transylvania', 'UNESCO'], storyContent: 'This small, medieval town in Transylvania has a UNESCO-protected historic center and charming streets lined with colorful houses. But beware: It\'s also the the birthplace of Vlad the Impaler, and is considered one of the world\'s most haunted cities.', storyLoves: 155, storyComments: 3, };
 const window = Dimensions.get('window');
 const STICKY_HEADER_HEIGHT = 60;
 const PARALLAX_HEADER_HEIGHT = 300;
+const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const colorpallete = [ '#ff6363', '#ff7474', '#ff8585', '#ff9797', '#ffa8a8', '#ffb9b9', '#ffcbcb',];
 
@@ -27,6 +30,8 @@ export default class PostDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            inputValue: '',
+            comments: ds.cloneWithRows([]),
             userId: 'User ID',
             username: 'User Name',
             bio: '',
@@ -37,16 +42,18 @@ export default class PostDetail extends Component {
             content: 'Nothing.',
             address: '',
             categoryId: -1,
+            category: 'Unknown',
             placeId: '',
             description: '',
             images: [],
             tags: [ 'travel', 'app', 'outdoor', 'quẩy', 'bôn', 'lành', 'ahihi', 'tag nè', 'app tuyệt vời'],
             loves: 0,
             time: 1511978923,
-            liked_posts: [],
             whoLoves: [],
             liked: false,
             customStyleIndex: 0,
+            followed: false,
+            isMine: false,
         };
     }
 
@@ -130,6 +137,22 @@ export default class PostDetail extends Component {
             //     });
             // }
 
+            if (snap.val().comments) {
+                var comments = [];
+                snap.val().comments.map((cmt, i) => {
+                    comments.push({
+                        username: cmt.user.name,
+                        profile_photo_url: cmt.user.profile_photo_url,
+                        createdAt: cmt.createdAt,
+                        text: cmt.text,
+                    });
+                });
+
+                this.setState({
+                    comments: ds.cloneWithRows(comments),
+                });
+            }
+
             firebaseApp.database().ref('users/' + snap.val().userId).on("value", (userSnap) => {
                 this.setState({
                     profile_picture: userSnap.val().profile_picture,
@@ -141,22 +164,41 @@ export default class PostDetail extends Component {
 
         firebaseApp.auth().onAuthStateChanged((user) => {
             if (user != null) {
-                var userRef = firebaseApp.database().ref('users/' + user.uid);
-                userRef.on('value', snap => {
+                if (this.state.userId === user.uid) {
                     this.setState({
-                        liked_posts: snap.val().liked_posts
+                        isMine: true
                     });
-
-                    if (snap.val().liked_posts != []) {
-                        snap.val().liked_posts.map((post, index) => {
-                            if (post === params.postID) {
-                                this.setState({
-                                    liked: true
-                                });
-                            }
-                        });
-                    }
-                }); 
+                }
+                else {
+                    var userRef = firebaseApp.database().ref('users/' + user.uid);
+                    userRef.on('value', snap => {
+                        let following = snap.val().following ? snap.val().following : [];
+                        if (following != []) {
+                            following.map((u, index) => {
+                                if (u === this.state.userId) {
+                                    this.setState({
+                                        followed: true
+                                    });
+                                } else if (u === user.uid) {
+                                    this.setState({
+                                        isMine: true
+                                    });
+                                }
+                            });
+                        }
+                        
+                        let liked_posts = snap.val().liked_posts ? snap.val().liked_posts : [];
+                        if (liked_posts != []) {
+                            liked_posts.map((post, index) => {
+                                if (post === params.postID) {
+                                    this.setState({
+                                        liked: true
+                                    });
+                                }
+                            });
+                        }
+                    }); 
+                }
             }
         });
     }
@@ -301,7 +343,7 @@ export default class PostDetail extends Component {
                     onPress={() => this.scrollview.scrollTo({ x: 0, y: 0 })}>{this.state.username}'s Story</Text>
                 </View>
               )}>
-                <View style={{ flex: 1, padding: 20 }}>
+                <View style={{ flex: 1, padding: 20, paddingBottom: 60 }}>
                 <SegmentedControlTab
                     values={['Post', 'Comments']}
                     selectedIndex={this.state.customStyleIndex}
@@ -309,9 +351,9 @@ export default class PostDetail extends Component {
                     borderRadius={0}
                     tabsContainerStyle={{ height: 60, backgroundColor: '#fff', marginBottom: 20 }}
                     tabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', }}
-                    activeTabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', borderBottomColor: '#333' }}
+                    activeTabStyle={{ backgroundColor: '#fff', borderWidth: 1, borderColor: 'transparent', borderBottomColor: '#FF5252' }}
                     tabTextStyle={{ color: '#999', fontWeight: 'bold', fontSize: 18 }}
-                    activeTabTextStyle={{ color: '#333', fontWeight: 'bold', fontSize: 18 }} />
+                    activeTabTextStyle={{ color: '#FF5252', fontWeight: 'bold', fontSize: 18 }} />
                 {this.state.customStyleIndex === 0 &&
                     <View>
                         <Text style={{ fontSize: 20, fontWeight: '600', marginBottom: 10, textAlign: 'center'}}>{this.state.description}</Text>
@@ -330,13 +372,16 @@ export default class PostDetail extends Component {
                             }} />
                 <View style={{flexDirection:'row', marginTop: 10}}>
                     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', }}>
-                        <Image style={{borderRadius: 40, width: 80, height: 80 }} 
+                        <Image style={{borderRadius: 30, width: 60, height: 60 }} 
                         source={{uri: this.state.profile_picture}}
                         />
                     </View>
-                    <View style={{ flex: 3, justifyContent: 'space-around', alignContent: 'center' }}>
-                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{this.state.username}</Text>
-                        <Text style={{ fontSize: 18,  fontStyle: 'italic', color: '#ff9797'}}>{this.state.bio}</Text>
+                    <View style={{ flex: 2, justifyContent: 'space-around', alignItems: 'flex-start', padding: 10 }}>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{this.state.username}</Text>
+                        <Text style={{ fontSize: 12,  fontStyle: 'italic', color: '#ff9797'}}>{this.state.bio}</Text>
+                    </View>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        {!this.state.isMine ? <View style={{ width: 80, height: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10, borderWidth: 2, backgroundColor: (this.state.followed ? '#FF5252' : '#fff'), borderColor: '#FF5252', padding: 5 }}><Text style={{ backgroundColor: 'transparent', color: (this.state.followed ? '#fff' : '#FF5252'), fontSize: 14 }}>{this.state.followed ? 'Following' : 'Follow'}</Text></View> : <View></View>}
                     </View>
                 </View>
                 <View
@@ -373,10 +418,106 @@ export default class PostDetail extends Component {
                 </View> }
                 
                 {this.state.customStyleIndex === 1 &&
-                    <Text>Comments</Text>}
+                    <View>
+                    { this.state.comments.getRowCount() > 0 ? 
+                        <ListView
+                            dataSource={this.state.comments}
+                            renderRow={rowData => this._renderComment(rowData)}
+                            />
+                        : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold'}}>No Comment</Text>
+                    }
+                    </View>}
               </View>
             </ParallaxScrollView>
+
+            <KeyboardAvoidingView behavior={'position'}>
+                <View style={{ 
+                    position: 'absolute',
+                    bottom: 0,
+                    paddingRight: 10, 
+                    paddingLeft: 10,
+                    flex: window.width,
+                    height: 60,
+                    backgroundColor: '#fff',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <RkTextInput rkType='cmtbox'
+                        style={{ 
+                            paddingRight: 10, 
+                            paddingLeft: 10,
+                            flex: 1,
+                        }} 
+                        clearButtonMode='always'
+                        ref={input => {
+                            this.textInput = input;
+                        }}
+                        returnKeyType='send'
+                        placeholder="Write a comment..."
+                        value={this.state.inputValue}
+                        onChangeText={this._handleTextChange}/>
+                </View>
+            </KeyboardAvoidingView>
             </View>
         ); 
     }
+
+    _handleTextChange = inputValue => {
+      this.setState({ inputValue });
+    };
+
+    _renderComment(rowData) {
+        return (
+        <View style={{ padding: 10 }}>
+            <View
+            style={{
+                flex: 1,
+                justifyContent: 'center',
+                flexDirection: 'row',
+                padding: 10,
+            }}>
+            <View style={{
+                height: 60,
+                width: 60, 
+                justifyContent: 'center',
+                }}>
+                <Image
+                    style={{ borderRadius: 60 / 2, width: 60, height: 60 }}
+                    resizeMode="cover"
+                    source={{uri: rowData.profile_photo_url }}
+                />
+            </View>
+            <View
+                style={{
+                flex: 1,
+                marginLeft: 20,
+                flexDirection: 'column',
+                justifyContent: 'space-around' 
+                }}>
+                <Text
+                style={{ fontSize: 20}}
+                ellipsizeMode="clip"
+                numberOfLines={1}>
+                {rowData.username}
+                </Text>
+                <Text style={{ fontSize: 18, color: '#D3D3D3' }}
+                numberOfLines={1}>{this.timeConverter(rowData.createdAt)}</Text>
+            </View>
+            
+            </View>
+            <Text style={{ fontSize: 16,}}
+                numberOfLines={5}>
+                {rowData.text}
+            </Text>
+            </View>
+        );
+    }
 }
+
+RkTheme.setType('RkTextInput','cmtbox',{
+    height: 40,
+    borderRadius: 50,
+    underlineColor:'#0000',
+    backgroundColor: '#f5f4f2', 
+    width: window.width - 20
+  }); 

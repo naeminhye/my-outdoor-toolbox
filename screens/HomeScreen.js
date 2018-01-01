@@ -13,6 +13,7 @@ import { StackNavigator } from 'react-navigation';
 import WeatherScreen from './WeatherScreen';
 import ScheduleScreen from './ScheduleScreen';
 import AgendaScreen from './AgendaScreen';
+import List from './List';
 import { Constants, LinearGradient } from 'expo';
 import Carousel, {
     Pagination,
@@ -31,11 +32,11 @@ const STICKY_HEADER_HEIGHT = 40;
 const SCREEN_LABEL = 'Home';
 const AVATAR_SIZE = 80;
 const profileItems = [
-  { name: 'Weather', icon: 'ios-partly-sunny-outline', code: '#888888', navigate: 'Weather' }, 
-  { name: 'Guide Me', icon: 'ios-navigate-outline', code: '#888888', navigate: 'Map'  },
-  { name: 'Schedule', icon: 'ios-calendar-outline', code: '#888888', navigate: 'Schedule'  }, 
-  { name: 'Events', icon: 'ios-calendar-outline', code: '#888888', navigate: 'Schedule'  }, 
-  { name: 'Stories', icon: 'ios-calendar-outline', code: '#888888', navigate: 'Schedule'  }, 
+  { name: 'Weather', icon: 'ios-partly-sunny-outline', colors: ['#1d2b64', '#f8cdda'], navigate: 'Weather', image: require('../assets/icons/homeicon/weather.png') }, 
+  { name: 'Guide Me', icon: 'ios-navigate-outline', colors: ['#1a2980', '#26d0ce'], navigate: 'Map', image: require('../assets/icons/homeicon/guide-me.png')  },
+  { name: 'Schedule', icon: 'ios-calendar-outline', colors: ['#403b4a', '#e7e9bb'], navigate: 'Schedule', image: require('../assets/icons/homeicon/schedule.png')  }, 
+  { name: 'Events', icon: 'ios-calendar-outline', colors: ['#e55d87', '#5fc3e4'], navigate: 'List', image: require('../assets/icons/homeicon/events.png')  }, 
+  { name: 'Stories', icon: 'ios-calendar-outline', colors: ['#cc95c0', '#dbd4b4', '#7aa1d2'], navigate: 'List', image: require('../assets/icons/homeicon/posts.png')  }, 
 ];
 
 class HomeScreen extends Component {
@@ -48,14 +49,6 @@ class HomeScreen extends Component {
 
   static navigationOptions = {
     header: null,
-    // tabBarLabel: SCREEN_LABEL,
-    // tabBarIcon: ({ tintColor, focused }) => (
-    //   <Ionicons
-    //     name={focused ? 'ios-home' : 'ios-home-outline'}
-    //     size={26}
-    //     style={{ color: tintColor }}
-    //   />
-    // ),
   }
 
   componentDidMount() {
@@ -105,16 +98,20 @@ class HomeScreen extends Component {
         <GridView
           itemWidth={(viewportWidth - 60) / 2}
           items={profileItems}
-          style={{flex: 1, }}
+          style={{flex: 1, padding: 10 }}
           renderItem={item => (  
             <TouchableOpacity onPress={() => { this.props.navigation.navigate(item.navigate); }}>
-            <View style={{ borderRadius: 20, margin: 10, padding: 10, height: 150, borderWidth: 1, borderColor: item.code }}>
-            <LinearGradient colors={['#ddd6f3', '#faaca8']} style={{}}>
-              
-                  <Ionicons name={item.icon} color={item.code} size={56} />
-                  <Text style={{ fontSize : 16, fontWeight: 'bold', color: item.code}}>{item.name}</Text>
+            <View
+            style={{
+              flex: 1,              
+              borderRadius: 20,
+              height: 200, 
+            }}>
+              <LinearGradient colors={item.colors} style={{ padding: 20, height: 200, alignItems: 'center', justifyContent: 'center', }}>
+                <Image source={item.image} style={{width: 80, height: 80}} resizeMode='cover' />
+                <Text style={{ fontSize : 20, fontWeight: 'bold', color: '#2a2d2c', backgroundColor: 'transparent'}}>{item.name}</Text>
               </LinearGradient>
-              </View>
+            </View>
             </TouchableOpacity>
           )}/>
         </View>
@@ -142,6 +139,7 @@ const RouteConfig = {
   Weather: { screen: WeatherScreen },
   Schedule: { screen: ScheduleScreen },
   Agenda: { screen: AgendaScreen },
+  List: { screen: List },
 }
 
 export default StackNavigator(RouteConfig);

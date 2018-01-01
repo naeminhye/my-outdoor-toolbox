@@ -10,7 +10,6 @@ import myStyles from '../assets/styles/myStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Constants } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
-import Timeline from 'react-native-timeline-listview'
 
 const STICKY_HEADER_HEIGHT = 40;
 const SCREEN_LABEL = 'Schedule';
@@ -29,13 +28,6 @@ export default class ScheduleScreen extends Component {
             },
           ]
       },
-      data: [
-        {time: '09:00', state: 'done', title: 'Archery Training', description: 'The Beginner Archery and Beginner Crossbow course does not require you to bring any equipment, since everything you need will be provided for the course. ',lineColor:'#009688', icon: require('../assets/icons/task-done.png')},
-        {time: '10:45', state: 'undone', title: 'Play Badminton', description: 'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.', icon: require('../assets/icons/task-undone.png')},
-        {time: '12:00', state: 'undone', title: 'Lunch', icon: require('../assets/icons/task-undone.png')},
-        {time: '14:00', state: 'undone', title: 'Watch Soccer', description: 'Team sport played between two teams of eleven players with a spherical ball. ',lineColor:'#009688', icon: require('../assets/icons/task-done.png')},
-        {time: '16:30', state: 'done', title: 'Go to Fitness center', description: 'Look out for the Best Gym & Fitness Centers around me :)', icon: require('../assets/icons/task-done.png')}
-      ]
     };
     this.onDayPress = this.onDayPress.bind(this);
   }
@@ -130,22 +122,6 @@ export default class ScheduleScreen extends Component {
         <Text style={{ fontSize: 18, fontWeight: 'bold',}}>Today's <Text style={{color: 'red'}}>Schedule</Text></Text>
         <Text style={{ fontSize: 16, color: '#FF5252', }}>More</Text>
         </View>
-        <Timeline 
-            style={{flex: 1, padding: 20, }}
-            data={this.state.data}
-            circleSize={30}
-            circleColor='rgba(0,0,0,0)'
-            lineColor='rgb(45,156,219)'
-            timeContainerStyle={{ minWidth: 65, marginTop: -5, borderRadius:50}}
-            timeStyle={{textAlign: 'center', fontSize: 18, backgroundColor:'transparent', color:'black', padding:5,}}
-            descriptionStyle={{color:'gray'}}
-            options={{
-                style:{paddingTop:5}
-            }}
-            innerCircle={'icon'}
-            separator={false}
-            detailContainerStyle={{marginBottom: 20, padding: 20, backgroundColor: "#BBDAFF", borderRadius: 20, shadowColor: '#000', shadowOffset: { width: -2, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 1,}}
-        />
         </ParallaxScrollView>
         <TouchableOpacity onPress={() => {}}>
             <View style={{ backgroundColor: '#FF5252', width: 60, height: 60, borderRadius:30, position: 'absolute', bottom: 30, right: 30, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: -2, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 1,}}>
