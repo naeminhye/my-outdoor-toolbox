@@ -23,10 +23,7 @@ const STICKY_HEADER_HEIGHT = 60;
 const PARALLAX_HEADER_HEIGHT = 300;
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 import Timeline from 'react-native-timeline-listview'
-const data = [
-    { time: 'Jan 18', title: 'Lễ Ra Quân Chiến Dịch Xuân Tình Nguyện 2018', description: 'Lễ Ra Quân Chiến Dịch Xuân Tình Nguyện 2018', icon: require('../assets/icons/task-undone.png') },
-    { time: 'Jan 20', title: 'Play Badminton', description: 'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.', icon: require('../assets/icons/task-undone.png') },
-]
+import CommentItem from '../components/CommentItem';
 export default class EventDetail extends Component {
     constructor(props) {
         super(props);
@@ -395,7 +392,14 @@ export default class EventDetail extends Component {
                                 {this.state.comments.getRowCount() > 0 ?
                                     <ListView
                                         dataSource={this.state.comments}
-                                        renderRow={rowData => this._renderComment(rowData)}
+                                        // renderRow={rowData => this._renderComment(rowData)}
+                                        renderRow={rowData => 
+                                            <CommentItem 
+                                                image={rowData.profile_photo_url}
+                                                createdAt={rowData.createdAt}
+                                                username={rowData.username}
+                                                text={rowData.text}/>
+                                        }
                                     />
                                     : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold' }}>No Comment</Text>
                                 }

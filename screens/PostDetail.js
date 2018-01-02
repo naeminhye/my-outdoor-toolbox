@@ -18,6 +18,7 @@ import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import { firebaseApp } from '../FirebaseConfig';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { RkText, RkTextInput, RkTheme } from 'react-native-ui-kitten';
+import CommentItem from '../components/CommentItem';
 
 const window = Dimensions.get('window');
 const STICKY_HEADER_HEIGHT = 60;
@@ -230,7 +231,7 @@ export default class PostDetail extends Component {
             //TODO: sau khi xoá postID khỏi liked_posts và user.id khỏi whoLoves => sắp xếp lại 2 mảng (id từ 0 -> length mới) !!
             firebaseApp.auth().onAuthStateChanged((user) => {
                 if (user != null) {
-                    console.log('user id: ' + user.uid);
+                    //console.log('user id: ' + user.uid);
                     //var updates = {};
                     let liked_posts = [];
                     let targetPost = -1;
@@ -254,14 +255,14 @@ export default class PostDetail extends Component {
                     let whoLovesRef = firebaseApp.database().ref('posts/' + params.postID).child('whoLoves');
                     whoLovesRef.on("value", (snap) => {
                         whoLoves = snap.val();
-                        console.log('whoLoves before removing: ' + whoLoves);
+                        //console.log('whoLoves before removing: ' + whoLoves);
                     });
                     whoLoves.map((id, index) => {
                         if (id === user.uid) {
                             targetUid = index;
                         }
                     });
-                    console.log('targetUid: ' + targetUid);
+                    //console.log('targetUid: ' + targetUid);
                     if (targetUid >= 0) {
                         whoLoves.splice(targetUid, 1);
                         whoLovesRef.set(whoLoves);
@@ -293,6 +294,91 @@ export default class PostDetail extends Component {
 
                     this.setState({
                         liked: true,
+                    });
+                }
+            });
+        }
+    }
+
+    _onFollowPress() {
+        // const { params } = this.props.navigation.state;
+
+        if (this.state.followed) {
+            console.log('UnFollowed');
+            // TODO: sau khi xoá postID khỏi liked_posts và user.id khỏi whoLoves => sắp xếp lại 2 mảng (id từ 0 -> length mới) !!
+            firebaseApp.auth().onAuthStateChanged((user) => {
+                if (user != null) {
+                    //console.log('user id: ' + user.uid);
+                    //var updates = {};
+                    let following = [];
+                    let target1 = -1;
+                    let followingRef = firebaseApp.database().ref('users/' + user.uid).child('following');
+                    followingRef.on("value", (snap) => {
+                        following = snap.val();
+                    });
+
+                    following.map((_id, index) => {
+                        if (_id === this.state.userId) {
+                            target1 = index;
+                        }
+                    });
+                    if (target1 >= 0) {
+                        following.splice(target1, 1);
+                        followingRef.set(following);
+                    }
+
+                    let followers = [];
+                    let target2 = -1;
+                    let followersRef = firebaseApp.database().ref('users/' + this.state.userId).child('followers');
+                    followersRef.on("value", (snap) => {
+                        followers = snap.val();
+                        //console.log('whoLoves before removing: ' + followers);
+                    });
+                    followers.map((id, index) => {
+                        if (id === user.uid) {
+                            target2 = index;
+                        }
+                    });
+                    if (target2 >= 0) {
+                        followers.splice(target2, 1);
+                        followersRef.set(followers);
+                        // console.log('whoLoves after removing: ' + whoLoves);
+                    }
+                    this.setState({
+                        followed: false,
+                    });
+                }
+            });
+        }
+        else {
+            console.log('Followed');
+            firebaseApp.auth().onAuthStateChanged((user) => {
+                if (user != null) {
+                    var updates = {};
+                    
+                    let numOfFollowing = 0;
+                    let followingRef = firebaseApp.database().ref('users/' + user.uid).child('following')
+                    if(followingRef) {
+                        followingRef.on("value", (snap) => {
+                            numOfFollowing = snap.numChildren();
+                        });
+                    }
+                    updates['/users/' + user.uid + '/following/' + numOfFollowing] = this.state.userId;
+
+                    // update trong posts
+                    let numOfFollowers = 0;
+                    let followersRef = firebaseApp.database().ref('users/' + this.state.userId).child('followers')
+                    if(followersRef) {
+                        followersRef.on("value", (snap) => {
+                            numOfFollowers = snap.numChildren();
+                        });
+                    }
+                    updates['/users/' + this.state.userId + '/followers/' + numOfFollowers] = user.uid;
+
+                    firebaseApp.database().ref().update(updates);
+
+                    this.setState({
+                        followed: true,
                     });
                 }
             });
@@ -408,9 +494,13 @@ export default class PostDetail extends Component {
                                         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{this.state.username}</Text>
                                         <Text style={{ fontSize: 12, fontStyle: 'italic', color: '#ff9797' }}>{this.state.bio}</Text>
                                     </View>
-                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                                        {!this.state.isMine ? <View style={{ width: 80, height: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10, borderWidth: 2, backgroundColor: (this.state.followed ? '#FF5252' : '#fff'), borderColor: '#FF5252', padding: 5 }}><Text style={{ backgroundColor: 'transparent', color: (this.state.followed ? '#fff' : '#FF5252'), fontSize: 14 }}>{this.state.followed ? 'Following' : 'Follow'}</Text></View> : <View></View>}
-                                    </View>
+                                    <TouchableOpacity 
+                                        activeOpacity={0.8}
+                                        onPress={() => this._onFollowPress()}>
+                                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                            {!this.state.isMine ? <View style={{ width: 80, height: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10, borderWidth: 2, backgroundColor: (this.state.followed ? '#FF5252' : '#fff'), borderColor: '#FF5252', padding: 5 }}><Text style={{ backgroundColor: 'transparent', color: (this.state.followed ? '#fff' : '#FF5252'), fontSize: 14 }}>{this.state.followed ? 'Following' : 'Follow'}</Text></View> : <View></View>}
+                                        </View>
+                                    </TouchableOpacity>
                                 </View>
                                 <View
                                     style={{
@@ -450,7 +540,14 @@ export default class PostDetail extends Component {
                                 {this.state.comments.getRowCount() > 0 ?
                                     <ListView
                                         dataSource={this.state.comments}
-                                        renderRow={rowData => this._renderComment(rowData)}
+                                        //renderRow={rowData => this._renderComment(rowData)}
+                                        renderRow={rowData => 
+                                            <CommentItem 
+                                                image={rowData.profile_photo_url}
+                                                createdAt={rowData.createdAt}
+                                                username={rowData.username}
+                                                text={rowData.text}/>
+                                        }
                                     />
                                     : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold' }}>No Comment</Text>
                                 }

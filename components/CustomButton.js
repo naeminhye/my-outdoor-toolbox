@@ -35,7 +35,7 @@ CustomButton.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   fontSize: PropTypes.number,
-  //borderWidth: PropTypes.number,
+  borderWidth: PropTypes.number,
   onPress: PropTypes.func,
 };
 
