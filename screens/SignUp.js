@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Text, View, StyleSheet, Image, Alert } from 'react-native';
-import { Button, FormInput } from 'react-native-elements'; // 0.17.0
 import '@expo/vector-icons'; // 5.2.0
-//import { Constants } from 'expo';
-//import TextField from './TextField';
+import { BlurView } from 'expo';
+import CustomButton from '../components/CustomButton';
+import { RkText, RkTextInput, RkTheme } from 'react-native-ui-kitten';
 
 import { firebaseApp } from '../FirebaseConfig';
 
@@ -27,125 +27,177 @@ export default class SignUp extends Component {
     firebaseApp.database().ref('users/' + userId).set({
       username: name,
       email: email,
-      profile_picture : 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png'
+      profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png'
     });
+  }
+
+  _validateEmail(mail) {
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
+      return (true)
+    }
+    Alert.alert(
+      'Invalid Email',
+      'You have entered an invalid email address!',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('Invalid Email')
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+    return (false)
   }
 
   _onSignUp() {
     const { navigate } = this.props.navigation;
-    firebaseApp
-      .auth()
-      .createUserWithEmailAndPassword(this.state._email, this.state._password)
-      .then(() => {
-        let user = firebaseApp.auth().currentUser;
-        this.writeUserData(user.uid, this.state._name, this.state._email);
-        Alert.alert(
-          'Alert Title',
-          'Đăng kí thành công với email ' + this.state._email,
-          [
-            {
-              text: 'Cancel',
-              onPress: () => console.log('Cancel Pressed'),
-              style: 'cancel',
+    if (this._completed()) {
+      if (this._validateEmail(this.state._email)) {
+        firebaseApp
+          .auth()
+          .createUserWithEmailAndPassword(this.state._email, this.state._password)
+          .then(() => {
+            let user = firebaseApp.auth().currentUser;
+            this.writeUserData(user.uid, this.state._name, this.state._email);
+            Alert.alert(
+              'Alert Title',
+              'Đăng kí thành công với email ' + this.state._email,
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel',
+                },
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    navigate('Tab')
+                    //console.log('Failed')
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+            this.setState({
+              _email: '',
+              _password: '',
+            });
+          })
+          .catch(() => {
+            Alert.alert(
+              'Alert Title',
+              'Đăng kí thất bại: ' + this.state._email,
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel',
+                },
+                { text: 'OK', onPress: () => console.log('Email: ' + this.state._email) },
+              ],
+              { cancelable: false }
+            );
+          });
+      }
+    }
+  }
+
+  _completed() {
+    if (this.state._email === '' || this.state._password === '' || this.state._name === '') {
+      Alert.alert(
+        'Empty',
+        'Please Fill All Required Field.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('Invalid Email')
             },
-            {
-              text: 'OK',
-              onPress: () => {
-                navigate('Tab')
-                //console.log('Failed')
-              },
-            },
-          ],
-          { cancelable: false }
-        );
-        this.setState({
-          _email: '',
-          _password: '',
-        });
-      })
-      .catch(() => {
-        Alert.alert(
-          'Alert Title',
-          'Đăng kí thất bại: ' + this.state._email,
-          [
-            {
-              text: 'Cancel',
-              onPress: () => console.log('Cancel Pressed'),
-              style: 'cancel',
-            },
-            { text: 'OK', onPress: () => console.log('Email: ' + this.state._email) },
-          ],
-          { cancelable: false }
-        );
-      });
+          },
+        ],
+        { cancelable: false }
+      );
+      return false;
+    }
+    return true;
   }
 
   render() {
+    const { navigate, goBack } = this.props.navigation;
     return (
       <View style={styles.container}>
         <Image
           source={{
-            uri: 'https://goo.gl/bu3e9g',
+            uri: 'https://images.unsplash.com/photo-1502933691298-84fc14542831?auto=format&fit=crop&w=1500&q=80',
           }}
           style={styles.imageBg}>
+          <BlurView tint="dark" intensity={20} style={StyleSheet.absoluteFill}>
 
-          <View style={styles.upperView}>
-            <FormInput
-              containerStyle={styles.textInput}
-              placeholder="Name"
-              placeholderTextColor="#fff"
-              inputStyle={styles.text}
-              onChangeText={(_name) => this.setState({ _name })}
-              value={this.state._name}
-            />
-            <FormInput
-              containerStyle={styles.textInput}
-              placeholder="Password"
-              placeholderTextColor="#fff"
-              secureTextEntry={true}
-              inputStyle={styles.text}
-              onChangeText={(_password) => this.setState({ _password })}
-              value={this.state._password}
-            />
-            <FormInput
-              containerStyle={styles.textInput}
-              placeholder="Email"
-              placeholderTextColor="#fff"
-              inputStyle={styles.text}
-              onChangeText={(_email) => this.setState({ _email })}
-              value={this.state._email}
-            />
-            <Button
-              large
-              iconRight={{
-                name: 'angle-right',
-                type: 'font-awesome',
-                color: '#87cefa',
-              }}
-              title="Sign Up"
-              color="#87cefa"
-              buttonStyle={styles.singupBtn}
-              onPress={this._onSignUp}
-              // buttonStyle={[styles.singupBtn, { backgroundColor: '#fff' }]}
-            />
-          </View>
-          <View style={styles.lowerView}>
-            <Text style={{ color: '#fff', fontSize: 16, marginTop: 50 }}>
-              Already have an account?
+            <View style={styles.upperView}>
+              <View style={{ height: 70 }}>
+                <RkTextInput rkType='forminput'
+                  style={{
+                    paddingRight: 10,
+                    paddingLeft: 10,
+                    flex: 1,
+                  }}
+                  clearButtonMode='always'
+                  ref={input => {
+                    this.nameInput = input;
+                  }}
+                  returnKeyType='next'
+                  placeholder="Name"
+                  value={this.state._name}
+                  onChangeText={(_name) => this.setState({ _name })} />
+              </View>
+              <View style={{ height: 70 }}>
+                <RkTextInput rkType='forminput'
+                  style={{
+                    paddingRight: 10,
+                    paddingLeft: 10,
+                    flex: 1,
+                  }}
+                  clearButtonMode='always'
+                  ref={input => {
+                    this.emailInput = input;
+                  }}
+                  returnKeyType='next'
+                  placeholder="Email"
+                  value={this.state._email}
+                  onChangeText={(_email) => this.setState({ _email })} />
+              </View>
+              <View style={{ height: 70 }}>
+                <RkTextInput rkType='forminput'
+                  style={{
+                    paddingRight: 10,
+                    paddingLeft: 10,
+                    flex: 1,
+                  }}
+                  secureTextEntry={true}
+                  clearButtonMode='always'
+                  ref={input => {
+                    this.passwordInput = input;
+                  }}
+                  returnKeyType='next'
+                  placeholder="Password"
+                  value={this.state._password}
+                  onChangeText={(_password) => this.setState({ _password })} />
+              </View>
+              <View style={{ marginTop: 20 }}>
+                <CustomButton text={'Sign Up'} backgroundColor={'#fff'} borderWidth={0} color={'#3b5998'} fontSize={18} width={350} height={50} onPress={this._onSignUp} />
+              </View>
+            </View>
+            <View style={styles.lowerView}>
+              <Text style={{ color: '#fff', fontSize: 16, marginTop: 50 }}>
+                Already have an account?
             </Text>
-            <Button
-              large
-              iconRight={{
-                name: 'angle-right',
-                type: 'font-awesome',
-                color: '#fff',
-              }}
-              title="Log in"
-              color="#fff"
-              buttonStyle={styles.loginBtn}
-              // buttonStyle={[styles.loginBtn, { backgroundColor: 'transparent' }]}
-            />
-          </View>
+              <View style={{ marginTop: 20 }}>
+                <CustomButton text={'Log in'} backgroundColor={'transparent'} borderWidth={1} borderColor={'#fff'} color={'#fff'} fontSize={18} width={350} height={50} onPress={() => { goBack(); }} />
+              </View>
+            </View>
+          </BlurView>
         </Image>
       </View>
     );
@@ -209,3 +261,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+
+RkTheme.setType('RkTextInput', 'forminput', {
+  height: 50,
+  width: 350,
+  borderRadius: 50,
+  borderWidth: 1,
+  borderColor: '#fff',
+  underlineWidth: 1,
+  underlineColor: '#fff',
+  backgroundColor: '#0000',
+  placeholderTextColor: '#fff',
+  color: '#fff'
+}); 

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import { Button } from 'react-native-elements'; // 0.17.0
-import { Facebook } from 'expo';
+import { Facebook, BlurView } from 'expo';
 import TabScreen from './TabScreen';
 import Loading from '../components/Loading';
 import { firebaseApp } from '../FirebaseConfig';
 import Backend from '../Backend';
+import CustomButton from '../components/CustomButton';
 
 export default class StartScreen extends Component {
   constructor(props) {
@@ -101,20 +101,20 @@ export default class StartScreen extends Component {
           <View style={styles.container}>
             <Image
               source={{
-                uri: 'https://goo.gl/Qiccdn',
+                uri: 'https://images.unsplash.com/photo-1478860002487-680cc42afbeb?auto=format&fit=crop&w=1534&q=80',
               }}
               style={styles.imageBg}>
-    
+              <BlurView tint="dark" intensity={20} style={StyleSheet.absoluteFill}>
               <View style={styles.titleView}>
                 <Text style={styles.title}>
-                  My Outdoor Toolbox
+                  OUTify
                 </Text>
                 <Text style={styles.description}>
                   Welcome to My Outdoor Toolbox!
                 </Text>
               </View>
               <View style={styles.loginBtnView}>
-                <Button
+                {/*<Button
                   large
                   iconRight={{
                     name: 'angle-right',
@@ -128,14 +128,9 @@ export default class StartScreen extends Component {
                   onPress={() => {
                     navigate('LogIn');
                   }}
-                />
-                {/*<CustomButton
-                  text="Log in with your Account"
-                  color="#87cefa"
-                  bgColor="#FFF"
-                  borderColor="#87cefa"
                 />*/}
-                <Button
+                <CustomButton text={'Log in with your Account'} backgroundColor={'#fff'} borderWidth={0} color={'#3b5998'} fontSize={18} width={350} height={50} onPress={()=>{navigate('LogIn');}}/>
+                {/*<Button
                   large
                   iconRight={{
                     name: 'angle-right',
@@ -146,13 +141,14 @@ export default class StartScreen extends Component {
                   //backgroundColor='#87cefa'
                   color="#fff"
                   buttonStyle={[styles.loginBtn, { backgroundColor: '#87cefa' }]}
-                />
+                />*/}
+                <CustomButton text={'Log in with Facebook'} backgroundColor={'#3b5998'} borderWidth={0} color={'#fff'} fontSize={18} width={350} height={50} onPress={()=>{navigate('LogIn');}}/>
               </View>
               <View style={styles.signupBtnView}>
                 <Text style={{ color: '#fff', fontSize: 16 }}>
                   {' '}Do not have an account?
                 </Text>
-                <Button
+                {/*<Button
                   large
                   iconRight={{
                     name: 'angle-right',
@@ -169,8 +165,12 @@ export default class StartScreen extends Component {
                   onPress={() => {
                     navigate('SignUp');
                   }}
-                />
+                />*/}
+                <View style={{ marginTop: 20 }}>
+                  <CustomButton text={'Sign up'} backgroundColor={'transparent'} borderWidth={1} borderColor={'#fff'} color={'#fff'} fontSize={18} width={350} height={50} onPress={()=>{navigate('SignUp');}}/>
+                </View>
               </View>
+              </BlurView>
             </Image>
           </View>)
     );
@@ -214,8 +214,9 @@ const styles = StyleSheet.create({
   },
   loginBtnView: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    paddingBottom: 40
   },
   loginBtn: {
     marginLeft: 50,

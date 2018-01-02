@@ -15,6 +15,14 @@ import { Constants, ImagePicker, LinearGradient } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import { firebaseApp } from '../FirebaseConfig';
 import Carousel from 'react-native-snap-carousel';
+import { NavigationActions } from 'react-navigation'
+
+const resetAction = NavigationActions.reset({
+  index: 0,
+  actions: [
+    NavigationActions.navigate({ routeName: 'TabInStack'})
+  ],
+})
 
 const SCREEN_LABEL = 'Profile';
 const STICKY_HEADER_HEIGHT = 40;
@@ -218,7 +226,7 @@ export default class ProfileScreen extends Component {
       <TouchableOpacity onPress={() => {
         firebaseApp.auth().signOut().then(function() {
           //TODO: Hành động sau khi signout 
-          goBack('Tab');
+          this.props.navigation.dispatch(resetAction)
         }).catch(function(error) {
           // An error happened.
         });

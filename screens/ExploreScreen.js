@@ -92,11 +92,11 @@ export default class ExploreScreen extends Component {
       snap.forEach(child => {
         events.push({
           flag: 1,
-          title : child.val().title,
+          title: child.val().title,
           _key: child.key,
           featuredImage: child.val().featuredImage,
           description: child.val().description,
-          userId: child.val().userId, 
+          userId: child.val().userId,
           username: "",
           address: child.val().address,
         });
@@ -125,7 +125,7 @@ export default class ExploreScreen extends Component {
           featuredImage: child.val().featuredImage,
           categoryId: child.val().categoryId,
           category: 'Unknown',
-          userId: child.val().userId, 
+          userId: child.val().userId,
           username: child.val().userId,
           address: child.val().address,
           description: child.val().description,
@@ -284,112 +284,112 @@ export default class ExploreScreen extends Component {
 
   _renderEvents({ item, index }) {
     return (
-      item.flag !== 0 ? 
-      <View
-        style={{
-          marginTop: 20,
-          marginBottom: 20,
-          marginLeft: 20,
-        }}>
+      item.flag !== 0 ?
         <View
           style={{
-            borderRadius: 10,
-            marginBottom: 5,
+            marginTop: 20,
+            marginBottom: 20,
+            marginLeft: 20,
           }}>
-          <Image
-            source={{ uri: item.featuredImage }}
+          <View
             style={{
-              width: ITEM_WIDTH,
-              height: ITEM_HEIGHT,
               borderRadius: 10,
-              flex: 1,
-            }}
-            resizeMode="cover">
-            <View
+              marginBottom: 5,
+            }}>
+            <Image
+              source={{ uri: item.featuredImage }}
               style={{
+                width: ITEM_WIDTH,
+                height: ITEM_HEIGHT,
+                borderRadius: 10,
                 flex: 1,
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexDirection: 'column',
-              }}>
-              <LinearGradient
-                colors={[
-                  'rgba(0, 0, 0, 0.25)',
-                  'rgba(0, 0, 0, 0.125)',
-                  'rgba(0, 0, 0, 0)',
-                ]}
+              }}
+              resizeMode="cover">
+              <View
                 style={{
-                  width: ITEM_WIDTH,
-                  flexDirection: 'row',
+                  flex: 1,
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 10,
+                  justifyContent: 'space-between',
+                  flexDirection: 'column',
                 }}>
-                <Text
+                <LinearGradient
+                  colors={[
+                    'rgba(0, 0, 0, 0.25)',
+                    'rgba(0, 0, 0, 0.125)',
+                    'rgba(0, 0, 0, 0)',
+                  ]}
                   style={{
-                    fontSize: 16,
-                    color: '#fff',
-                    backgroundColor: 'transparent',
-                    fontWeight: 'bold',
+                    width: ITEM_WIDTH,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 10,
                   }}>
-                  {item.address}
-                </Text>
-              </LinearGradient>
-              <LinearGradient
-                colors={[
-                  'rgba(0, 0, 0, 0)',
-                  'rgba(0, 0, 0, 0.125)',
-                  'rgba(0, 0, 0, 0.25)',
-                ]}
-                style={{
-                  width: ITEM_WIDTH,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  padding: 10,
-                }}>
-                <Text
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: '#fff',
+                      backgroundColor: 'transparent',
+                      fontWeight: 'bold',
+                    }}>
+                    {item.address}
+                  </Text>
+                </LinearGradient>
+                <LinearGradient
+                  colors={[
+                    'rgba(0, 0, 0, 0)',
+                    'rgba(0, 0, 0, 0.125)',
+                    'rgba(0, 0, 0, 0.25)',
+                  ]}
                   style={{
-                    fontSize: 16,
-                    color: '#fff',
-                    backgroundColor: 'transparent',
+                    width: ITEM_WIDTH,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    padding: 10,
                   }}>
-                  by <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
-                </Text>
-              </LinearGradient>
-            </View>
-          </Image>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: '#fff',
+                      backgroundColor: 'transparent',
+                    }}>
+                    by <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
+                  </Text>
+                </LinearGradient>
+              </View>
+            </Image>
+          </View>
+          <View style={{ width: ITEM_WIDTH }}>
+            <Text style={{ fontSize: 18, textAlign: 'left', fontWeight: 'bold' }}>
+              {item.title}
+            </Text>
+            <Text
+              numberOfLines={2}
+              style={{ fontSize: 14, textAlign: 'left', color: '#d2d2d2' }}>
+              {item.description}
+            </Text>
+          </View>
+        </View> :
+        <View
+          style={{
+            width: ITEM_WIDTH,
+            height: ITEM_HEIGHT,
+            borderRadius: 10,
+            flex: 1,
+            borderWidth: 2,
+            borderColor: 'grey',
+            borderStyle: 'dashed',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'row',
+            marginTop: 20,
+            marginBottom: 20,
+            marginLeft: 20,
+          }}>
+          <Ionicons name={'md-add'} color={'black'} size={30} />
+          <Text style={{ fontSize: 18 }}> Add new events</Text>
         </View>
-        <View style={{ width: ITEM_WIDTH }}>
-          <Text style={{ fontSize: 18, textAlign: 'left', fontWeight: 'bold' }}>
-            {item.title}
-          </Text>
-          <Text
-            numberOfLines={2}
-            style={{ fontSize: 14, textAlign: 'left', color: '#d2d2d2' }}>
-            {item.description}
-          </Text>
-        </View>
-      </View> : 
-      <View
-      style={{
-        width: ITEM_WIDTH,
-        height: ITEM_HEIGHT,
-        borderRadius: 10,
-        flex: 1,
-        borderWidth: 2,
-        borderColor: 'grey',
-        borderStyle: 'dashed',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-        marginTop: 20,
-        marginBottom: 20,
-        marginLeft: 20,
-      }}>
-        <Ionicons name={'md-add'} color={'black'} size={30} />
-        <Text style={{fontSize: 18}}> Add new events</Text>
-      </View>
     );
   }
 
@@ -558,45 +558,46 @@ export default class ExploreScreen extends Component {
           {this.state.isLoading
             ? <Loading />
             : <View>
-                {/*Headline*/}
-                <View
-                  style={{
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingTop: 10,
-                    paddingBottom: 10,
-                    justifyContent: 'space-between',
-                    alignSelf: 'stretch',
-                    flexDirection: 'row',
-                  }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                    Latest Stories
+              {/*Headline*/}
+              <View
+                style={{
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  justifyContent: 'space-between',
+                  alignSelf: 'stretch',
+                  flexDirection: 'row',
+                }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                  Latest Stories
                   </Text>
-                  <Text style={{ fontSize: 16, color: '#FF5252' }}>
-                    See more <Ionicons name={'ios-arrow-forward'} size={16} />
-                  </Text>
-                </View>
-                <Carousel
-                  data={this.state.latestPosts}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <TouchableOpacity
-                        onPress={() => {
-                          navigate('PostDetail', { postID: item._key });
-                        }}>
-                        {this._renderPosts({ item, index })}
-                      </TouchableOpacity>
-                    );
-                  }}
-                  sliderWidth={window.width}
-                  itemWidth={260}
-                  activeSlideAlignment={'start'}
-                  inactiveSlideScale={1}
-                  inactiveSlideOpacity={1}
-                />
+                <Text style={{ fontSize: 16, color: '#FF5252' }}>
+                  See more <Ionicons name={'ios-arrow-forward'} size={16} />
+                </Text>
+              </View>
+              <Carousel
+                data={this.state.latestPosts}
+                renderItem={({ item, index }) => {
+                  return (
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      onPress={() => {
+                        navigate('PostDetail', { postID: item._key });
+                      }}>
+                      {this._renderPosts({ item, index })}
+                    </TouchableOpacity>
+                  );
+                }}
+                sliderWidth={window.width}
+                itemWidth={260}
+                activeSlideAlignment={'start'}
+                inactiveSlideScale={1}
+                inactiveSlideOpacity={1}
+              />
 
-                {/*Headline*/}
-                { this.state.myLastPost != null ? <View>
+              {/*Headline*/}
+              {this.state.myLastPost != null ? <View>
                 <View
                   style={{
                     paddingLeft: 20,
@@ -620,9 +621,9 @@ export default class ExploreScreen extends Component {
                   }}>
                   {this._renderSpecialPost()}
                 </TouchableOpacity>
-                </View> : null}
+              </View> : null}
 
-                {/*Headline
+              {/*Headline
                 <View
                   style={{
                     paddingLeft: 20,
@@ -661,75 +662,76 @@ export default class ExploreScreen extends Component {
                   inactiveSlideOpacity={1}
                 />*/}
 
-                <View
-                  style={{
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingTop: 10,
-                    paddingBottom: 10,
-                    justifyContent: 'space-between',
-                    alignSelf: 'stretch',
-                    flexDirection: 'row',
-                  }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                    Latest Events
+              <View
+                style={{
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  justifyContent: 'space-between',
+                  alignSelf: 'stretch',
+                  flexDirection: 'row',
+                }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                  Latest Events
                   </Text>
-                  <Text style={{ fontSize: 16, color: '#FF5252' }}>
-                    See more <Ionicons name={'ios-arrow-forward'} size={16} />
-                  </Text>
-                </View>
-                <Carousel
-                  data={this.state.latestEvents}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <View>
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (item.flag === 0) 
-                              console.log('you\'ve just clicked event flag ' + item.flag);
-                            else 
-                              navigate('EventDetail', { eventID: item._key });
-                          }}>
-                          {this._renderEvents({ item, index })}
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  }}
-                  sliderWidth={window.width}
-                  itemWidth={260}
-                  activeSlideAlignment={'start'}
-                  inactiveSlideScale={1}
-                  inactiveSlideOpacity={1}
-                />
+                <Text style={{ fontSize: 16, color: '#FF5252' }}>
+                  See more <Ionicons name={'ios-arrow-forward'} size={16} />
+                </Text>
+              </View>
+              <Carousel
+                data={this.state.latestEvents}
+                renderItem={({ item, index }) => {
+                  return (
+                    <View>
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          if (item.flag === 0)
+                            console.log('you\'ve just clicked create new event');
+                          else
+                            navigate('EventDetail', { eventID: item._key });
+                        }}>
+                        {this._renderEvents({ item, index })}
+                      </TouchableOpacity>
+                    </View>
+                  );
+                }}
+                sliderWidth={window.width}
+                itemWidth={260}
+                activeSlideAlignment={'start'}
+                inactiveSlideScale={1}
+                inactiveSlideOpacity={1}
+              />
 
-                {/*Headline*/}
-                <View
-                  style={{
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingTop: 10,
-                    paddingBottom: 10,
-                    justifyContent: 'space-between',
-                    alignSelf: 'stretch',
-                    flexDirection: 'row',
-                  }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                    Categories
+              {/*Headline*/}
+              <View
+                style={{
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  justifyContent: 'space-between',
+                  alignSelf: 'stretch',
+                  flexDirection: 'row',
+                }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                  Categories
                   </Text>
-                  <Text style={{ fontSize: 16, color: '#FF5252' }}>
-                    See all <Ionicons name={'ios-arrow-forward'} size={16} />
-                  </Text>
-                </View>
-                <Carousel
-                  data={this.state.categories}
-                  renderItem={this._renderCategories}
-                  sliderWidth={window.width}
-                  itemWidth={260}
-                  activeSlideAlignment={'start'}
-                  inactiveSlideScale={1}
-                  inactiveSlideOpacity={1}
-                />
-              </View>}
+                <Text style={{ fontSize: 16, color: '#FF5252' }}>
+                  See all <Ionicons name={'ios-arrow-forward'} size={16} />
+                </Text>
+              </View>
+              <Carousel
+                data={this.state.categories}
+                renderItem={this._renderCategories}
+                sliderWidth={window.width}
+                itemWidth={260}
+                activeSlideAlignment={'start'}
+                inactiveSlideScale={1}
+                inactiveSlideOpacity={1}
+              />
+            </View>}
         </ParallaxScrollView>
 
         <TouchableOpacity
