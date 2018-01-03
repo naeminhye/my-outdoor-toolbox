@@ -199,11 +199,7 @@ export default class ExploreScreen extends Component {
           marginBottom: 20,
           marginLeft: 20,
         }}>
-        <View
-          style={{
-            borderRadius: 10,
-            marginBottom: 5,
-          }}>
+          <LinearGradient colors={['#c6e2ff', '#ffc0cb']} style={{ padding: 0, width: ITEM_WIDTH, height: ITEM_HEIGHT, borderRadius: 10, marginBottom: 5, }}>
           <Image
             source={{ uri: item.featuredImage }}
             style={{
@@ -267,7 +263,7 @@ export default class ExploreScreen extends Component {
               </LinearGradient>
             </View>
           </Image>
-        </View>
+          </LinearGradient>
         <View style={{ width: ITEM_WIDTH }}>
           <Text style={{ fontSize: 18, textAlign: 'left', fontWeight: 'bold' }}>
             {item.title}
@@ -291,11 +287,7 @@ export default class ExploreScreen extends Component {
             marginBottom: 20,
             marginLeft: 20,
           }}>
-          <View
-            style={{
-              borderRadius: 10,
-              marginBottom: 5,
-            }}>
+          <LinearGradient colors={['#c6e2ff', '#ffc0cb']} style={{ padding: 0, width: ITEM_WIDTH, height: ITEM_HEIGHT, borderRadius: 10, marginBottom: 5, }}>
             <Image
               source={{ uri: item.featuredImage }}
               style={{
@@ -359,7 +351,7 @@ export default class ExploreScreen extends Component {
                 </LinearGradient>
               </View>
             </Image>
-          </View>
+          </LinearGradient>
           <View style={{ width: ITEM_WIDTH }}>
             <Text style={{ fontSize: 18, textAlign: 'left', fontWeight: 'bold' }}>
               {item.title}
@@ -464,11 +456,7 @@ export default class ExploreScreen extends Component {
   );
 
   _renderSpecialPost = () => (
-    <View
-      style={{
-        margin: 20,
-        borderRadius: 10,
-      }}>
+    <LinearGradient colors={['#c6e2ff', '#ffc0cb']} style={{ padding: 0, width: window.width - 40, height: 260, borderRadius: 10, margin: 20, }}>
       <Image
         source={{
           //uri: 'http://kenh14cdn.com/thumb_w/660/2017/lang-phap-kt-1510804667959.jpg',
@@ -493,7 +481,7 @@ export default class ExploreScreen extends Component {
           {this.state.myLastPost.title}
         </Text>
       </Image>
-    </View>
+    </LinearGradient>
   );
 
   render() {

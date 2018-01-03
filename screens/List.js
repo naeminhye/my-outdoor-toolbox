@@ -207,15 +207,10 @@ export default class List extends Component {
             flexDirection: 'column',
             backgroundColor: '#d8bfd8'
         }}>
-          <View style={{height: 50, backgroundColor: '#b4eeb4'}}>
+          <View style={{ backgroundColor: '#b4eeb4'}}>
             <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{item.title}</Text>
           </View>
-          <Image style={{width: 400, height: 350 }} source={{uri: item.featuredImage}}/>
-          <View style={{height: 100, backgroundColor: '#ff9699'}}>
-            <View>
-              <Text style={{ fontSize: 16 }} numberOfLines={2}>{item.description}</Text>
-            </View>
-          </View>
+          <Image style={{width: 400, height: 200 }} source={{uri: item.featuredImage}}/>
           <View style={{backgroundColor: '#f4d2a1', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
             <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', }}>
                 <Image style={{borderRadius: 20, width: 40, height: 40 }} 
@@ -225,6 +220,11 @@ export default class List extends Component {
                 <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.username}</Text>
             </View>
             <Text>23 minutes ago</Text>
+          </View>
+          <View style={{ backgroundColor: '#ff9699'}}>
+            <View>
+              <Text style={{ fontSize: 16 }} numberOfLines={2}>{item.description}</Text>
+            </View>
           </View>
         </View>
       </TouchableOpacity>

@@ -28,7 +28,7 @@ export default function CustomButton({
 }
 
 CustomButton.propTypes = {
-  text: PropTypes.string,
+  text: PropTypes.string.isRequired,
   bgColor: PropTypes.string,
   color: PropTypes.string,
   borderColor: PropTypes.string,

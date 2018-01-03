@@ -135,7 +135,7 @@ export default class AgendaScreen extends Component {
       for (let i = -15; i < 85; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = this.timeToString(time);
-        console.log(this.state.agenda);
+       // console.log(this.state.agenda);
         if (!this.state.agenda[strTime]) {
           this.state.agenda[strTime] = [];
           const numItems = Math.floor(Math.random() * 5);

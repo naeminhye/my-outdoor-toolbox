@@ -23,7 +23,6 @@ import GridView from 'react-native-super-grid';
 import GoogleMapAPI from '../GoogleMapAPI';
 import Carousel from 'react-native-snap-carousel';
 import SlidingUpPanel from 'rn-sliding-up-panel';
-import Modal from 'react-native-modal';
 import SearchPlaceFilter from '../components/SearchPlaceFilter';
 
 let { width, height } = Dimensions.get('window');
@@ -128,12 +127,20 @@ const placeType = [
 ];
 
 const placeRadius = [
-{ name: '500m', value: 500 },
-{ name: '1km', value: 1000 },
-{ name: '5km', value: 5000 },
-{ name: '10km', value: 10000 },
-{ name: '50km', value: 50000 },
-{ name: '100km', value: 100000 },
+  { name: '500m', value: 500 },
+  { name: '1km', value: 1000 },
+  { name: '2km', value: 2000 },
+  { name: '3km', value: 3000 },
+  { name: '5km', value: 5000 },
+  { name: '10km', value: 10000 },
+  { name: '20km', value: 20000 },
+  { name: '30km', value: 30000 },
+  { name: '50km', value: 50000 },
+  { name: '80km', value: 80000 },
+  { name: '100km', value: 100000 },
+  { name: '200km', value: 200000 },
+  { name: '300km', value: 300000 },
+  { name: '500km', value: 500000 },
 ];
 
 const selectedColor = '#FF5252',
