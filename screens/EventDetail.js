@@ -24,6 +24,8 @@ const PARALLAX_HEADER_HEIGHT = 300;
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 import Timeline from 'react-native-timeline-listview'
 import CommentItem from '../components/CommentItem';
+import ShortInfo from '../components/ShortInfo';
+
 export default class EventDetail extends Component {
     constructor(props) {
         super(props);
@@ -52,6 +54,7 @@ export default class EventDetail extends Component {
             followed: false,
             itinerary: [],
         };
+        this._onShortInfoPress = this._onShortInfoPress.bind(this);
     }
 
     static navigationOptions = {
@@ -62,6 +65,20 @@ export default class EventDetail extends Component {
         this.setState({
             ...this.state,
             customStyleIndex: index,
+        });
+    }
+
+    _onShortInfoPress(userID) {
+        const { navigate } = this.props.navigation;
+
+        firebaseApp.auth().onAuthStateChanged((user) => {
+            if (user != null) {
+                if (userID === user.uid) {
+                    navigate('Profile'); 
+                } else {
+                    navigate('OtherProfile', { userID: userID });
+                }
+            }
         });
     }
 
@@ -92,6 +109,7 @@ export default class EventDetail extends Component {
                 var comments = [];
                 snap.val().comments.map((cmt, i) => {
                     comments.push({
+                        userId: cmt.user._id,
                         username: cmt.user.name,
                         profile_photo_url: cmt.user.profile_photo_url,
                         createdAt: cmt.createdAt,
@@ -317,7 +335,15 @@ export default class EventDetail extends Component {
                                         borderBottomColor: '#d2d2d2',
                                         borderBottomWidth: 1,
                                     }} />
-                                <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                                    <ShortInfo 
+                                        profile_picture={this.state.profile_picture}
+                                        username={this.state.username}
+                                        bio={this.state.bio}
+                                        isMine={this.state.isMine}
+                                        followed={this.state.followed}
+                                        onFollowPress={() => this._onFollowPress()} 
+                                        onPress={() => this._onShortInfoPress(this.state.userId)}/>
+                                {/*<View style={{ flexDirection: 'row', marginTop: 10 }}>
                                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', }}>
                                         <Image style={{ borderRadius: 30, width: 60, height: 60 }}
                                             source={{ uri: this.state.profile_picture }}
@@ -330,7 +356,7 @@ export default class EventDetail extends Component {
                                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                                         {!this.state.isMine ? <View style={{ width: 80, height: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10, borderWidth: 2, backgroundColor: (this.state.followed ? '#FF5252' : '#fff'), borderColor: '#FF5252', padding: 5 }}><Text style={{ backgroundColor: 'transparent', color: (this.state.followed ? '#fff' : '#FF5252'), fontSize: 14 }}>{this.state.followed ? 'Following' : 'Follow'}</Text></View> : <View></View>}
                                     </View>
-                                </View>
+                                </View>*/}
                                 <View
                                     style={{
                                         marginTop: 20,
@@ -393,12 +419,14 @@ export default class EventDetail extends Component {
                                     <ListView
                                         dataSource={this.state.comments}
                                         // renderRow={rowData => this._renderComment(rowData)}
-                                        renderRow={rowData => 
+                                        renderRow={(rowData, sectionID, rowID) => 
                                             <CommentItem 
+                                                key={rowID}
                                                 image={rowData.profile_photo_url}
                                                 createdAt={rowData.createdAt}
                                                 username={rowData.username}
-                                                text={rowData.text}/>
+                                                text={rowData.text}
+                                                />
                                         }
                                     />
                                     : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold' }}>No Comment</Text>
@@ -527,6 +555,91 @@ export default class EventDetail extends Component {
                 </Text>
             </View>
         );
+    }
+
+    _onFollowPress() {
+        // const { params } = this.props.navigation.state;
+
+        if (this.state.followed) {
+            console.log('UnFollowed');
+            // TODO: sau khi xoá postID khỏi liked_posts và user.id khỏi whoLoves => sắp xếp lại 2 mảng (id từ 0 -> length mới) !!
+            firebaseApp.auth().onAuthStateChanged((user) => {
+                if (user != null) {
+                    //console.log('user id: ' + user.uid);
+                    //var updates = {};
+                    let following = [];
+                    let target1 = -1;
+                    let followingRef = firebaseApp.database().ref('users/' + user.uid).child('following');
+                    followingRef.on("value", (snap) => {
+                        following = snap.val();
+                    });
+
+                    following.map((_id, index) => {
+                        if (_id === this.state.userId) {
+                            target1 = index;
+                        }
+                    });
+                    if (target1 >= 0) {
+                        following.splice(target1, 1);
+                        followingRef.set(following);
+                    }
+
+                    let followers = [];
+                    let target2 = -1;
+                    let followersRef = firebaseApp.database().ref('users/' + this.state.userId).child('followers');
+                    followersRef.on("value", (snap) => {
+                        followers = snap.val();
+                        //console.log('whoLoves before removing: ' + followers);
+                    });
+                    followers.map((id, index) => {
+                        if (id === user.uid) {
+                            target2 = index;
+                        }
+                    });
+                    if (target2 >= 0) {
+                        followers.splice(target2, 1);
+                        followersRef.set(followers);
+                        // console.log('whoLoves after removing: ' + whoLoves);
+                    }
+                    this.setState({
+                        followed: false,
+                    });
+                }
+            });
+        }
+        else {
+            console.log('Followed');
+            firebaseApp.auth().onAuthStateChanged((user) => {
+                if (user != null) {
+                    var updates = {};
+                    
+                    let numOfFollowing = 0;
+                    let followingRef = firebaseApp.database().ref('users/' + user.uid).child('following')
+                    if(followingRef) {
+                        followingRef.on("value", (snap) => {
+                            numOfFollowing = snap.numChildren();
+                        });
+                    }
+                    updates['/users/' + user.uid + '/following/' + numOfFollowing] = this.state.userId;
+
+                    // update trong posts
+                    let numOfFollowers = 0;
+                    let followersRef = firebaseApp.database().ref('users/' + this.state.userId).child('followers')
+                    if(followersRef) {
+                        followersRef.on("value", (snap) => {
+                            numOfFollowers = snap.numChildren();
+                        });
+                    }
+                    updates['/users/' + this.state.userId + '/followers/' + numOfFollowers] = user.uid;
+
+                    firebaseApp.database().ref().update(updates);
+
+                    this.setState({
+                        followed: true,
+                    });
+                }
+            });
+        }
     }
 }
 

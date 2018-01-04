@@ -19,6 +19,7 @@ import { firebaseApp } from '../FirebaseConfig';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { RkText, RkTextInput, RkTheme } from 'react-native-ui-kitten';
 import CommentItem from '../components/CommentItem';
+import ShortInfo from '../components/ShortInfo';
 
 const window = Dimensions.get('window');
 const STICKY_HEADER_HEIGHT = 60;
@@ -56,6 +57,7 @@ export default class PostDetail extends Component {
             followed: false,
             isMine: false,
         };
+        this._onShortInfoPress = this._onShortInfoPress.bind(this);
     }
 
     static navigationOptions = {
@@ -142,6 +144,7 @@ export default class PostDetail extends Component {
                 var comments = [];
                 snap.val().comments.map((cmt, i) => {
                     comments.push({
+                        userId: cmt.user._id,
                         username: cmt.user.name,
                         profile_photo_url: cmt.user.profile_photo_url,
                         createdAt: cmt.createdAt,
@@ -227,7 +230,7 @@ export default class PostDetail extends Component {
         const { params } = this.props.navigation.state;
 
         if (this.state.liked) {
-            console.log('Unliked');
+            //console.log('Unliked');
             //TODO: sau khi xoá postID khỏi liked_posts và user.id khỏi whoLoves => sắp xếp lại 2 mảng (id từ 0 -> length mới) !!
             firebaseApp.auth().onAuthStateChanged((user) => {
                 if (user != null) {
@@ -275,7 +278,7 @@ export default class PostDetail extends Component {
             });
         }
         else {
-            console.log('Liked');
+            //console.log('Liked');
             firebaseApp.auth().onAuthStateChanged((user) => {
                 if (user != null) {
                     var updates = {};
@@ -300,11 +303,23 @@ export default class PostDetail extends Component {
         }
     }
 
-    _onFollowPress() {
-        // const { params } = this.props.navigation.state;
+    _onShortInfoPress(userID) {
+        const { navigate } = this.props.navigation;
 
+        firebaseApp.auth().onAuthStateChanged((user) => {
+            if (user != null) {
+                if (userID === user.uid) {
+                    navigate('Profile'); 
+                } else {
+                    navigate('OtherProfile', { userID: userID });
+                }
+            }
+        });
+    }
+
+    _onFollowPress() {
         if (this.state.followed) {
-            console.log('UnFollowed');
+            //console.log('UnFollowed');
             // TODO: sau khi xoá postID khỏi liked_posts và user.id khỏi whoLoves => sắp xếp lại 2 mảng (id từ 0 -> length mới) !!
             firebaseApp.auth().onAuthStateChanged((user) => {
                 if (user != null) {
@@ -351,7 +366,7 @@ export default class PostDetail extends Component {
             });
         }
         else {
-            console.log('Followed');
+            //console.log('Followed');
             firebaseApp.auth().onAuthStateChanged((user) => {
                 if (user != null) {
                     var updates = {};
@@ -484,7 +499,16 @@ export default class PostDetail extends Component {
                                         borderBottomColor: '#d2d2d2',
                                         borderBottomWidth: 1,
                                     }} />
-                                <View style={{ flexDirection: 'row', marginTop: 10 }}>
+
+                                <ShortInfo 
+                                    profile_picture={this.state.profile_picture}
+                                    username={this.state.username}
+                                    bio={this.state.bio}
+                                    isMine={this.state.isMine}
+                                    followed={this.state.followed}
+                                    onFollowPress={() => this._onFollowPress()}
+                                    onPress={() => this._onShortInfoPress(this.state.userId)} />
+                                {/*<View style={{ flexDirection: 'row', marginTop: 10 }}>
                                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', }}>
                                         <Image style={{ borderRadius: 30, width: 60, height: 60 }}
                                             source={{ uri: this.state.profile_picture }}
@@ -501,7 +525,7 @@ export default class PostDetail extends Component {
                                             {!this.state.isMine ? <View style={{ width: 80, height: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10, borderWidth: 2, backgroundColor: (this.state.followed ? '#FF5252' : '#fff'), borderColor: '#FF5252', padding: 5 }}><Text style={{ backgroundColor: 'transparent', color: (this.state.followed ? '#fff' : '#FF5252'), fontSize: 14 }}>{this.state.followed ? 'Following' : 'Follow'}</Text></View> : <View></View>}
                                         </View>
                                     </TouchableOpacity>
-                                </View>
+                                </View>*/}
                                 <View
                                     style={{
                                         marginTop: 20,
@@ -546,7 +570,8 @@ export default class PostDetail extends Component {
                                                 image={rowData.profile_photo_url}
                                                 createdAt={rowData.createdAt}
                                                 username={rowData.username}
-                                                text={rowData.text}/>
+                                                text={rowData.text}
+                                                />
                                         }
                                     />
                                     : <Text style={{ fontSize: 20, color: '#999', fontWeight: 'bold' }}>No Comment</Text>

@@ -693,7 +693,7 @@ export default class ExploreScreen extends Component {
               />
 
               {/*Headline*/}
-              <View
+              {/*<View
                 style={{
                   paddingLeft: 20,
                   paddingRight: 20,
@@ -718,7 +718,7 @@ export default class ExploreScreen extends Component {
                 activeSlideAlignment={'start'}
                 inactiveSlideScale={1}
                 inactiveSlideOpacity={1}
-              />
+              />*/}
             </View>}
         </ParallaxScrollView>
 

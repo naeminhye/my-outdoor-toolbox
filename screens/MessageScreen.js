@@ -18,10 +18,13 @@ import myStyles from '../assets/styles/myStyles';
 import { Constants } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import MessageListItem from '../components/MessageListItem';
+import SlidingUpPanel from 'rn-sliding-up-panel';
+import _ from 'lodash';
 
 const SCREEN_LABEL = 'Message';
 const STICKY_HEADER_HEIGHT = 40;
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+var { width, height } = Dimensions.get('window');
 
 export default class MessageScreen extends Component {
   constructor(props) {
@@ -34,11 +37,12 @@ export default class MessageScreen extends Component {
       conversations: [],
       userCons: [],
       dataSource: ds.cloneWithRows([]),
+      panelVisible: false,
     };
 
     this.database = firebaseApp.database();
 
-    this._handleTextChange = this._handleTextChange.bind(this);
+    //this._handleTextChange = this._handleTextChange.bind(this);
     this._handleSubmitText = this._handleSubmitText.bind(this);
     this.renderSearchBox = this.renderSearchBox.bind(this);
   }
@@ -57,13 +61,26 @@ export default class MessageScreen extends Component {
     ),
   }
 
-  _handleTextChange = inputValue => {
-    this.setState({ inputValue });
-  };
+  // _handleTextChange = inputValue => {
+  //   this.setState({ inputValue });
+  // };
 
   _handleSubmitText = () => {
     console.log(this.state.inputValue);
   };
+
+  _filter(text) {
+    let pattern = new RegExp(text, 'i');
+    let chats = _.filter(this.chatlist, (chat) => {
+      console.log('chat.name: ' + chat.name);
+      if (chat.name.search(pattern) != -1)
+        return chat;
+    });
+    this.setState({
+      //conversations: events,
+      dataSource: ds.cloneWithRows(chats),
+    });
+  }
 
   renderChatList() {
     return (
@@ -116,14 +133,32 @@ export default class MessageScreen extends Component {
             var data = [];
             var lastIndex = 0;
             var lastMsg = [];
+            var numOfMembers = 2;
+            var members = [];
+            var nameOfConversation = '';
+            var image = 'https://78.media.tumblr.com/865f4207e818841b80726e56c5c1689b/tumblr_op7fvw7TPE1vfhewmo1_250.png';
             snap.forEach(child => {
               lastMsg = child.val().messages;
               lastIndex = lastMsg.length - 1;
+              numOfMembers = child.val().member.length;
+              members = child.val().member;
+              if (numOfMembers ===2 ) {
+                members.forEach(mem => {
+                  if(mem.uid != user.uid) {
+                    nameOfConversation = mem.username;
+                    image = mem.profile_photo_url;
+                  }
+                });
+              }
+              else {
+                nameOfConversation = child.val().name;
+              }
               events.push({
-                name: child.val().name,
+                name: nameOfConversation,
                 _key: child.key,
                 last_text: lastMsg[lastIndex].text,
                 last_time: lastMsg[lastIndex].createdAt,
+                image: image
               });
             });
       
@@ -135,14 +170,17 @@ export default class MessageScreen extends Component {
                     name: item.name,
                     last_text: item.last_text,
                     last_time: item.last_time,
+                    image: item.image
                   });
                 }
               });
             });
       
+            this.chatlist = data;
+            console.log('this.chatlist: ' + this.chatlist);
             this.setState({
               //conversations: events,
-              dataSource: ds.cloneWithRows(data),
+              dataSource: ds.cloneWithRows(this.chatlist),
             });
             //console.log(this.state.dataSource);
           });
@@ -155,7 +193,6 @@ export default class MessageScreen extends Component {
   }
 
   renderSearchBox() { 
-    console.log('render search box');
     return (
       <View style={{ flexDirection: 'row', padding: 10, alignItems: 'center' }}>
         <RkTextInput rkType='searchbox' label={<Ionicons style={[styles.inputIcon, styles.searchIcon]} name='ios-search'/>}
@@ -171,8 +208,9 @@ export default class MessageScreen extends Component {
           returnKeyType="search"
           onSubmitEditing={this._handleSubmitText}
           placeholder="Search conversation"
-          value={this.state.inputValue}
-          onChangeText={this._handleTextChange}
+          // value={this.state.inputValue}
+          // onChangeText={this._handleTextChange}
+          onChange={(event) => this._filter(event.nativeEvent.text)}
           onBlur={() => {
             this.setState({
               _focus: false,
@@ -225,26 +263,14 @@ export default class MessageScreen extends Component {
               returnKeyType="search"
               onSubmitEditing={this._handleSubmitText}
               placeholder="Search conversation"
-              value={this.state.inputValue}
-              onChangeText={this._handleTextChange}
+              // value={this.state.inputValue}
+              // onChangeText={this._handleTextChange}
+              onChange={(event) => this._filter(event.nativeEvent.text)}
               onBlur={() => {
                 this.setState({
                   _focus: false,
                 });
               }}/>
-                {this.state._focus
-                  ? <TouchableOpacity
-                      onPress={() => {
-                        this.setState({
-                          _focus: false,
-                        });
-                        this.textInput.blur();
-                      }}>
-                      <Text style={{ fontSize: 18, color: '#007aff', margin: 10 }}>
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
-                  : null}
           </View>
         </View>
       )}
@@ -266,7 +292,7 @@ export default class MessageScreen extends Component {
                     <MessageListItem
                       name={rowData.name}
                       text={rowData.last_text}
-                      //image={rowData.image}
+                      image={rowData.image}
                       time={rowData.last_time}
                     />
                   </TouchableOpacity>
@@ -286,11 +312,26 @@ export default class MessageScreen extends Component {
         
 
         </ParallaxScrollView>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => this.setState({panelVisible: !this.state.panelVisible})}>
           <View style={{ backgroundColor: '#FF5252', width: 60, height: 60, borderRadius:30, position: 'absolute', bottom: 30, right: 30, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: -2, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 1,}}>
               <Ionicons name={'md-add'} size={32} color={'#FFF'} />
           </View>
         </TouchableOpacity>
+        <SlidingUpPanel
+          allowDragging={false}
+          ref={c => this._panel = c}
+          visible={this.state.panelVisible}
+          onRequestClose={() => this.setState({panelVisible: false})}>
+          <View style={{
+            flex: 1,
+            backgroundColor: '#fff',
+            justifyContent: 'center', alignItems: 'center' 
+          }}>
+          <TouchableOpacity onPress={() => this.setState({panelVisible: !this.state.panelVisible})}>
+            <Text>Cancel</Text>
+          </TouchableOpacity>
+          </View>
+        </SlidingUpPanel>
       </View>
     );
   }

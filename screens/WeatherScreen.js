@@ -260,7 +260,7 @@ export default class WeatherScreen extends Component {
         parallaxHeaderHeight={100}
         stickyHeaderHeight={ STICKY_HEADER_HEIGHT }
         renderForeground={() => (
-          <View  style={{ flexDirection: 'column', paddingTop: 25 }}>
+          <View style={{ flexDirection: 'column', paddingTop: 25 }}>
             <TouchableOpacity 
               onPress={() => goBack()}>
               <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20 }}>

@@ -47,7 +47,7 @@
 const wuKEY = '250ce64540802eac';
 exports.fetchConditions = (lat, lon) => {
     let url = `http://api.wunderground.com/api/${wuKEY}/conditions/q/${lat},${lon}.json`;
-    // console.log(url);
+    console.log(url);
     return fetch(url)
     .then(res => res.json()).then(json => ({
         name: json.current_observation.display_location.full,

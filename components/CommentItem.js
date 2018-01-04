@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, StyleSheet, TouchableOpacity, Dimensions, View, Image } from "react-native";
-
 import PropTypes from "prop-types";
+import { firebaseApp } from '../FirebaseConfig';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -93,7 +93,7 @@ export default function CommentItem({
   image = "http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png",
   username = "",
   createdAt = 0,
-  text = ""
+  text = "",
 }) {
   return (
     <View style={{ padding: 10 }} {...this.props}>
@@ -144,5 +144,6 @@ CommentItem.propTypes = {
   username: PropTypes.string,
   profile_photo_url: PropTypes.string,
 //   createdAt: PropTypes.string,
-  text: PropTypes.string
+  text: PropTypes.string,
+  onPress: PropTypes.func
 };

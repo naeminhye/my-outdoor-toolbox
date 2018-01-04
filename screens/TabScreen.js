@@ -15,6 +15,7 @@ import WeatherScreen from './WeatherScreen';
 import ScheduleScreen from './ScheduleScreen';
 import AgendaScreen from './AgendaScreen';
 import MessageDetail from './MessageDetail';
+import OtherProfile from './OtherProfile';
 
 const TabInStack = TabNavigator({
     Home: { 
@@ -53,6 +54,7 @@ const TabScreen = StackNavigator({
   EventDetail: { screen: EventDetail },
   PlaceDetail: { screen: PlaceDetail },
   Profile: { screen: ProfileScreen },
+  OtherProfile: { screen: OtherProfile },
   Map: { screen: MapScreen },
   MessageDetail: { screen: MessageDetail },
 });

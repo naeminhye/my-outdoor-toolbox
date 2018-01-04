@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 
 import PropTypes from 'prop-types';
+import { LinearGradient } from 'expo';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -14,6 +15,7 @@ export default function CustomButton({
   width = WIDTH * 0.8,
   height = HEIGHT * 0.08,
   fontSize = 22,
+  gradientColors = ['transparent'],
 	onPress}) {
 		
 	return (
@@ -22,7 +24,12 @@ export default function CustomButton({
       activeOpacity={0.9} 
       style={[styles.button, { backgroundColor: backgroundColor, borderColor: borderColor, borderWidth: borderWidth, width: width, height: height, }]} 
       onPress={onPress}>
-      <Text style={[styles.buttonText, { color: color, fontSize: fontSize }]}>{text}</Text>
+        <LinearGradient
+            colors={gradientColors}
+            start={[1, 1]}
+            style={{width: width, height: height, borderRadius: 50, justifyContent: 'center', alignContent: 'center'}}>
+          <Text style={[styles.buttonText, { color: color, fontSize: fontSize }]}>{text}</Text>
+        </LinearGradient>
     </TouchableOpacity>
 	);
 }
@@ -37,6 +44,7 @@ CustomButton.propTypes = {
   fontSize: PropTypes.number,
   borderWidth: PropTypes.number,
   onPress: PropTypes.func,
+  gradientColors: PropTypes.array
 };
 
 const styles = StyleSheet.create({

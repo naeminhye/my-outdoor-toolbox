@@ -67,7 +67,7 @@ export default class MessageDetail extends Component {
         wrapperStyle={{
           right: {
             //backgroundColor: Colors.primary
-            backgroundColor: this.state.color
+            backgroundColor: this.state.color,
           }
         }}
       />
@@ -289,7 +289,7 @@ export default class MessageDetail extends Component {
         >
           <View
             style={{
-              height: 60,
+              height: 40,
               alignItems: "center",
               justifyContent: "space-between",
               paddingLeft: 20,
@@ -309,11 +309,11 @@ export default class MessageDetail extends Component {
             <TouchableOpacity
               onPress={this.openDrawer}
             >
-              <Ionicons
-                name={"ios-information-circle-outline"}
-                size={28}
-                color={this.state.color}
-              />
+              <View style={{marginLeft: 10, marginRight: 10}}><Ionicons
+              name={"ios-information-circle-outline"}
+              size={28}
+              color={this.state.color}
+            /></View>
             </TouchableOpacity>
           </View>
           <GiftedChat

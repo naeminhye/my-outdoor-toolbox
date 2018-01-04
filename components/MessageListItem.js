@@ -45,7 +45,7 @@ export default class MessageListItem extends Component {
             <Image
                 style={{ borderRadius: 60 / 2, width: 60, height: 60 }}
                 resizeMode="cover"
-                source={{uri: 'https://78.media.tumblr.com/865f4207e818841b80726e56c5c1689b/tumblr_op7fvw7TPE1vfhewmo1_250.png' }}
+                source={{uri: this.props.image ? this.props.image : 'https://78.media.tumblr.com/865f4207e818841b80726e56c5c1689b/tumblr_op7fvw7TPE1vfhewmo1_250.png' }}
             />
         </View>
         <View

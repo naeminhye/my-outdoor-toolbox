@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import ShortInfo from '../components/ShortInfo';
 
 import PropTypes from "prop-types";
 var { width, height } = Dimensions.get('window');
@@ -51,7 +52,9 @@ export default class MessageSetting extends React.Component {
           </Text>
           <View />
         </View>
-        <View style={{ flex: 1, backgroundColor: "pink", justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ flex: 1, backgroundColor: "pink", justifyContent: 'flex-start', alignItems: 'center' }}>
+        <ShortInfo 
+          onFollowPress={() => {console.log('Nothing on you')}} />
           <TouchableOpacity onPress={() => this.setState({panelVisible: true})}>
             <Text>Change Color</Text>
           </TouchableOpacity>
