@@ -72,7 +72,6 @@ export default class MessageScreen extends Component {
   _filter(text) {
     let pattern = new RegExp(text, 'i');
     let chats = _.filter(this.chatlist, (chat) => {
-      console.log('chat.name: ' + chat.name);
       if (chat.name.search(pattern) != -1)
         return chat;
     });
@@ -177,7 +176,6 @@ export default class MessageScreen extends Component {
             });
       
             this.chatlist = data;
-            console.log('this.chatlist: ' + this.chatlist);
             this.setState({
               //conversations: events,
               dataSource: ds.cloneWithRows(this.chatlist),

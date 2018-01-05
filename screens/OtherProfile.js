@@ -8,6 +8,8 @@ import {
   ScrollView,
   Dimensions,
   Platform,
+  KeyboardAvoidingView,
+  TextInput
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import myStyles from '../assets/styles/myStyles';
@@ -17,6 +19,7 @@ import { firebaseApp } from '../FirebaseConfig';
 import Carousel from 'react-native-snap-carousel';
 import { NavigationActions } from 'react-navigation';
 import CustomButton from '../components/CustomButton';
+import SlidingUpPanel from 'rn-sliding-up-panel';
 
 const resetAction = NavigationActions.reset({
   index: 0,
@@ -45,13 +48,109 @@ export default class OtherProfile extends Component {
       bio: '',
       numOfFollowing: 0,
       numOfFollowers: 0,
-      cover: 'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=750&q=80'
+      cover: 'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=750&q=80',
+      messageVisible: false,
+      message: '',
+      hasTalked: false,
+      oldConversation: '',
     };
     this._onFollowPress = this._onFollowPress.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
+  }
+
+  sendMessage(text) {
+    const { params } = this.props.navigation.state;
+    const { navigate, goBack } = this.props.navigation;
+
+    // let d = new Date();
+    let createdAt = ((new Date()).getTime() / 1000).toFixed();
+    
+    firebaseApp.auth().onAuthStateChanged((user) => {
+      if (user != null) {
+
+        var myInfo = null, userInfo = null;
+        var myNumOfMsgs = 0, userNumOfMsgs = 0;
+        var myname = '';
+        firebaseApp.database().ref('users/' + user.uid).on("value", (snap1) => {
+          myname = snap1.val().username;
+          myInfo = {
+            uid: user.uid,
+            profile_photo_url: snap1.val().profile_picture,
+            username: myname
+          };
+          if(snap1.val().conversations) {
+            firebaseApp.database().ref('users/' + user.uid + '/conversations').on("value", (consnap) => {
+              myNumOfMsgs = consnap.numChildren();
+              console.log('myNumOfMsgs: ' + myNumOfMsgs);
+            });
+          }
+        });
+
+        firebaseApp.database().ref('users/' + params.userID).on("value", (snap2) => {
+          userInfo = {
+            uid: params.userID,
+            profile_photo_url: snap2.val().profile_picture,
+            username: snap2.val().username
+          };
+          if(snap2.val().conversations) {
+            firebaseApp.database().ref('users/' + params.userID + '/conversations').on("value", (consnap) => {
+              userNumOfMsgs = consnap.numChildren();
+              console.log('userNumOfMsgs: ' + userNumOfMsgs);
+            });
+          }
+        });
+
+        // A message entry.
+        var messageData = {
+          createdAt: createdAt,
+          color: '#44bec7',
+          createdBy: user.uid,
+          member: [myInfo, userInfo],
+          messages: [{
+            createdAt: createdAt,
+            text: text,
+            user: {
+              _id: user.uid,
+              name: myname
+            }
+          }]
+        };
+
+        // Get a key for a new Message.
+        var newMessageKey = firebaseApp.database().ref().child('conversations').push(messageData).key;
+
+        // Write the new post's data simultaneously in the posts list and the user's post list.
+        var updates = {};
+        if(userNumOfMsgs > 0) {
+          updates['/users/' + params.userID + '/conversations/' + userNumOfMsgs] = { _id: newMessageKey};
+        } else {
+          firebaseApp.database().ref('users/' + params.userID).child('conversations').set([{ _id: newMessageKey}])
+        }
+        
+        if(myNumOfMsgs > 0) {
+          updates['/users/' + user.uid + '/conversations/' + userNumOfMsgs] = { _id: newMessageKey};
+        } else {
+          firebaseApp.database().ref('users/' + user.uid).child('conversations').set([{ _id: newMessageKey}])
+        }
+
+        this.setState({
+          messageVisible: !this.state.messageVisible,
+          message: '',
+          hasTalked: true,
+          oldConversation: newMessageKey,
+        });
+        firebaseApp.database().ref().update(updates);
+        navigate('MessageDetail', { conversation_id: newMessageKey })
+      }
+      else {
+        console.log('chưa đăng nhập');
+      }
+    });
   }
 
   componentDidMount() {
     const { params } = this.props.navigation.state;
+    var userCons = [];
     if(params.userID) {
         var userRef = firebaseApp.database().ref('users/' + params.userID);
         userRef.on('value', snap => {
@@ -64,7 +163,11 @@ export default class OtherProfile extends Component {
             numOfFollowers: snap.val().followers ? snap.val().followers.length : 0,
             numOfPosts: snap.val().posts ? snap.val().posts.length : 0,
           });
-
+          if(snap.val().conversations) {
+            snap.val().conversations.forEach(c => {
+              userCons.push(c._id);
+            });
+          }
           if (this.state.numOfPosts > 0) {
             let events = [];
             snap.val().posts.map((post, index) => {
@@ -103,6 +206,29 @@ export default class OtherProfile extends Component {
                   });
                 }
               });
+            }
+            let myCons = [];
+            if(snap.val().conversations) {
+              snap.val().conversations.forEach(c => {
+                myCons.push(c._id);
+              });
+            }
+            
+            if(userCons && myCons) {
+              let same = userCons.filter((n) => myCons.includes(n));
+              if(same) {
+                same.forEach(msg => {
+                  firebaseApp.database().ref('conversations/' + msg).on("value", (dataSnapShot) => {
+                    console.log('dataSnapShot.val().member.length: ' + dataSnapShot.val().member.length);
+                    if(dataSnapShot.val().member.length ===2) {
+                      this.setState({
+                        hasTalked: true,
+                        oldConversation: msg,
+                      });
+                    }
+                  });
+                })
+              }
             }
           });
       }
@@ -329,6 +455,13 @@ export default class OtherProfile extends Component {
           backgroundColor = '#fff'
           color={'#5F4B8B'}
           borderColor={'#5F4B8B'}
+          onPress={() => {
+            if(this.state.hasTalked && this.state.oldConversation != '') {
+              navigate('MessageDetail', { conversation_id: this.state.oldConversation })
+            } else {
+              this.setState({messageVisible: !this.state.messageVisible});
+            }
+          }}
         />
       </View>
       <View
@@ -385,8 +518,65 @@ export default class OtherProfile extends Component {
         }}>
         <Text
           style={{ fontSize: 24, fontWeight: '600', color: '#CCCCCC' }}>No Posts</Text>
-      </View> }
+        </View> }
         </ParallaxScrollView>
+        <SlidingUpPanel
+          allowDragging={false}
+          ref={c => this._panel = c}
+          visible={this.state.messageVisible}
+          onRequestClose={() => this.setState({messageVisible: false})}>
+          <KeyboardAvoidingView>
+          <View style={{
+            height: window.height - 440,
+            width: window.width - 40,
+            borderRadius: 20,
+            backgroundColor: '#fff',
+            marginLeft: 20,
+            marginRight: 20,
+            marginTop: 220,
+            marginBottom: 220, 
+          }}>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingTop: 10, 
+            paddingBottom: 10
+          }}>
+          <TouchableOpacity onPress={() => this.setState({
+            messageVisible: !this.state.messageVisible,
+            message: ''
+          })}>
+            <Text style={{ fontSize: 20 }}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            if(this.state.message != '') {
+              this.sendMessage(this.state.message);
+            }
+          }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 20, color: this.state.message != '' ? '#5F4B8B' : '#999' }}>Send</Text>
+          </TouchableOpacity>
+          </View>
+          <View
+            style={{
+                borderBottomColor: '#d2d2d2',
+                borderBottomWidth: 1,
+            }} />
+          <View style={{}}><Text style={{ fontSize: 18 }}>To: <Text style={{color: '#5F4B8B'}}>{this.state.name}</Text></Text></View>
+          <View style={{flex: 1, padding: 20}}>
+            <TextInput 
+              placeholder="Write a message..."
+              multiline={true}
+              placeholderTextColor="#999"
+              onChangeText={(message) => this.setState({message})}
+              value={this.state.message}
+              style={{ fontSize: 20 }}
+              />
+          </View>
+          </View>
+          </KeyboardAvoidingView>
+        </SlidingUpPanel>
       </View>
     );
   }
