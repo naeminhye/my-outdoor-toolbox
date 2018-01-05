@@ -34,9 +34,9 @@ const AVATAR_SIZE = 80;
 const profileItems = [
   { name: 'Weather', icon: 'ios-partly-sunny-outline', colors: ['#1d2b64', '#f8cdda'], navigate: 'Weather', image: require('../assets/icons/homeicon/weather.png') },
   { name: 'Guide Me', icon: 'ios-navigate-outline', colors: ['#1a2980', '#26d0ce'], navigate: 'Map', image: require('../assets/icons/homeicon/guide-me.png') },
-  { name: 'Schedule', icon: 'ios-calendar-outline', colors: ['#403b4a', '#e7e9bb'], navigate: 'Agenda', image: require('../assets/icons/homeicon/schedule.png') },
-  { name: 'Events', icon: 'ios-calendar-outline', colors: ['#e55d87', '#5fc3e4'], navigate: 'List', image: require('../assets/icons/homeicon/events.png') },
-  { name: 'Stories', icon: 'ios-calendar-outline', colors: ['#cc95c0', '#dbd4b4', '#7aa1d2'], navigate: 'List', image: require('../assets/icons/homeicon/posts.png') },
+  //{ name: 'Schedule', icon: 'ios-calendar-outline', colors: ['#403b4a', '#e7e9bb'], navigate: 'Agenda', image: require('../assets/icons/homeicon/schedule.png') },
+  //{ name: 'Events', icon: 'ios-calendar-outline', colors: ['#e55d87', '#5fc3e4'], navigate: 'List', image: require('../assets/icons/homeicon/events.png') },
+  //{ name: 'Stories', icon: 'ios-calendar-outline', colors: ['#cc95c0', '#dbd4b4', '#7aa1d2'], navigate: 'List', image: require('../assets/icons/homeicon/posts.png') },
 ];
 
 class HomeScreen extends Component {

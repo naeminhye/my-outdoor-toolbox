@@ -19,6 +19,7 @@ import { Constants } from 'expo';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import MessageListItem from '../components/MessageListItem';
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import AddNewPost from '../components/AddNewPost';
 import _ from 'lodash';
 
 const SCREEN_LABEL = 'Message';
@@ -323,8 +324,9 @@ export default class MessageScreen extends Component {
           <View style={{
             flex: 1,
             backgroundColor: '#fff',
-            justifyContent: 'center', alignItems: 'center' 
+            //justifyContent: 'center', alignItems: 'center' 
           }}>
+          {/*<AddNewPost onCancelPress={() => this.setState({panelVisible: !this.state.panelVisible})}/>*/}
           <TouchableOpacity onPress={() => this.setState({panelVisible: !this.state.panelVisible})}>
             <Text>Cancel</Text>
           </TouchableOpacity>

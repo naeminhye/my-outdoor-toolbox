@@ -28,6 +28,7 @@ import { Constants } from "expo";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MessageSetting from "../components/MessageSetting";
 import Drawer from "react-native-drawer";
+import Loading from '../components/Loading';
 
 export default class MessageDetail extends Component {
   constructor(props) {
@@ -45,6 +46,7 @@ export default class MessageDetail extends Component {
       color: "blue",
       drawerOpen: false,
       drawerDisabled: false,
+      isLoading: true,
     };
 
     this.database = firebaseApp.database();
@@ -131,6 +133,8 @@ export default class MessageDetail extends Component {
       />
     );
   }
+  
+  otherMember = [];
 
   componentDidMount() {
     const { params } = this.props.navigation.state;
@@ -162,7 +166,17 @@ export default class MessageDetail extends Component {
                 }
               });
             }
-            //console.log('nameOfConversation: ' + name);
+            snap.val().member.forEach(mem => {
+              if(mem.uid !== this.state.currentUser) {
+                this.otherMember.push(mem.uid);
+              }
+            });
+            // console.log('otherMember: ' + this.otherMember)
+            setTimeout(() => {
+              this.setState({
+                isLoading: false
+              })
+            }, 500);
             this.setState({
               nameOfConversation: name
             });
@@ -259,14 +273,18 @@ export default class MessageDetail extends Component {
       <Drawer
         ref={ref => (this._drawer = ref)}
         type="displace"
-        content={<MessageSetting closeDrawer={this.closeDrawer}/>}
+        content={
+          this.state.isLoading ? <Loading/> :
+          <MessageSetting 
+            closeDrawer={this.closeDrawer}
+            list={this.otherMember}
+            navigation={this.props.navigation} />
+        }
         acceptDoubleTap
         onOpen={() => {
-          console.log("onopen");
           this.setState({ drawerOpen: true });
         }}
         onClose={() => {
-          console.log("onclose");
           this.setState({ drawerOpen: false });
         }}
         captureGestures={false}

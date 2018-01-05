@@ -24,31 +24,31 @@ const { Lottie } = DangerZone;
 const { width: deviceWidth } = Dimensions.get('window');
 
 const pages = [{
-  title: 'Cheap Travel',
-  description: 'Save money on your trip by finding the best priced flight tickets available.',
-  backgroundColor: '#b2deff',
+  title: 'Play Outdoor Sports',
+  description: 'Develop muscle strength, increases flexibility, and gross your motor skills.',
+  backgroundColor: '#3a375c',
   source: require('../assets/lottie/cycle_animation.json'),
   width: 320,
   height: 260,
 }, {
-  title: 'Go everywhere',
+  title: 'Go Everywhere',
   description: 'See everywhere without having to worry about planning and transportation.',
-  backgroundColor: '#d6f6ff',
+  backgroundColor: '#853645',
   source: require('../assets/lottie/location_pin.json'),
   width: 300,
   height: 300,
 }, {
-  title: 'Stay warm',
-  description: "Don't like the cold wheather? We guarantee you a sunny and warm vacation.",
-  backgroundColor: '#f2e3ff',
-  source: require('../assets/lottie/done.json'),
+  title: 'Share your Journey',
+  description: "Don't forget to tell everybody that you have been to so many beautiful places.",
+  backgroundColor: '#db513a',
+  source: require('../assets/lottie/mailsent.json'),
   width: 300,
   height: 300,
 }, {
-  title: 'Amazing hotels',
-  description: 'Make sure you stay in the best hotels for the best prices that are available.',
-  backgroundColor: '#ffbddb',
-  source: require('../assets/lottie/emoji_wink.json'),
+  title: 'Have a Good Time',
+  description: 'Make friends with people from over the world. Life is the biggest present God gave you.',
+  backgroundColor: '#f6a228',
+  source: require('../assets/lottie/present.json'),
   width: 300,
   height: 300,
 }];
@@ -70,13 +70,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: '300',
+    fontWeight: 'bold',
     marginBottom: 30,
-    color: 'black',
+    color: '#fff',
   },
   description: {
     fontWeight: '300',
-    color: 'black',
+    color: '#fff',
     textAlign: 'center',
   },
 });
@@ -163,6 +163,7 @@ export default class OnBoarding extends Component {
                     }}
                     style={{width: page.width, height: page.height, marginTop: 50}}
                     source={page.source}
+                    loop={true}
                   />
                 </Card>
                 </Header>

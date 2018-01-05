@@ -490,7 +490,7 @@ export default class PostDetail extends Component {
                                     <TouchableOpacity onPress={() => this._onLikePress()}>
                                         <Text style={{ fontSize: 20, color: 'black', alignItems: 'center', }}><Ionicons name={this.state.liked ? 'md-heart' : 'md-heart-outline'} style={{ color: '#FF5252' }} size={24} /> {this.state.loves}</Text>
                                     </TouchableOpacity>
-                                    <Text style={{ fontSize: 20, color: 'black', }}>something</Text>
+                                    <Text style={{ fontSize: 20, color: 'black', }}>Share</Text>
                                 </View>
                                 <View
                                     style={{

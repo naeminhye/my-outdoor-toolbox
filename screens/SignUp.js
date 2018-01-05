@@ -27,7 +27,9 @@ export default class SignUp extends Component {
     firebaseApp.database().ref('users/' + userId).set({
       username: name,
       email: email,
-      profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png'
+      profile_picture: 'http://www.theatricalrights.com/wp-content/themes/trw/assets/images/default-user.png',
+      bio: 'No bio',
+      cover:'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=750&q=80'
     });
   }
 
@@ -194,7 +196,7 @@ export default class SignUp extends Component {
                 Already have an account?
             </Text>
               <View style={{ marginTop: 20 }}>
-                <CustomButton text={'Log in'} backgroundColor={'transparent'} borderWidth={1} borderColor={'#fff'} color={'#fff'} fontSize={18} width={350} height={50} onPress={() => { goBack(); }} />
+                <CustomButton text={'Log in'} backgroundColor={'transparent'} borderWidth={1} borderColor={'#fff'} color={'#fff'} fontSize={18} width={350} height={50} onPress={() => { navigate('LogIn'); }} />
               </View>
             </View>
           </BlurView>

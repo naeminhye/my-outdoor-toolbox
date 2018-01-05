@@ -20,6 +20,7 @@ import Carousel from 'react-native-snap-carousel';
 import { NavigationActions } from 'react-navigation';
 import CustomButton from '../components/CustomButton';
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import Loading from '../components/Loading';
 
 const resetAction = NavigationActions.reset({
   index: 0,
@@ -81,7 +82,7 @@ export default class OtherProfile extends Component {
           if(snap1.val().conversations) {
             firebaseApp.database().ref('users/' + user.uid + '/conversations').on("value", (consnap) => {
               myNumOfMsgs = consnap.numChildren();
-              console.log('myNumOfMsgs: ' + myNumOfMsgs);
+              //console.log('myNumOfMsgs: ' + myNumOfMsgs);
             });
           }
         });
@@ -95,7 +96,7 @@ export default class OtherProfile extends Component {
           if(snap2.val().conversations) {
             firebaseApp.database().ref('users/' + params.userID + '/conversations').on("value", (consnap) => {
               userNumOfMsgs = consnap.numChildren();
-              console.log('userNumOfMsgs: ' + userNumOfMsgs);
+              //console.log('userNumOfMsgs: ' + userNumOfMsgs);
             });
           }
         });
@@ -219,7 +220,7 @@ export default class OtherProfile extends Component {
               if(same) {
                 same.forEach(msg => {
                   firebaseApp.database().ref('conversations/' + msg).on("value", (dataSnapShot) => {
-                    console.log('dataSnapShot.val().member.length: ' + dataSnapShot.val().member.length);
+                    //console.log('dataSnapShot.val().member.length: ' + dataSnapShot.val().member.length);
                     if(dataSnapShot.val().member.length ===2) {
                       this.setState({
                         hasTalked: true,
@@ -495,9 +496,7 @@ export default class OtherProfile extends Component {
           renderItem={({ item, index }) => {
             return (
               <TouchableOpacity
-                onPress={() => {
-                  navigate("PostDetail", { postID: item._key });
-                }}
+                onPress={() => navigate("PostDetail", { postID: item._key })}
               >
                 {this._renderPosts({ item, index })}
               </TouchableOpacity>
@@ -508,7 +507,7 @@ export default class OtherProfile extends Component {
           activeSlideAlignment={"start"}
           inactiveSlideScale={1}
           inactiveSlideOpacity={1}
-        /> 
+        />
       </View> : 
       <View
         style={{

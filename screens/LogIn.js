@@ -133,7 +133,7 @@ export default class LogIn extends Component {
                 Do not have an account?
                 </Text>
               <View style={{ marginTop: 20 }}>
-                <CustomButton text={'Sign Up'} backgroundColor={'transparent'} borderWidth={1} borderColor={'#fff'} color={'#fff'} fontSize={18} width={350} height={50} onPress={() => { goBack(); }} />
+                <CustomButton text={'Sign Up'} backgroundColor={'transparent'} borderWidth={1} borderColor={'#fff'} color={'#fff'} fontSize={18} width={350} height={50} onPress={() => { navigate('SignUp'); }} />
               </View>
             </View>
           </BlurView>

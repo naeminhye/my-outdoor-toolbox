@@ -57,25 +57,25 @@ export default class AddNewPost extends Component {
                 
                 var tags = this.state.tags;
                 var postTags = {};
-                for ( var i = 0; i < this.state.tags.length; i ++) {
+                if(this.state.tags) {
+                  for ( var i = 0; i < this.state.tags.length; i ++) {
                     postTags = Object.assign( { [i]: tags[i] }, postTags);
                 }
-
+                }
+    
                 // A post entry.
                 var postData = {
                   userId: this.state.uid,
-                  //author: this.state.username,
                   title: this.state.title,
                   content: this.state.content,
                   description: this.state.description,
                   tags: postTags,
-                  //featureImage
-                  //address: '',
+                  featureImage: 'http://drpattydental.com/wp-content/uploads/2017/05/placeholder.png',
                   categoryId: 0,
                   time: n,
-                  //
+                  address: 'No address',
                 };
-
+    
                 // Get a key for a new Post.
                 var newPostKey = firebaseApp.database().ref().child('posts').push().key;
                 
@@ -83,12 +83,18 @@ export default class AddNewPost extends Component {
                 firebaseApp.database().ref('users/' + user.uid).child('posts').on("value", (snap) => {
                     numOfPosts = snap.numChildren();
                 });
-                
-                // Write the new post's data simultaneously in the posts list and the user's post list.
-                var updates = {};
-                updates['/posts/' + newPostKey] = postData;
-                updates['/users/' + user.uid + '/posts/' + numOfPosts] = newPostKey;
 
+                var newMessageKey = firebaseApp.database().ref().child('posts').push(postData).key;
+                
+                if(numOfPosts > 0) {
+                    // Write the new post's data simultaneously in the posts list and the user's post list.
+                    var updates = {};
+                    //updates['/posts/' + newPostKey] = postData;
+                    updates['/users/' + user.uid + '/posts/' + numOfPosts] = newPostKey;
+                    firebaseApp.database().ref().update(updates);
+                } else {
+                    firebaseApp.database().ref('users/' + user.uid).child('posts').set([newPostKey])
+                }
                 // if (this.state.feature_image) {
                 //     this.uploadImage(this.state.feature_image)
                 //         .then(url => { console.log('uploaded ' + url); })
@@ -100,8 +106,6 @@ export default class AddNewPost extends Component {
                 this.setState({
                     // goBack
                 });
-
-                return firebaseApp.database().ref().update(updates);
             }
             else {
               console.log('chưa đăng nhập');
@@ -195,11 +199,7 @@ export default class AddNewPost extends Component {
                         placeholder={TITLE}
                         placeholderTextColor={'#ffdcdc'}
                       //ref={(textinput) => { this.textInput = textinput; }}
-                      onChangeText={(title) => {
-                            this.setState({
-                                title,
-                            })
-                        }}
+                      onChangeText={(title) => {this.setState({title})}}
                       value={this.state.title}
                       //editable = {true}
                       maxLength = {40}
@@ -296,7 +296,8 @@ export default class AddNewPost extends Component {
                 <View style={{ flexDirection:'row', justifyContent: 'space-around' }}>
                     <CustomButton text={'Cancel'} borderColor={'#FF5252'} borderWidth={2} color={'#FF5252'} fontSize={18} width={150} height={50} onPress={this.props.onCancelPress}/>
                     <CustomButton text={'OK'} backgroundColor={'#FF5252'} borderWidth={0} color={'#fff'} fontSize={18} width={150} height={50} onPress={() => {
-                        this.props.onOkPress();
+                        this.writeNewPost();
+                        this.props.onCancelPress
                     }}/>
                 </View>
             </View>
