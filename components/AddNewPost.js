@@ -34,7 +34,7 @@ export default class AddNewPost extends Component {
             title: '',
             uid: '', 
             username: '', 
-            feature_image: null, //'http://thelabyrinth-a5.com/wp-content/uploads/2015/08/slider-image.jpg' 
+            featured_image: null, //'http://thelabyrinth-a5.com/wp-content/uploads/2015/08/slider-image.jpg' 
             description: '',
             content: '',
             tag: '',
@@ -70,21 +70,21 @@ export default class AddNewPost extends Component {
                   content: this.state.content,
                   description: this.state.description,
                   tags: postTags,
-                  featureImage: 'http://drpattydental.com/wp-content/uploads/2017/05/placeholder.png',
+                  featuredImage: 'http://drpattydental.com/wp-content/uploads/2017/05/placeholder.png',
                   categoryId: 0,
                   time: n,
                   address: 'No address',
                 };
     
                 // Get a key for a new Post.
-                var newPostKey = firebaseApp.database().ref().child('posts').push().key;
+                //var newPostKey = firebaseApp.database().ref().child('posts').push().key;
                 
                 let numOfPosts = 0;
                 firebaseApp.database().ref('users/' + user.uid).child('posts').on("value", (snap) => {
                     numOfPosts = snap.numChildren();
                 });
 
-                var newMessageKey = firebaseApp.database().ref().child('posts').push(postData).key;
+                var newPostKey = firebaseApp.database().ref().child('posts').push(postData).key;
                 
                 if(numOfPosts > 0) {
                     // Write the new post's data simultaneously in the posts list and the user's post list.
@@ -95,8 +95,8 @@ export default class AddNewPost extends Component {
                 } else {
                     firebaseApp.database().ref('users/' + user.uid).child('posts').set([newPostKey])
                 }
-                // if (this.state.feature_image) {
-                //     this.uploadImage(this.state.feature_image)
+                // if (this.state.featured_image) {
+                //     this.uploadImage(this.state.featured_image)
                 //         .then(url => { console.log('uploaded ' + url); })
                 //         .catch(error => console.log(error))
                 // }
@@ -150,14 +150,14 @@ export default class AddNewPost extends Component {
         console.log(result);
     
         if (!result.cancelled) {
-          this.setState({ feature_image: result.uri });
+          this.setState({ featured_image: result.uri });
         }
       };
 
       _renderPlaceHolder() {
         return(
         <TouchableOpacity onPress={this._pickImage}>
-        { this.state.feature_image == null ?
+        { this.state.featured_image == null ?
           <View style={{
             margin: 20,
             borderWidth: 2,
@@ -174,7 +174,7 @@ export default class AddNewPost extends Component {
                 <Text style={{fontSize: 20, color: '#999'}}> Add feature image</Text>
           </View>
             : 
-        <Image source={{ uri: this.state.feature_image }} style={{ width: window.width, height: 240}} resizeMode='cover' />}
+        <Image source={{ uri: this.state.featured_image }} style={{ width: window.width, height: 240}} resizeMode='cover' />}
         </TouchableOpacity>
         );
       }
