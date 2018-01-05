@@ -146,9 +146,6 @@ export default class LogIn extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: 'center',
-    //justifyContent: 'center',
-    // paddingTop: Constants.statusBarHeight,
     backgroundColor: 'transparent',
   },
   imageBg: {

@@ -1,11 +1,23 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, Image, ActivityIndicator,
+  Animated,
+  Dimensions,
+  StatusBar, } from 'react-native';
 import { Facebook, BlurView } from 'expo';
 import TabScreen from './TabScreen';
 import Loading from '../components/Loading';
 import { firebaseApp } from '../FirebaseConfig';
 import Backend from '../Backend';
 import CustomButton from '../components/CustomButton';
+import OnBoarding from '../components/OnBoarding';
+import { NavigationActions } from 'react-navigation';
+
+const resetAction = NavigationActions.reset({
+  index: 0,
+  actions: [
+    NavigationActions.navigate({ routeName: 'Welcome'})
+  ],
+})
 
 export default class StartScreen extends Component {
   constructor(props) {
@@ -13,50 +25,11 @@ export default class StartScreen extends Component {
     this.state = {
       isLoading: true,
       isLoggedIn: false,
+      currentIndex: 0,
     };
   }
   static navigationOptions = {
     header: null,
-  };
-
-  _handleFacebookLogin = async () => {
-    try {
-      const { type, token } = await Facebook.logInWithReadPermissionsAsync(
-        '1201211719949057', // Replace with your own app id in standalone app
-        { permissions: ['public_profile'] }
-      );
-
-      switch (type) {
-        case 'success': {
-          // Get the user's name using Facebook's Graph API
-          const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
-          const profile = await response.json();
-          Alert.alert(
-            'Logged in!',
-            `Hi ${profile.name}!`,
-          );
-          break;
-        }
-        case 'cancel': {
-          Alert.alert(
-            'Cancelled!',
-            'Login was cancelled!',
-          );
-          break;
-        }
-        default: {
-          Alert.alert(
-            'Oops!',
-            'Login failed!',
-          );
-        }
-      }
-    } catch (e) {
-      Alert.alert(
-        'Oops!',
-        'Login failed!',
-      );
-    }
   };
 
   componentDidMount() {
@@ -90,6 +63,25 @@ export default class StartScreen extends Component {
     });
   }
 
+  onScroll = (event) => {
+    const { contentOffset } = event.nativeEvent;
+    const currentIndex = Math.round(contentOffset.x / deviceWidth);
+    if (this.state.currentIndex !== currentIndex) {
+      this.animations.forEach((animation) => {
+        animation.reset();
+      });
+      this.animations.get(currentIndex).play();
+      this.setState({ currentIndex });
+    }
+  }
+
+  scrollTo = (index) => {
+    this.scrollView._component.scrollTo({
+      x: (deviceWidth * index),
+      animated: true,
+    });
+  }
+
   render() {
     {/*<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator /></View>*/} 
     const { navigate } = this.props.navigation;
@@ -97,146 +89,11 @@ export default class StartScreen extends Component {
       this.state.isLoading ? 
           <Loading /> :(
           this.state.isLoggedIn ?
-          <TabScreen /> :
-          <View style={styles.container}>
-            <Image
-              source={{
-                uri: 'https://images.unsplash.com/photo-1478860002487-680cc42afbeb?auto=format&fit=crop&w=1534&q=80',
-              }}
-              style={styles.imageBg}>
-              <BlurView tint="dark" intensity={20} style={StyleSheet.absoluteFill}>
-              <View style={styles.titleView}>
-                <Text style={styles.title}>
-                  OUTify
-                </Text>
-                <Text style={styles.description}>
-                  Welcome to My Outdoor Toolbox!
-                </Text>
-              </View>
-              <View style={styles.loginBtnView}>
-                {/*<Button
-                  large
-                  iconRight={{
-                    name: 'angle-right',
-                    type: 'font-awesome',
-                    color: '#87cefa',
-                  }}
-                  title="Log in with your Account"
-                  //backgroundColor='#fff'
-                  color="#87cefa"
-                  buttonStyle={[styles.loginBtn, { backgroundColor: '#fff' }]}
-                  onPress={() => {
-                    navigate('LogIn');
-                  }}
-                />*/}
-                <CustomButton text={'Log in with your Account'} backgroundColor={'#fff'} borderWidth={0} color={'#3b5998'} fontSize={18} width={350} height={50} onPress={()=>{navigate('LogIn');}}/>
-                {/*<Button
-                  large
-                  iconRight={{
-                    name: 'angle-right',
-                    type: 'font-awesome',
-                    color: '#fff',
-                  }}
-                  title="Log in with Facebook"
-                  //backgroundColor='#87cefa'
-                  color="#fff"
-                  buttonStyle={[styles.loginBtn, { backgroundColor: '#87cefa' }]}
-                />*/}
-                <CustomButton text={'Log in with Facebook'} backgroundColor={'#3b5998'} borderWidth={0} color={'#fff'} fontSize={18} width={350} height={50} onPress={()=>{navigate('LogIn');}}/>
-              </View>
-              <View style={styles.signupBtnView}>
-                <Text style={{ color: '#fff', fontSize: 16 }}>
-                  {' '}Do not have an account?
-                </Text>
-                {/*<Button
-                  large
-                  iconRight={{
-                    name: 'angle-right',
-                    type: 'font-awesome',
-                    color: '#fff',
-                  }}
-                  title="Sign up"
-                  //backgroundColor='transparent'
-                  color="#fff"
-                  buttonStyle={[
-                    styles.singupBtn,
-                    { backgroundColor: 'transparent' },
-                  ]}
-                  onPress={() => {
-                    navigate('SignUp');
-                  }}
-                />*/}
-                <View style={{ marginTop: 20 }}>
-                  <CustomButton text={'Sign up'} backgroundColor={'transparent'} borderWidth={1} borderColor={'#fff'} color={'#fff'} fontSize={18} width={350} height={50} onPress={()=>{navigate('SignUp');}}/>
-                </View>
-              </View>
-              </BlurView>
-            </Image>
-          </View>)
+          <TabScreen /> : <OnBoarding onPress={() => {
+            //navigate('Welcome')
+            this.props.navigation.dispatch(resetAction)
+          }
+          } />)
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // alignItems: 'center',
-    //justifyContent: 'center',
-    //paddingTop: Constants.statusBarHeight,
-    backgroundColor: 'transparent',
-  },
-  imageBg: {
-    flex: 1,
-    width: null,
-    height: null,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  titleView: {
-    //flex: 1,
-    height: 320,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    //margin: 24,
-    fontSize: 50,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#fff',
-  },
-  description: {
-    textAlign: 'center',
-    color: '#fff',
-    fontSize: 16,
-    marginTop: 20,
-  },
-  loginBtnView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: 40
-  },
-  loginBtn: {
-    marginLeft: 50,
-    marginRight: 50,
-    marginTop: 40,
-    width: 350,
-    borderRadius: 50,
-  },
-  signupBtnView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  singupBtn: {
-    paddingLeft: 50,
-    paddingRight: 50,
-    marginTop: 20,
-    borderColor: '#fff',
-    borderWidth: 1,
-    borderRadius: 50,
-    width: 346,
-  },
-});

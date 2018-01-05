@@ -28,6 +28,7 @@
     "react-native-lightbox": "^0.7.0",
     "react-native-maps": "^0.19.0",
     "react-native-modal": "^4.1.1",
+    "react-native-onboarding-component": "0.0.3",
     "react-native-parallax-scroll-view": "^0.20.1",
     "react-native-popup-dialog": "^0.9.39",
     "react-native-segmented-control-tab": "^3.2.1",
