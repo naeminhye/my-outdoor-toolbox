@@ -1,10 +1,7 @@
 # my-outdoor-toolbox
 
-### Môn: Lập trình ứng dụng di động SE346.I12 (HK1-2017-2018)
+### Đồ án: Xây dựng ứng dụng hỗ trợ hoạt động ngoài trời sử dụng React Native, Expo và Firebase
+## Project: Build Outdoor Activities Assistant Application using React Native, Expo and Firebase
 
-### Nhóm
-Tên: Tyrannosaurus Rex
-
-Thành Viên: Nguyễn Minh Hiếu - 14520287
-
+Xem demo bằng Expo Client tại link: https://expo.io/@naeminhye/my-outdoor-toolbox
 Please feel free to see the demo at: https://expo.io/@naeminhye/my-outdoor-toolbox
