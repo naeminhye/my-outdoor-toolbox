@@ -6,3 +6,5 @@
 Tên: Tyrannosaurus Rex
 
 Thành Viên: Nguyễn Minh Hiếu - 14520287
+
+Please feel free to see the demo at: https://expo.io/@naeminhye/my-outdoor-toolbox
